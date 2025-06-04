@@ -54,7 +54,7 @@ export default defineNuxtConfig({
   nitro: {
     esbuild: {
       options: {
-        target: 'esnext'
+        target: 'node18' // Changed from 'esnext' to 'node18'
       }
     },
     prerender: {
