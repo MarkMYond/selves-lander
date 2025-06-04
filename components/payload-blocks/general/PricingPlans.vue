@@ -5,7 +5,7 @@
         v-if="title"
         :title="title"
         :subtitle="block.mainCtaText && block.mainCtaLink ? null : 'Choose the plan that\'s right for you.'" 
-        :eyebrowText="block.eyebrowText"  // This will error until eyebrowText is added to block
+        :eyebrowText="block.eyebrowText"
         class="text-center mb-8 md:mb-12"
         :theme="sectionBgColorValue === 'brand-900' || sectionBgColorValue === 'brand-primary' ? 'dark' : 'light'"
       />

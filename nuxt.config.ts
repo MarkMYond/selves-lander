@@ -54,7 +54,15 @@ export default defineNuxtConfig({
   nitro: {
     esbuild: {
       options: {
-        target: 'node18' // Changed from 'esnext' to 'node18'
+        target: 'node20' // Updated to node20 for better Vercel compatibility
+      }
+    },
+    // Set preset first
+    preset: 'vercel',
+    // Add explicit Node.js runtime for Vercel
+    vercel: {
+      functions: {
+        runtime: 'nodejs20.x'
       }
     },
     prerender: {
@@ -91,7 +99,6 @@ export default defineNuxtConfig({
       // Removed '/**/_payload.json': { ssr: false, prerender: false }
     },
     // Add Vercel-specific optimizations
-    preset: 'vercel'
   },
 
   // Performance optimization

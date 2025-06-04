@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'vue-bundle-renderer/runtime';
-import { e as buildAssetsURL, u as useRuntimeConfig, f as getResponseStatusText, h as getResponseStatus, i as defineRenderHandler, p as publicAssetsURL, g as getQuery, c as createError, j as getRouteRules, k as useNitroApp } from '../nitro/nitro.mjs';
+import { e as buildAssetsURL, u as useRuntimeConfig, f as getResponseStatusText, h as getResponseStatus, i as defineRenderHandler, p as publicAssetsURL, j as getQuery, k as createError, l as getRouteRules, m as useNitroApp } from '../nitro/nitro.mjs';
 import { renderToString } from 'vue/server-renderer';
 import { createHead as createHead$1, propsToString, renderSSRHead } from 'unhead/server';
 import { stringify, uneval } from 'devalue';
