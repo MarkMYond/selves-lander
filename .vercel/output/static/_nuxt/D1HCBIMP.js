@@ -1,1 +1,0 @@
-import{U as t,V as n,W as r,E as s,X as o}from"./BfbKYXm_.js";function a(a,e={}){const u=function(t){const a=t||n();return a?.ssrContext?.head||a?.runWithContext((()=>{if(r())return s(o)}))}(e.nuxt);if(u)return t(a,{head:u,...e})}export{a as u};

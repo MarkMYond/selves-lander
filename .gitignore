@@ -37,6 +37,7 @@ out
 # Nuxt.js build output
 .nuxt
 dist
+.output/
 
 # Gatsby build output
 .cache/
@@ -79,6 +80,9 @@ bun.lockb
 # Payload specific
 build/
 .payload-scss-cache/
+
+# Vercel build artifacts
+.vercel/
 
 original_payload_config.ts
 env
