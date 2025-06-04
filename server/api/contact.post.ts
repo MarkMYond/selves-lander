@@ -50,7 +50,14 @@ export default defineEventHandler(async (event) => {
     };
 
     // Configure your "from" address (must be a verified domain with Resend)
-    const configuredFromEmail = runtimeConfig.public.resendFromEmail || process.env.NUXT_RESEND_FROM_EMAIL;
+    const configuredFromEmailViaRuntime = runtimeConfig.public.resendFromEmail;
+    const configuredFromEmailViaProcessEnv = process.env.NUXT_PUBLIC_RESEND_FROM_EMAIL;
+
+    console.log('[Contact API] Debug From Email:');
+    console.log('[Contact API] runtimeConfig.public.resendFromEmail:', configuredFromEmailViaRuntime, `(Type: ${typeof configuredFromEmailViaRuntime})`);
+    console.log('[Contact API] process.env.NUXT_PUBLIC_RESEND_FROM_EMAIL:', configuredFromEmailViaProcessEnv, `(Type: ${typeof configuredFromEmailViaProcessEnv})`);
+    
+    const configuredFromEmail = configuredFromEmailViaRuntime || configuredFromEmailViaProcessEnv;
     if (!configuredFromEmail || typeof configuredFromEmail !== 'string' || configuredFromEmail.trim() === '') {
       console.error('From email is not configured correctly. Please set NUXT_PUBLIC_RESEND_FROM_EMAIL or runtimeConfig.public.resendFromEmail.');
       // Fallback to a generic noreply, but this should be configured properly.
