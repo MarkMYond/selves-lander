@@ -7,10 +7,10 @@
         class="bg-brandNeutral-02 rounded-xl p-12 md:p-16 flex flex-col gap-y-12 relative overflow-hidden"
       >
         <!-- Grid Background Pattern -->
-        <div class="absolute inset-0 z-10 bg-[url('/webflow-assets/images/pattern-hero3.png')] bg-center bg-no-repeat bg-cover opacity-20"></div>
+        <div class="absolute inset-0 z-10 bg-[url('~/assets/images/pattern-hero3.png')] bg-center bg-no-repeat bg-cover opacity-20"></div>
         
         <!-- Arrow Background Element -->
-        <div class="overview-arrow-shape absolute z-0 bottom-0 left-0 w-full h-full bg-[url('/webflow-assets/images/overview-arrow-shape.svg')] bg-bottom-left bg-no-repeat opacity-30" style="background-size: 100%;"></div>
+        <div class="overview-arrow-shape absolute z-0 bottom-0 left-0 w-full h-full bg-[url('~/assets/images/overview-arrow-shape.svg')] bg-bottom-left bg-no-repeat opacity-30" style="background-size: 100%;"></div>
         <div class="overview-top-content flex flex-col md:grid md:grid-cols-2 items-stretch gap-x-8 md:gap-x-12 relative z-20">
           <div class="overview-left-content flex flex-col items-start justify-center gap-y-10 w-full md:col-span-1">
             <div class="context-text-block flex flex-col space-y-2">

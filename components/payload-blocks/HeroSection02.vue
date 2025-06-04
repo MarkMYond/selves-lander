@@ -57,7 +57,7 @@
               <div class="mr-2">
                 <p class="text-body-14 font-medium">{{ props.block?.arrowButtonText }}</p> <!-- Typography -->
               </div>
-              <img src="/webflow-assets/images/shape-1.svg" loading="lazy" alt="Arrow Shape" class="h-5 w-5">
+              <img src="~/assets/images/shape-1.svg" loading="lazy" alt="Arrow Shape" class="h-5 w-5">
             </div>
           </div>
         </div>
@@ -175,7 +175,7 @@ onMounted(() => {
 .hero-background-pattern { /* Styles for background on the outer section */
   position: relative; /* Added for positioning */
   top: -5.625rem; /* Pulls section up by 90px (5rem + 10px). Adjust as needed. */
-  background-image: url('/assets/images/pattern-shape2.png');
+  background-image: url('~/assets/images/pattern-shape2.png');
   background-position: 0% 0%; /* Top left */
   background-repeat: no-repeat;
   background-size: cover; 
