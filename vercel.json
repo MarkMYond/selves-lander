@@ -4,7 +4,7 @@
   "installCommand": "npm install --include=optional",
   "functions": {
     "**/*.func": {
-      "runtime": "nodejs20.x"
+      "runtime": "nodejs18.x"
     }
   },
   "routes": [
@@ -14,7 +14,7 @@
     }
   ],
   "env": {
-    "NUXT_PUBLIC_PAYLOAD_API_URL": "https://taash-payld.vercel.app"
+    "NUXT_PUBLIC_PAYLOAD_API_URL": "https://cms.taash.ai"
   },
   "github": {
     "silent": true,
