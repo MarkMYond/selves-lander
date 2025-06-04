@@ -65,15 +65,7 @@ body {
   padding: 2rem; /* p-8 */
   border-radius: 0.75rem; /* rounded-xl */
   /* box-shadow: theme('boxShadow.xl'); */ /* Optional: Add if shadow is desired */
-
-  /* Full-bleed effect */
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  box-sizing: border-box; /* Ensure padding is included in width calculations correctly with 100vw */
+  /* Removed full-bleed effect based on user feedback */
 }
 
 @media (min-width: 768px) { /* md breakpoint */
