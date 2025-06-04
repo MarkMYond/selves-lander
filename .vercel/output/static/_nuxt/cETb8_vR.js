@@ -1,0 +1,1 @@
+import{P as t,Q as n,R as r,G as s,S as o}from"./C0ajcZnf.js";function a(a,e={}){const u=function(t){const a=t||n();return a?.ssrContext?.head||a?.runWithContext((()=>{if(r())return s(o)}))}(e.nuxt);if(u)return t(a,{head:u,...e})}export{a as u};

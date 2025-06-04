@@ -1,0 +1,12 @@
+{
+  // https://nuxt.com/docs/guide/concepts/typescript
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/src/*": ["../payl/src/*"], // Maps @/src/... to ../payl/src/...
+      "@/*": ["./*"], // General fallback for @/...
+      "payload-types": ["../payl/src/payload-types"] // Specific alias for direct import if needed
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "installCommand": "npm install --include=optional",
+  "routes": [
+    {
+      "src": "/admin/(.*)",
+      "dest": "https://payload-sigma-ten.vercel.app/admin/$1"
+    }
+  ],
+  "env": {
+    "NUXT_PUBLIC_PAYLOAD_API_URL": "https://taash-payld.vercel.app"
+  },
+  "github": {
+    "silent": true,
+    "autoAlias": true,
+    "autoJobCancelation": true
+  }
+}

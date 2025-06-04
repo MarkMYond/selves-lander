@@ -1,0 +1,7 @@
+{
+  ...EXISTING_CONTENT,
+  "scripts": {
+    ...EXISTING_SCRIPTS,
+    "generate:wiki-nav": "node scripts/generate-wiki-navigation.js"
+  }
+}
