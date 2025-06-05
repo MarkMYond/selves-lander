@@ -1,12 +1,12 @@
 <template>
-  <div class="wiki-navigation bg-light-grey text-gray-800 p-4 rounded-md h-full">
+  <div class="wiki-navigation bg-transparent text-gray-800 p-4 rounded-md h-full"> <!-- Changed bg-light-grey to bg-transparent -->
     <!-- Top-level title for the entire Wiki Nav -->
     <NuxtLink v-if="navTitle" to="/wiki" prefetch class="block text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 rounded-md transition-colors duration-150 -ml-2 -mr-2 mb-1">
       <h3 class="text-lg font-semibold">{{ navTitle }}</h3>
     </NuxtLink>
 
     <!-- Loop through processed items: could be categories or top-level pages (if API changes later) -->
-    <ul v-if="navStore.processedNavigationItems && navStore.processedNavigationItems.length > 0" class="space-y-1">
+    <ul v-if="navStore.processedNavigationItems && navStore.processedNavigationItems.length > 0" class="space-y-0.5"> <!-- Changed space-y-1 to space-y-0.5 -->
       <li v-for="item in navStore.processedNavigationItems" :key="item.id">
         <!-- Item is a Category -->
         <div v-if="item.isCategory" class="category-item group">
@@ -26,7 +26,7 @@
               <span>{{ item.expanded ? '-' : '+' }}</span>
             </button>
           </div>
-          <ul v-if="item.expanded && item.children && item.children.length > 0" :id="`category-children-${item.id}`" class="ml-4 mt-1 pl-3 border-l border-primary-200 space-y-1">
+          <ul v-if="item.expanded && item.children && item.children.length > 0" :id="`category-children-${item.id}`" class="ml-4 mt-1 pl-3 border-l border-primary-200 space-y-0.5"> <!-- Changed space-y-1 to space-y-0.5 -->
             <!-- Loop through pages within this category -->
             <li v-for="page in item.children" :key="page.id" class="page-item">
               <div class="flex items-center justify-between group">
@@ -60,7 +60,7 @@
                 </button>
               </div>
               <!-- Sub-pages of this page (recursive structure for pages) -->
-              <ul v-if="page.expanded && page.children && page.children.length > 0" class="ml-6 mt-1 pl-3 border-l border-primary-200 space-y-1">
+              <ul v-if="page.expanded && page.children && page.children.length > 0" class="ml-6 mt-1 pl-3 border-l border-primary-200 space-y-0.5"> <!-- Changed space-y-1 to space-y-0.5 -->
                 <li v-for="childPage in page.children" :key="childPage.id" class="sub-page-item">
                   <NuxtLink
                     :to="`/wiki/${childPage.slug}`"
@@ -125,7 +125,7 @@
               <span>{{ item.expanded ? '-' : '+' }}</span>
             </button>
           </div>
-          <ul v-if="item.expanded && item.children && item.children.length > 0" class="ml-6 mt-1 pl-3 border-l border-primary-200 space-y-1">
+          <ul v-if="item.expanded && item.children && item.children.length > 0" class="ml-6 mt-1 pl-3 border-l border-primary-200 space-y-0.5"> <!-- Changed space-y-1 to space-y-0.5 -->
             <li v-for="child in item.children" :key="child.id" class="sub-page-item">
               <NuxtLink
                 :to="`/wiki/${child.slug}`"
