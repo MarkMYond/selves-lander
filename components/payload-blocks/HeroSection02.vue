@@ -90,15 +90,41 @@ if (props.block?.buttons) {
   }
 }
 
-// Helper function to get button URL based on HeroSection02Payload button structure
+// Helper function to determine if a link is truly external (starts with http, https, //)
+const isTrulyExternalUrl = (url?: string): boolean => {
+  if (!url) return false;
+  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//');
+};
+
+// Revised Helper function to determine if a button is an internal link
+const isInternalLink = (button?: any): boolean => {
+  if (!button) return false;
+  if (button.type === 'internal') return true;
+  if (button.type === 'external') {
+    // If type is external, but the link is a relative path, treat as internal for Nuxt routing
+    if (button.externalLink && button.externalLink.startsWith('/') && !isTrulyExternalUrl(button.externalLink)) {
+      return true; 
+    }
+    return false; // It's a true external link or type is external without a relative path
+  }
+  // Fallback if type is not set:
+  // Prefer internal if internalLink is present and externalLink is not, 
+  // or if externalLink is a relative path and internalLink is not present.
+  if (button.internalLink && !button.externalLink) return true;
+  if (button.externalLink && button.externalLink.startsWith('/') && !isTrulyExternalUrl(button.externalLink) && !button.internalLink) return true;
+  
+  return false; // Default to external if ambiguous or truly external
+};
+
+// Revised Helper function to get button URL
 const getButtonUrl = (button?: any): string => {
   if (!button) return '#';
 
-  const internal = isInternalLink(button); // Determine if it's internal based on type or fallback
+  const isEffectivelyInternal = isInternalLink(button);
 
-  if (internal) {
-    // Process internal link
-    if (button.internalLink) {
+  if (isEffectivelyInternal) {
+    // If type was 'internal', prioritize internalLink field
+    if (button.type === 'internal' && button.internalLink) {
       const internalValue = button.internalLink;
       if (typeof internalValue === 'object' && internalValue !== null && 'slug' in internalValue && typeof internalValue.slug === 'string') {
         return `/${internalValue.slug}`;
@@ -107,46 +133,38 @@ const getButtonUrl = (button?: any): string => {
         return internalValue.startsWith('/') ? internalValue : `/${internalValue}`;
       }
     }
-  } else {
-    // Process external link
+    // If type was 'external' but externalLink is a relative path (now treated as internal)
+    if (button.externalLink && button.externalLink.startsWith('/') && !isTrulyExternalUrl(button.externalLink)) {
+      return button.externalLink;
+    }
+    // Fallback for effectively internal if internalLink was primary but malformed or type was missing
+    if (button.internalLink) { 
+        const internalValue = button.internalLink;
+        if (typeof internalValue === 'object' && internalValue !== null && 'slug' in internalValue && typeof internalValue.slug === 'string') return `/${internalValue.slug}`;
+        if (typeof internalValue === 'string') return internalValue.startsWith('/') ? internalValue : `/${internalValue}`;
+    }
+  } else { // Truly External link (type was 'external' and externalLink is a full URL)
     if (button.externalLink) {
       return button.externalLink;
     }
   }
-  
-  return '#'; // Fallback if no valid link found for the determined type
+  return '#'; // Fallback if no valid link found
 };
 
-// Helper function to determine if a button is an internal link
-const isInternalLink = (button?: any): boolean => {
-  if (!button) {
-    return false;
-  }
-  
-  // Check the type field first if it exists
-  if (button.type) {
-    const isInternal = button.type === 'internal';
-    return isInternal;
-  }
-  
-  // Fallback: If button has internalLink and no externalLink, it's internal
-  // If button has externalLink, it's external
-  const hasInternal = !!button.internalLink;
-  const hasExternal = !!button.externalLink;
-  const isInternal = hasInternal && !hasExternal;
-  return isInternal;
-};
-
-// Helper function to determine if link should open in new tab
+// Revised Helper function to determine if link should open in new tab
 const shouldOpenInNewTab = (button?: any): boolean => {
-  if (!button) {
-    return false;
-  }
+  if (!button) return false;
   
-  // For external links, always open in new tab for security
-  // Internal links can optionally open in new tab based on configuration
-  const shouldOpen = !!button?.externalLink || !!button?.newTab;
-  return shouldOpen;
+  // Open in new tab if newTab is explicitly true
+  if (button.newTab === true) return true;
+  
+  // Open in new tab if it's a truly external URL (and newTab is not explicitly false)
+  // This means type: 'external' with a full URL like https://...
+  // We use getButtonUrl to ensure we are checking the final URL that will be used.
+  const url = getButtonUrl(button);
+  if (isTrulyExternalUrl(url) && button.newTab !== false) return true;
+  
+  return false;
 };
 
 // Log generated URLs for debugging
