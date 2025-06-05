@@ -92,30 +92,29 @@ if (props.block?.buttons) {
 
 // Helper function to get button URL based on HeroSection02Payload button structure
 const getButtonUrl = (button?: any): string => {
-  if (!button) {
-    return '#';
-  }
+  if (!button) return '#';
 
-  // Check for internal link first
-  if (button.internalLink) { 
-    const internalValue = button.internalLink; // internalValue is string | WebPage
-    if (typeof internalValue === 'object' && internalValue !== null && 'slug' in internalValue && typeof internalValue.slug === 'string') {
-      const url = `/${internalValue.slug}`;
-      return url; // It's a WebPage object
+  const internal = isInternalLink(button); // Determine if it's internal based on type or fallback
+
+  if (internal) {
+    // Process internal link
+    if (button.internalLink) {
+      const internalValue = button.internalLink;
+      if (typeof internalValue === 'object' && internalValue !== null && 'slug' in internalValue && typeof internalValue.slug === 'string') {
+        return `/${internalValue.slug}`;
+      }
+      if (typeof internalValue === 'string') {
+        return internalValue.startsWith('/') ? internalValue : `/${internalValue}`;
+      }
     }
-    if (typeof internalValue === 'string') {
-      // It's an ID or a slug/path string
-      const url = internalValue.startsWith('/') ? internalValue : `/${internalValue}`;
-      return url;
+  } else {
+    // Process external link
+    if (button.externalLink) {
+      return button.externalLink;
     }
   }
   
-  // Check for external link
-  if (button.externalLink) {
-    return button.externalLink;
-  }
-  
-  return '#';
+  return '#'; // Fallback if no valid link found for the determined type
 };
 
 // Helper function to determine if a button is an internal link
