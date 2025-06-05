@@ -1,14 +1,14 @@
 <template>
   <div class="section-header text-left space-y-2 md:flex md:flex-row md:items-start md:gap-8">
     <!-- Text Content Column -->
-    <div :class="[titleImage ? 'md:w-3/4' : 'md:w-full', 'space-y-2']">
+    <div :class="[titleImage && typeof titleImage === 'object' && titleImage.url ? 'md:w-3/4' : 'md:w-full', 'space-y-2']">
       <div v-if="eyebrowText" 
            class="inline-block px-4 py-1 rounded-full"
            :class="[eyebrowBackgroundColorClass]">
         <p class="text-body-14 font-medium text-brandNeutral-04">{{ eyebrowText }}</p>
       </div>
       <div class="space-y-4">
-        <h2 v-if="title" class="text-h3 md:text-h2 font-bold text-brandNeutral-04 max-w-xl leading-[1.1]" v-html="title"></h2> <!-- Set line-height to 1.1, changed max-w-lg to max-w-xl -->
+        <h2 v-if="title" class="text-h3 md:text-h2 font-bold text-brandNeutral-04 max-w-xl leading-[1.1]" v-html="title"></h2>
         <p v-if="subtitle" class="text-body-18 text-brandNeutral-03 max-w-2xl" v-html="subtitle"></p>
       </div>
     </div>

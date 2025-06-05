@@ -15,7 +15,7 @@
             :aria-expanded="item.expanded ? 'true' : 'false'"
             :aria-controls="`category-children-${item.id}`"
           >
-            <h4 class="font-semibold text-md align-middle uppercase text-brandNeutral-04">{{ item.title }}</h4>
+            <h4 class="font-semibold text-sm align-middle uppercase text-brandNeutral-04">{{ item.title }}</h4>
             <button
               v-if="item.children && item.children.length > 0"
               class="p-1 ml-2 rounded-md text-brandNeutral-04 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
