@@ -6,7 +6,7 @@
     </NuxtLink>
 
     <!-- Loop through processed items: could be categories or top-level pages (if API changes later) -->
-    <ul v-if="navStore.processedNavigationItems && navStore.processedNavigationItems.length > 0" class="space-y-0"> <!-- Changed space-y-0.5 to space-y-0 -->
+    <ul v-if="navStore.processedNavigationItems && navStore.processedNavigationItems.length > 0" class="space-y-1"> <!-- Reverted to space-y-1 for top-level items -->
       <li v-for="item in navStore.processedNavigationItems" :key="item.id">
         <!-- Item is a Category -->
         <div v-if="item.isCategory" class="category-item group">
