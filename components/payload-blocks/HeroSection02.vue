@@ -82,6 +82,14 @@ const props = defineProps({
   },
 });
 
+// Log button data from Payload for debugging
+if (props.block?.buttons) {
+  console.log('[HeroSection02] Button 1 Data:', JSON.parse(JSON.stringify(props.block.buttons[0])));
+  if (props.block.buttons[1]) {
+    console.log('[HeroSection02] Button 2 Data:', JSON.parse(JSON.stringify(props.block.buttons[1])));
+  }
+}
+
 // Helper function to get button URL based on HeroSection02Payload button structure
 const getButtonUrl = (button?: any): string => {
   if (!button) {
@@ -141,6 +149,14 @@ const shouldOpenInNewTab = (button?: any): boolean => {
   const shouldOpen = !!button?.externalLink || !!button?.newTab;
   return shouldOpen;
 };
+
+// Log generated URLs for debugging
+if (props.block?.buttons && props.block.buttons[0]) {
+  console.log('[HeroSection02] Button 1 - isInternal:', isInternalLink(props.block.buttons[0]), 'URL:', getButtonUrl(props.block.buttons[0]));
+}
+if (props.block?.buttons && props.block.buttons[1]) {
+  console.log('[HeroSection02] Button 2 - isInternal:', isInternalLink(props.block.buttons[1]), 'URL:', getButtonUrl(props.block.buttons[1]));
+}
 
 // Use the composable for image URL
 const mediaHelpers = useMediaUrl(); // Call composable and store its result
