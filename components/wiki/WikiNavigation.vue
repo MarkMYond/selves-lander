@@ -1,7 +1,7 @@
 <template>
   <div class="wiki-navigation bg-transparent text-gray-800 p-4 rounded-md h-full"> <!-- Changed bg-light-grey to bg-transparent -->
     <!-- Top-level title for the entire Wiki Nav -->
-    <NuxtLink v-if="navTitle" to="/wiki" prefetch class="block text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 rounded-md transition-colors duration-150 -ml-2 -mr-2 mb-1">
+    <NuxtLink v-if="navTitle" to="/wiki" prefetch class="block text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 rounded-md transition-colors duration-150 -ml-1 -mr-1 mb-0.5">
       <h3 class="text-lg font-semibold">{{ navTitle }}</h3>
     </NuxtLink>
 
@@ -12,14 +12,14 @@
         <div v-if="item.isCategory" class="category-item group">
           <div 
             @click="() => navStore.toggleExpand(item.id)"
-            class="flex items-center justify-between cursor-pointer text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 rounded-md transition-colors duration-150"
+            class="flex items-center justify-between cursor-pointer text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 rounded-md transition-colors duration-150"
             role="button"
             :aria-expanded="item.expanded ? 'true' : 'false'"
             :aria-controls="`category-children-${item.id}`"
           >
             <h4 class="font-semibold text-md align-middle uppercase text-brandNeutral-04">{{ item.title }}</h4>
             <button
-              vif="item.children && item.children.length > 0"
+              v-if="item.children && item.children.length > 0"
               class="p-1 ml-2 rounded-md text-brandNeutral-04 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
               :aria-label="item.expanded ? `Collapse ${item.title}` : `Expand ${item.title}`"
             >
@@ -33,7 +33,7 @@
                 <NuxtLink
                   :to="`/wiki/${page.slug}`"
                   prefetch
-                  class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 rounded-md transition-colors duration-150"
+                  class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 rounded-md transition-colors duration-150"
                   active-class="bg-purple-light text-primary-700 font-semibold"
                 >
                   <!--
@@ -65,7 +65,7 @@
                   <NuxtLink
                     :to="`/wiki/${childPage.slug}`"
                     prefetch
-                    class="flex items-center text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 block rounded-md transition-colors duration-150 text-sm"
+                    class="flex items-center text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 block rounded-md transition-colors duration-150 text-sm"
                     active-class="bg-purple-light text-primary-700 font-semibold"
                   >
                     <!--
@@ -99,7 +99,7 @@
             <NuxtLink
               :to="`/wiki/${item.slug}`"
               prefetch
-              class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 rounded-md transition-colors duration-150"
+              class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 rounded-md transition-colors duration-150"
               active-class="bg-purple-light text-primary-700 font-semibold"
             >
               <!--
@@ -130,7 +130,7 @@
               <NuxtLink
                 :to="`/wiki/${child.slug}`"
                 prefetch
-                class="flex items-center text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 block rounded-md transition-colors duration-150 text-sm"
+                class="flex items-center text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 block rounded-md transition-colors duration-150 text-sm"
                 active-class="bg-purple-light text-primary-700 font-semibold"
               >
                 <component 
