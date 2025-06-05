@@ -81,7 +81,7 @@ const iconComponents: Record<string, Component> = {
 const getIconComponent = (iconName?: string): Component => (iconName && iconComponents[iconName]) || iconComponents.Default;
 
 const props = defineProps({
-  navTitle: { type: String, default: 'Wiki Menu' },
+  navTitle: { type: String, default: 'Wiki Home' },
   currentParentId: { type: String as PropType<string | null | undefined>, default: null },
 });
 

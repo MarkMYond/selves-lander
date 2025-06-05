@@ -1,7 +1,7 @@
 <template>
   <RegistryLayout
     :nav-parent-id="null"
-    nav-title="Registry Menu"
+    nav-title="Registry Home"
     :isLeftSidebarOpen="isLeftSidebarOpen"
     @closeLeftSidebar="isLeftSidebarOpen = false"
   >

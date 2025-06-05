@@ -199,7 +199,7 @@ const getIconComponent = (iconName?: string): Component =>
   (iconName && iconComponents[iconName]) || iconComponents.Default
 
 const props = defineProps({
-  navTitle: { type: String, default: 'Registry Menu' },
+  navTitle: { type: String, default: 'Registry Home' },
   currentParentId: {
     type: String as PropType<string | null | undefined>,
     default: null,

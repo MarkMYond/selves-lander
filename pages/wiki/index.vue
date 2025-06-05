@@ -1,7 +1,7 @@
 <template>
   <WikiLayout
     :nav-parent-id="null"
-    nav-title="Wiki Menu"
+    nav-title="Wiki Home"
     :toc-items="[]"
     :is-right-sidebar-open="isRightSidebarOpen"
     :toggle-right-sidebar="toggleRightSidebar"

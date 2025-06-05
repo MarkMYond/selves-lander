@@ -282,7 +282,7 @@ const {
 const pageData = computed(() => pageResponse.value?.docs?.[0])
 
 const navParentId = null
-const navTitle = 'Wiki Menu'
+const navTitle = 'Wiki Home'
 
 // Fetch sibling navigation data for PagePrevNextNav
 const siblingNavData = ref<NavCategoryGroup[]>([])

@@ -4,10 +4,10 @@
       <NuxtLink
         :to="`/wiki/${item.slug}`"
         prefetch
-        class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 rounded-md transition-colors duration-150 text-sm"
+        class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 rounded-md transition-colors duration-150 text-sm flex items-center"
         active-class="bg-purple-light text-primary-700 font-semibold"
       >
-        <!-- Icon can be added here if needed, e.g., using getIconComponent(item.icon) -->
+        <Icon v-if="item.icon" :name="item.icon.startsWith('ph:') ? `ph:${item.icon.substring(3).toLowerCase()}` : `ph:${item.icon.toLowerCase()}`" class="mr-2 h-4 w-4 flex-shrink-0" />
         <span class="align-middle [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']">{{ item.title }}</span>
       </NuxtLink>
       <button
@@ -22,11 +22,11 @@
       </button>
     </div>
     <ul v-if="item.expanded && item.children && item.children.length > 0" 
-        :class="['mt-1 pl-3 border-l border-primary-200 space-y-0', `ml-${(level + 1) * 2}`]"> {/* Dynamic margin-left for indentation */}
+        :class="['mt-1 pl-3 border-l border-primary-200 space-y-0']" :style="{ marginLeft: `${(level + 1) * 0.5}rem` }">
       <NavItemRecursive v-for="childItem in item.children" :key="childItem.id" :item="childItem" :level="level + 1" />
     </ul>
     <p v-if="item.expanded && item.children && item.children.length === 0 && !item.loadingChildren && item.hasChildren" 
-       :class="['mt-1 pl-3 text-xs text-gray-500', `ml-${(level + 1) * 2}`]">
+       :class="['mt-1 pl-3 text-xs text-gray-500']" :style="{ marginLeft: `${(level + 1) * 0.5}rem` }">
       No sub-pages.
     </p>
   </li>
@@ -77,5 +77,4 @@ const navStore = useWikiNavStore();
 
 <style scoped>
 /* Scoped styles for NavItemRecursive if needed */
-/* Indentation is handled dynamically via :class binding on the ul */
 </style>
