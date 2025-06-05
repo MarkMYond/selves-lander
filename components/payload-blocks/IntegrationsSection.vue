@@ -41,9 +41,11 @@
         </div>
 
         <!-- Button -->
-        <div v-if="block.button && block.button.text && block.button.url" class="text-left"> <!-- Alignment: text-left, removed mt-8 -->
+        <div v-if="block.button && block.button.text" class="text-left"> <!-- block.button.url check removed, getButtonUrl handles undefined -->
           <BaseButton
-            :to="block.button.url"
+            :to="isInternalLink(block.button) ? getButtonUrl(block.button) : undefined"
+            :href="!isInternalLink(block.button) ? getButtonUrl(block.button) : undefined"
+            :target="shouldOpenInNewTab(block.button) ? '_blank' : undefined"
             :variant="block.button.variant as any || 'primary'"
             class="px-8 md:px-10 rounded-full"
           >
@@ -56,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'; // Added computed if it's used by helpers, defineProps is auto-imported
 import { useMediaUrl } from '../../composables/useMediaUrl';
 import type { Media } from '../../src/payload-types';
 import BaseButton from '@/components/ui/BaseButton.vue'; // Import BaseButton
@@ -74,8 +77,13 @@ interface LogoEntry {
 
 interface ButtonData {
   text: string;
-  url: string;
+  url: string; // This is the simple URL string from Payload for this block
   variant?: 'border' | 'primary' | 'secondary' | 'tertiary';
+  // Potentially, if Payload data for this button is enriched to match HeroSection02:
+  type?: 'internal' | 'external';
+  internalLink?: string | { slug?: string }; // Assuming internalLink could be object or string
+  externalLink?: string;
+  newTab?: boolean;
 }
 
 interface IntegrationsSectionBlockProps {
@@ -85,14 +93,116 @@ interface IntegrationsSectionBlockProps {
   description?: string;
   titleImage?: Media | string | null; // Added titleImage
   logos?: LogoEntry[];
-  button?: ButtonData;
+  button?: ButtonData; // This can now accommodate richer link fields if present
 }
 
 const props = defineProps<{
   block: IntegrationsSectionBlockProps;
 }>();
 
+// Log button data from Payload for debugging
+if (props.block?.button) {
+  console.log('[IntegrationsSection] Button Data:', JSON.parse(JSON.stringify(props.block.button)));
+}
+
 const { getMediaUrl } = useMediaUrl();
+
+// --- Link Helper Functions (adapted for ButtonData or richer link objects) ---
+const isTrulyExternalUrl = (url?: string): boolean => {
+  if (!url) return false;
+  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//');
+};
+
+// Adjusted to accept ButtonData or a more complex link object like in HeroSection02
+const isInternalLink = (button?: ButtonData | any): boolean => {
+  if (!button) return false;
+
+  // If button object has a 'type' field (like from a linkGroup in HeroSection02)
+  if (button.type && typeof button.type === 'string') {
+    const linkButton = button as any;
+    if (linkButton.type === 'internal') return true;
+    if (linkButton.type === 'external') {
+      if (linkButton.externalLink && typeof linkButton.externalLink === 'string' && linkButton.externalLink.startsWith('/') && !isTrulyExternalUrl(linkButton.externalLink)) {
+        return true; // Treat relative externalLink as internal
+      }
+      return false; // Truly external or type is external without a relative path
+    }
+  }
+
+  // Fallback for simple ButtonData (like in IntegrationsSection) with just a 'url'
+  if (button.url && typeof button.url === 'string') {
+    return button.url.startsWith('/') && !isTrulyExternalUrl(button.url);
+  }
+
+  // Fallback if type is not set but link fields are present (more like HeroSection02's button object)
+  if (button.internalLink && !button.externalLink) return true;
+  if (button.externalLink && typeof button.externalLink === 'string' && button.externalLink.startsWith('/') && !isTrulyExternalUrl(button.externalLink) && !button.internalLink) return true;
+  
+  return false; 
+};
+
+const getButtonUrl = (button?: ButtonData | any): string => {
+  if (!button) return '#';
+
+  const isEffectivelyInternal = isInternalLink(button);
+
+  if (isEffectivelyInternal) {
+    // Case 1: Rich link object with 'type' and 'internalLink' (like HeroSection02)
+    if (button.type === 'internal' && button.internalLink) {
+      const internalValue = button.internalLink;
+      if (typeof internalValue === 'object' && internalValue !== null && 'slug' in internalValue && typeof internalValue.slug === 'string') {
+        return `/${internalValue.slug}`;
+      }
+      if (typeof internalValue === 'string') {
+        return internalValue.startsWith('/') ? internalValue : `/${internalValue}`;
+      }
+    }
+    // Case 2: Rich link object with 'type'='external' but 'externalLink' is a relative path
+    if (button.type === 'external' && button.externalLink && typeof button.externalLink === 'string' && button.externalLink.startsWith('/') && !isTrulyExternalUrl(button.externalLink)) {
+      return button.externalLink;
+    }
+    // Case 3: Simple ButtonData object with 'url' being a relative path
+    if (button.url && typeof button.url === 'string' && button.url.startsWith('/') && !isTrulyExternalUrl(button.url)) {
+      return button.url;
+    }
+    // Fallback for effectively internal if internalLink field exists (e.g. from HeroSection02 type button if type was missing)
+    if (button.internalLink) { 
+        const internalValue = button.internalLink;
+        if (typeof internalValue === 'object' && internalValue !== null && 'slug' in internalValue && typeof internalValue.slug === 'string') return `/${internalValue.slug}`;
+        if (typeof internalValue === 'string') return internalValue.startsWith('/') ? internalValue : `/${internalValue}`;
+    }
+  } else { // Truly External link
+     // Case 1: Rich link object with 'type'='external' and 'externalLink'
+     if (button.type === 'external' && button.externalLink && typeof button.externalLink === 'string') {
+      return button.externalLink;
+    }
+    // Case 2: Simple ButtonData object with 'url' being a full external URL
+    if (button.url && typeof button.url === 'string' && isTrulyExternalUrl(button.url)) {
+      return button.url;
+    }
+  }
+  // Fallback to raw button.url if present and not caught above, otherwise '#'
+  return (typeof button.url === 'string' ? button.url : '#');
+};
+
+const shouldOpenInNewTab = (button?: ButtonData | any): boolean => {
+  if (!button) return false;
+  
+  // If button object has a 'newTab' field (like from a linkGroup)
+  if ('newTab' in button && button.newTab === true) return true;
+  
+  const url = getButtonUrl(button); // Use the final determined URL
+  // Open in new tab if it's a truly external URL and newTab is not explicitly false
+  if (isTrulyExternalUrl(url) && (!('newTab' in button) || button.newTab !== false)) return true;
+  
+  return false;
+};
+
+// Log processed link for debugging
+if (props.block?.button) {
+  console.log('[IntegrationsSection] Processed Button - isInternal:', isInternalLink(props.block.button), 'URL:', getButtonUrl(props.block.button), 'NewTab:', shouldOpenInNewTab(props.block.button));
+}
+// --- End of Link Helper Functions ---
 
 const getTooltipTextColorClass = (bgColorValue?: string) => {
   // These are the 'value' fields from logoBgColorOptions in IntegrationsSection.ts
