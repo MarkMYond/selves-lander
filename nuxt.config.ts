@@ -73,9 +73,9 @@ export default defineNuxtConfig({
     routeRules: {
       '/': { ssr: true },
       '/wiki': { ssr: true },
-      '/wiki/**': { swr: 3600, ssr: true },
+      '/wiki/**': { ssr: true }, // Removing SWR
       '/registry': { ssr: true },
-      '/registry/**': { swr: 3600, ssr: true },
+      '/registry/**': { ssr: true }, // Removing SWR
       '/favicon.svg': { cache: { maxAge: 60 * 60 * 24 * 30 } },
       '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
     },
