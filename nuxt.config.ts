@@ -37,7 +37,7 @@ export default defineNuxtConfig({
   */
 
   plugins: [
-    '~/plugins/phosphor-icons.ts',
+    // '~/plugins/phosphor-icons.ts', // Temporarily disable to test EMFILE issue
   ],
 
   nitro: {
