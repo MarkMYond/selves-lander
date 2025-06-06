@@ -17,14 +17,13 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxtjs/tailwindcss',
-    // 'nuxt-icon', // Temporarily disable to test EMFILE issue
+    'nuxt-icon',
     '@pinia/nuxt',
     '@nuxt/image',
   ],
 
-  /*
   icon: { 
-    // packs: ['ph'], 
+    packs: ['ph'], 
     aliases: {
       'user-duotone': 'ph:user-duotone',
       'house-duotone': 'ph:house-duotone',
@@ -34,10 +33,9 @@ export default defineNuxtConfig({
     },
     class: 'nuxt-icon',
   },
-  */
 
   plugins: [
-    // '~/plugins/phosphor-icons.ts', // Temporarily disable to test EMFILE issue
+    '~/plugins/phosphor-icons.ts',
   ],
 
   nitro: {

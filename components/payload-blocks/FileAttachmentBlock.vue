@@ -9,11 +9,11 @@
       rel="noopener noreferrer"
       class="flex items-center text-blue-600 hover:text-blue-800 hover:underline"
     >
-      <PhFile
+      <!-- <PhFile
         :size="18"
         class="mr-2 shrink-0"
-      />
-      <span class="font-medium">{{ displayLabel }}</span>
+      /> -->
+      <span class="font-medium">[F] {{ displayLabel }}</span> <!-- Placeholder for File icon -->
     </a>
   </div>
   <div
@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 import { computed } from 'vue'
-import { PhFile } from '@phosphor-icons/vue'
+// import { PhFile } from '@phosphor-icons/vue'
 import type { Media } from '../../../src/payload-types'
 import { useMediaUrl } from '../../composables/useMediaUrl'
 

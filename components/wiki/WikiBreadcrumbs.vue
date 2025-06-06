@@ -9,11 +9,11 @@
           to="/wiki"
           class="hover:text-gray-700 flex items-center"
         >
-          <PhHouse
+          <!-- <PhHouse
             :size="14"
             class="mr-1 shrink-0"
-          />
-          Taash
+          /> -->
+          Home
         </NuxtLink>
       </li>
       <li
@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { PhHouse } from '@phosphor-icons/vue'
+// import { PhHouse } from '@phosphor-icons/vue'
 
 interface WikiPage {
   _id: string
