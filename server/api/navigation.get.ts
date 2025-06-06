@@ -79,9 +79,9 @@ export default defineEventHandler(
     const section = query.section?.toString() // 'wiki' or 'registry'
 
     if (!section || !['wiki', 'registry'].includes(section)) {
-      console.warn(
-        'Navigation API: Invalid or missing section query parameter.'
-      )
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[navigation.get.ts] Invalid or missing section query parameter.');
+      }
       return [] // Return empty if section is invalid
     }
 
@@ -102,7 +102,9 @@ export default defineEventHandler(
         // sort: 'category,sort',
       }).toString()
 
-      console.log(`Fetching pages from: ${pagesApiUrl}?${pagesParams}`) // Log the fetch URL
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[navigation.get.ts] Fetching pages from: ${pagesApiUrl}?${pagesParams}`);
+      }
 
       let allPages: (WikiPage | RegistryPage)[] = []
       try {
@@ -114,21 +116,21 @@ export default defineEventHandler(
         })
 
         if (!pagesResponse || !Array.isArray(pagesResponse.docs)) {
-          console.error(
-            'Navigation API: Invalid pages response format from Payload.'
-          )
-          console.log('Using empty pages array as fallback.')
+          console.error('[navigation.get.ts] Invalid pages response format from Payload.');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[navigation.get.ts] Using empty pages array as fallback.');
+          }
         } else {
           allPages = pagesResponse.docs
-          console.log(
-            `Fetched ${allPages.length} pages for section ${section}.`
-          )
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[navigation.get.ts] Fetched ${allPages.length} pages for section ${section}.`);
+          }
         }
       } catch (err: any) {
-        console.error(
-          `Error fetching pages from Payload: ${err?.message || 'Unknown error'}`
-        )
-        console.log('Using empty pages array as fallback.')
+        console.error(`[navigation.get.ts] Error fetching pages from Payload: ${err?.message || 'Unknown error'}`);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[navigation.get.ts] Using empty pages array as fallback.');
+        }
         // Continue with empty pages rather than failing
       }
 
@@ -140,9 +142,9 @@ export default defineEventHandler(
         depth: '0', // No need to populate relations for categories themselves
       }).toString()
 
-      console.log(
-        `Fetching categories from: ${categoriesApiUrl}?${categoriesParams}`
-      )
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[navigation.get.ts] Fetching categories from: ${categoriesApiUrl}?${categoriesParams}`);
+      }
 
       let allCategories: Category[] = []
       let categoriesById: Record<string, Category> = {}
@@ -157,28 +159,32 @@ export default defineEventHandler(
         )
 
         if (!categoriesResponse || !Array.isArray(categoriesResponse.docs)) {
-          console.error(
-            'Navigation API: Invalid categories response format from Payload.'
-          )
-          console.log('Using empty categories array as fallback.')
+          console.error('[navigation.get.ts] Invalid categories response format from Payload.');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[navigation.get.ts] Using empty categories array as fallback.');
+          }
         } else {
           allCategories = categoriesResponse.docs
           categoriesById = Object.fromEntries(
             allCategories.map((cat) => [cat.id, cat])
           )
-          console.log(`Fetched ${allCategories.length} categories.`)
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[navigation.get.ts] Fetched ${allCategories.length} categories.`);
+          }
         }
       } catch (err: any) {
-        console.error(
-          `Error fetching categories from Payload: ${err?.message || 'Unknown error'}`
-        )
-        console.log('Using empty categories array as fallback.')
+        console.error(`[navigation.get.ts] Error fetching categories from Payload: ${err?.message || 'Unknown error'}`);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[navigation.get.ts] Using empty categories array as fallback.');
+        }
         // Continue with empty categories rather than failing
       }
 
       // 3. Build hierarchy from pages (includes sorting children and root pages)
       const rootPages = buildHierarchy(allPages)
-      console.log(`Built hierarchy with ${rootPages.length} root pages.`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[navigation.get.ts] Built hierarchy with ${rootPages.length} root pages.`);
+      }
 
       // 4. Group root pages by category
       const pagesByCategory: Record<string, NavPage[]> = {}
@@ -203,9 +209,9 @@ export default defineEventHandler(
           }
         } else {
           // Handle pages without a valid category
-          console.warn(
-            `Page "${page.title}" (ID: ${page.id}) has no valid category or category not found.`
-          )
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`[navigation.get.ts] Page "${page.title}" (ID: ${page.id}) has no valid category or category not found.`);
+          }
           const defaultCategoryId = 'uncategorized'
           if (!pagesByCategory[defaultCategoryId])
             pagesByCategory[defaultCategoryId] = []
@@ -246,32 +252,21 @@ export default defineEventHandler(
           pages: pagesByCategory['uncategorized'], // Pages are already sorted and filtered
         })
       }
-
-      console.log(
-        `Formatted navigation data with ${result.length} category groups.`
-      )
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[navigation.get.ts] Formatted navigation data with ${result.length} category groups.`);
+      }
       return result
     } catch (error: any) {
-      console.error(
-        `Error in navigation API handler for section "${section}":`,
-        error.message || error
-      )
+      console.error(`[navigation.get.ts] Error in navigation API handler for section "${section}":`, error.message || error);
       // Log the actual error response if available from $fetch
-      if (error.data) {
-        // Nuxt $fetch error structure
-        console.error(
-          'Payload API Error Response:',
-          error.statusCode,
-          error.statusMessage,
-          error.data
-        )
-      } else if (error.response) {
-        // Generic fetch error structure
-        console.error(
-          'Fetch Error Response:',
-          error.response.status,
-          error.response.statusText
-        )
+      if (process.env.NODE_ENV === 'development') { // More detailed logging for dev
+        if (error.data) {
+          // Nuxt $fetch error structure
+          console.error('[navigation.get.ts] Payload API Error Response:', error.statusCode, error.statusMessage, error.data);
+        } else if (error.response) {
+          // Generic fetch error structure
+          console.error('[navigation.get.ts] Fetch Error Response:', error.response.status, error.response.statusText);
+        }
       }
       throw createError({
         statusCode: error.statusCode || 500,

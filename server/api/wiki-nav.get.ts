@@ -28,9 +28,7 @@ interface NavItem {
   isCategory?: boolean
   children?: NavItem[]
   hasChildren?: boolean
-  pageId?: string
-  pageSlug?: string
-  pageIcon?: string
+  // pageId, pageSlug, pageIcon were redundant as id, slug, icon cover pages too
 }
 
 const buildPayloadQueryUrl = (
@@ -46,14 +44,16 @@ const buildPayloadQueryUrl = (
       const whereClauses = params[key] as Record<string, any>
       for (const field in whereClauses) {
         const condition = whereClauses[field]
+        // Handle operators like 'equals', 'in', 'exists', 'not_equals'
         if (typeof condition === 'object' && condition !== null) {
           for (const operator in condition) {
             apiQuery.append(
               `where[${field}][${operator}]`,
-              String(condition[operator])
+              String(condition[operator]) // Value for the operator
             )
           }
         } else {
+           // Default to 'equals' if condition is not an object (though less common for complex queries)
           apiQuery.append(`where[${field}][equals]`, String(condition))
         }
       }
@@ -64,50 +64,81 @@ const buildPayloadQueryUrl = (
   return `${endpoint}?${apiQuery.toString()}`
 }
 
-async function getPageChildren(
-  pageId: string,
-  payloadApiUrl: string
+// Fetches pages (either children of a parentId or top-level for a category)
+// and determines their `hasChildren` status efficiently.
+async function fetchPagesAndDetermineChildren(
+  payloadApiUrl: string,
+  whereClausesForPages: Record<string, any>
 ): Promise<NavItem[]> {
-  const childrenUrl = buildPayloadQueryUrl(payloadApiUrl, 'wiki-pages', {
-    where: {
-      parent: { equals: pageId },
-      status: { equals: 'published' },
-      isSectionHomepage: { not_equals: true },
-    },
+  const pagesUrl = buildPayloadQueryUrl(payloadApiUrl, 'wiki-pages', {
+    where: whereClausesForPages,
     sort: 'sort',
-    limit: 100,
+    limit: 200, // Increased limit for pages within a category or parent
     depth: 0,
   })
 
-  const childrenResponse = await $fetch<{ docs: PayloadWikiPageDoc[] }>(
-    childrenUrl
-  )
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[wiki-nav.get.ts] Fetching pages from: ${pagesUrl}`);
+  }
+  const pagesResponse = await $fetch<{ docs: PayloadWikiPageDoc[] }>(pagesUrl);
 
-  if (!childrenResponse || !childrenResponse.docs) return []
+  if (!pagesResponse || !pagesResponse.docs || pagesResponse.docs.length === 0) {
+    return [];
+  }
 
-  const childNavItemsPromises = childrenResponse.docs.map(async (childDoc) => {
-    const grandChildrenResponse = await $fetch<{ totalDocs: number }>(
-      buildPayloadQueryUrl(payloadApiUrl, 'wiki-pages', {
+  const pageIds = pagesResponse.docs.map(doc => doc.id);
+  const parentIdsWithChildren = new Set<string>();
+
+  if (pageIds.length > 0) {
+    const childrenOfPagesUrl = buildPayloadQueryUrl(payloadApiUrl, 'wiki-pages', {
+      where: {
+        parent: { in: pageIds.join(',') },
+        status: { equals: 'published' },
+        isSectionHomepage: { not_equals: true },
+      },
+      limit: 2000, // Fetch all potential children to map back
+      depth: 0,
+      select: ['parent'], // Only need parent ID to determine who has children
+    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[wiki-nav.get.ts] Checking children for multiple pages from: ${childrenOfPagesUrl}`);
+    }
+    // Restore original fetch for allChildrenResponse
+    const allChildrenResponse = await $fetch<{ docs: { id: string; parent: string | {id: string} }[] }>( // Ensure 'id' is expected for safety, though parent is key
+       buildPayloadQueryUrl(payloadApiUrl, 'wiki-pages', {
         where: {
-          parent: { equals: childDoc.id },
+          parent: { in: pageIds.join(',') },
           status: { equals: 'published' },
           isSectionHomepage: { not_equals: true },
         },
-        limit: 1,
-        depth: 0,
+        limit: 2000, // Fetch all potential children to map back
+        depth: 0, // Keep depth 0, parent will be ID string
+        // select: ['parent'], // Remove select to fetch all default depth 0 fields
       })
-    )
-    return {
-      id: childDoc.id,
-      title: childDoc.title,
-      slug: childDoc.slug,
-      icon: childDoc.icon,
-      hasChildren: grandChildrenResponse.totalDocs > 0,
-      isCategory: false,
+    );
+    // Removed debugging logs for allChildrenResponse.docs content
+    
+    if (allChildrenResponse && allChildrenResponse.docs) {
+      allChildrenResponse.docs.forEach(childDoc => {
+        if (childDoc.parent) {
+          const pId = typeof childDoc.parent === 'string' ? childDoc.parent : childDoc.parent.id;
+          parentIdsWithChildren.add(pId);
+        }
+      });
+      // Removed debugging log for parentIdsWithChildren
     }
-  })
-  return Promise.all(childNavItemsPromises)
+  }
+
+  return pagesResponse.docs.map(pageDoc => ({
+    id: pageDoc.id,
+    title: pageDoc.title,
+    slug: pageDoc.slug,
+    icon: pageDoc.icon,
+    hasChildren: parentIdsWithChildren.has(pageDoc.id),
+    isCategory: false, // These are page items
+  }));
 }
+
 
 export default defineEventHandler(async (event): Promise<NavItem[]> => {
   const queryParams = getQuery(event)
@@ -117,7 +148,7 @@ export default defineEventHandler(async (event): Promise<NavItem[]> => {
   const payloadApiUrl = runtimeConfig.public.payloadApiUrl
 
   if (!payloadApiUrl) {
-    console.error('[/api/wiki-nav] FATAL: payloadApiUrl is not defined.')
+    console.error('[wiki-nav.get.ts] FATAL: payloadApiUrl is not defined.')
     throw createError({
       statusCode: 500,
       statusMessage: 'Payload API URL not configured.',
@@ -125,116 +156,91 @@ export default defineEventHandler(async (event): Promise<NavItem[]> => {
   }
 
   try {
+    // Case 1: Fetching children for a specific parent page
     if (parentId) {
-      return getPageChildren(parentId, payloadApiUrl)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[wiki-nav.get.ts] Fetching children for parentId: ${parentId}`);
+      }
+      return fetchPagesAndDetermineChildren(payloadApiUrl, {
+        parent: { equals: parentId },
+        status: { equals: 'published' },
+        isSectionHomepage: { not_equals: true },
+      });
     }
 
+    // Case 2: Fetching top-level navigation (categories and their first-level pages)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[wiki-nav.get.ts] Fetching top-level categories and pages.`);
+    }
     const categoriesUrl = buildPayloadQueryUrl(payloadApiUrl, 'categories', {
       sort: 'sort',
-      limit: 50,
+      limit: 50, // Assuming not too many categories
       depth: 0,
     })
-    const categoriesResponse = await $fetch<{ docs: PayloadCategoryDoc[] }>(
-      categoriesUrl
-    )
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[wiki-nav.get.ts] Fetching categories from: ${categoriesUrl}`);
+    }
+    const categoriesResponse = await $fetch<{ docs: PayloadCategoryDoc[] }>(categoriesUrl);
 
-    if (!categoriesResponse || !categoriesResponse.docs) {
-      console.warn(
-        '[/api/wiki-nav] WARN: No categories found or invalid response.'
-      )
-      return []
+    if (!categoriesResponse || !categoriesResponse.docs || categoriesResponse.docs.length === 0) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[wiki-nav.get.ts] No categories found.');
+      }
+      return [];
     }
 
     const categorizedNavItemsPromises = categoriesResponse.docs.map(
       async (categoryDoc) => {
-        const pagesUrl = buildPayloadQueryUrl(payloadApiUrl, 'wiki-pages', {
-          where: {
-            category: { equals: categoryDoc.id },
-            parent: { exists: false },
-            status: { equals: 'published' },
-            isSectionHomepage: { not_equals: true },
-          },
-          sort: 'sort',
-          limit: 100,
-          depth: 0,
-        })
-        const pagesResponse = await $fetch<{ docs: PayloadWikiPageDoc[] }>(
-          pagesUrl
-        )
-
-        let pageNavItems: NavItem[] = []
-        if (pagesResponse && pagesResponse.docs) {
-          const pageNavItemPromises = pagesResponse.docs.map(
-            async (pageDoc) => {
-              const childrenCheckUrl = buildPayloadQueryUrl(
-                payloadApiUrl,
-                'wiki-pages',
-                {
-                  where: {
-                    parent: { equals: pageDoc.id },
-                    status: { equals: 'published' },
-                    isSectionHomepage: { not_equals: true },
-                  },
-                  limit: 1,
-                  depth: 0,
-                }
-              )
-              const childrenResponse = await $fetch<{ totalDocs: number }>(
-                childrenCheckUrl
-              )
-              return {
-                id: pageDoc.id,
-                title: pageDoc.title,
-                slug: pageDoc.slug,
-                icon: pageDoc.icon,
-                hasChildren: childrenResponse.totalDocs > 0,
-                isCategory: false,
-              }
-            }
-          )
-          pageNavItems = await Promise.all(pageNavItemPromises)
-        }
+        const pageNavItems = await fetchPagesAndDetermineChildren(payloadApiUrl, {
+          category: { equals: categoryDoc.id },
+          parent: { exists: false }, // Top-level pages for this category
+          status: { equals: 'published' },
+          isSectionHomepage: { not_equals: true },
+        });
 
         return {
           id: categoryDoc.id,
           title: categoryDoc.name,
+          slug: categoryDoc.slug, // Restore category slug
           isCategory: true,
           children: pageNavItems,
           hasChildren: pageNavItems.length > 0,
-        }
+        };
       }
-    )
+    );
 
-    const finalNavItems = await Promise.all(categorizedNavItemsPromises)
+    const finalNavItems = await Promise.all(categorizedNavItemsPromises);
+    // Filter out categories that have no children pages
     const finalNavItemsFiltered = finalNavItems.filter(
-      (item) => item.isCategory && item.children && item.children.length > 0
-    )
-
-    return finalNavItemsFiltered
-  } catch (err: any) {
-    const fetchError = err as FetchError
-    console.error(
-      `[/api/wiki-nav] ERROR: Processing wiki navigation. ParentId: ${parentId}.`,
-      fetchError.message
-    )
-    if (fetchError.response) {
-      console.error(
-        '[/api/wiki-nav] ERROR: Payload API Response Status:',
-        fetchError.response.status
-      )
-      console.error(
-        '[/api/wiki-nav] ERROR: Payload API Response Data:',
-        fetchError.response._data
-      )
+      (item) => item.hasChildren
+    );
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[wiki-nav.get.ts] Processed ${finalNavItemsFiltered.length} top-level nav items (categories with pages).`);
     }
+    return finalNavItemsFiltered;
+
+  } catch (err: unknown) { // Changed to unknown
+    const fetchError = err as FetchError; // Attempt to cast for FetchError specific properties
+    const originalErrorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+
+    console.error(
+      `[wiki-nav.get.ts] ERROR: Processing wiki navigation. ParentId: ${parentId}. Message: ${originalErrorMessage}`,
+      err // Log the full error object for more details in dev
+    );
+    if (fetchError.response && process.env.NODE_ENV === 'development') {
+      console.error('[wiki-nav.get.ts] ERROR: Payload API Response Status:', fetchError.response.status);
+      console.error('[wiki-nav.get.ts] ERROR: Payload API Response Data:', fetchError.response._data);
+    }
+
     throw createError({
       statusCode: fetchError.response?.status || 500,
       statusMessage: 'Failed to fetch or process wiki navigation data.',
       data: {
         parentIdUsed: parentId,
-        originalErrorMessage: fetchError.message,
+        originalErrorMessage,
         payloadApiResponseStatus: fetchError.response?.status,
       },
-    })
+    });
   }
 })

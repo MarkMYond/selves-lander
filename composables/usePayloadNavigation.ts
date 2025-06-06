@@ -45,32 +45,33 @@ export function usePayloadNavigation(sectionSlug: Ref<string | undefined>) {
     try {
       // Using the Payload CMS API endpoint structure
       const endpoint = `/api/navigation?section=${section}`
-      const cacheKey = `navigation-${section}-${Date.now()}`
+      const cacheKey = `navigation-${section}` // Removed Date.now() for proper caching
 
       // Use useFetch for consistent API behavior and better error handling
-      const { data, error: fetchError } = await useFetch(endpoint, {
-        key: cacheKey, // Unique key to prevent caching issues
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
+      // Typed useFetch and improved error message in onResponseError
+      const { data, error: fetchError } = await useFetch<NavCategoryGroup[]>(endpoint, {
+        key: cacheKey, // Unique key based on section
+        // headers: { // Removed aggressive no-cache header
+        //   'Cache-Control': 'no-cache',
+        // },
         // Only catch true errors, not "no data found" responses
         onResponseError(ctx) {
           if (ctx.response.status !== 404) {
-            throw new Error(`API Error: ${ctx.response.statusText}`)
+            throw new Error(`API Error: ${ctx.response.statusText} (status: ${ctx.response.status})`)
           }
+          // For 404s, we don't throw here. data.value will likely be null or the error body.
         },
-        // Disable suspense to prevent component tree errors
-        suspense: false,
       })
 
-      // Handle fetch errors
+      // Handle fetch errors (e.g. network issues, or errors thrown from onResponseError)
       if (fetchError.value) {
         throw fetchError.value
       }
 
-      // Check if data exists and has the expected format
+      // Check if data.value is an array (it should be NavCategoryGroup[] if successful and data exists)
+      // data.value could be null if the API returns 204, or if a 404 occurred and onResponseError didn't throw.
       if (data.value && Array.isArray(data.value)) {
-        navData.value = data.value as NavCategoryGroup[]
+        navData.value = data.value // Cast 'as NavCategoryGroup[]' is no longer needed
       } else {
         // Return empty array but don't treat as error
         navData.value = []
@@ -79,13 +80,16 @@ export function usePayloadNavigation(sectionSlug: Ref<string | undefined>) {
           console.warn(`No navigation data returned for section: ${section}`)
         }
       }
-    } catch (err) {
+    } catch (err: unknown) { // Typed the error object
       // Handle errors gracefully
       console.error(`Navigation fetch error for section ${section}:`, err)
-      error.value =
-        err instanceof Error
-          ? err
-          : new Error('Unknown error fetching navigation')
+      if (err instanceof Error) {
+        error.value = err
+      } else if (typeof err === 'string') {
+        error.value = new Error(err)
+      } else {
+        error.value = new Error('An unknown error occurred while fetching navigation data.')
+      }
       // Set empty data to prevent UI errors
       navData.value = []
     } finally {

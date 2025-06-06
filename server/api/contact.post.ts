@@ -1,4 +1,14 @@
 import { Resend } from 'resend'
+import { defineEventHandler, readBody, createError } from 'h3' // Ensure all h3 imports are here
+
+interface ContactFormBody {
+  name?: string
+  email: string
+  company?: string
+  subject?: string
+  message?: string
+  recipientEmail: string
+}
 
 export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig(event)
@@ -6,7 +16,7 @@ export default defineEventHandler(async (event) => {
     runtimeConfig.resendApiKey || process.env.NUXT_RESEND_API_KEY
 
   if (!resendApiKey) {
-    console.error('Resend API key is not configured.')
+    console.error('[contact.post.ts] Resend API key is not configured.') // Added prefix
     throw createError({
       statusCode: 500,
       statusMessage: 'Email service is not configured.',
@@ -16,7 +26,7 @@ export default defineEventHandler(async (event) => {
   const resend = new Resend(resendApiKey)
 
   try {
-    const body = await readBody(event)
+    const body = await readBody<ContactFormBody>(event) // Use defined interface
 
     // Validate recipientEmail
     if (
@@ -24,10 +34,12 @@ export default defineEventHandler(async (event) => {
       typeof body.recipientEmail !== 'string' ||
       body.recipientEmail.trim() === ''
     ) {
-      console.error(
-        'Invalid or missing recipientEmail in request body:',
-        body.recipientEmail
-      )
+      if (process.env.NODE_ENV === 'development') {
+        console.error(
+          '[contact.post.ts] Invalid or missing recipientEmail in request body:',
+          body.recipientEmail
+        );
+      }
       throw createError({
         statusCode: 400,
         statusMessage: 'Recipient email is invalid or missing.',
@@ -45,6 +57,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Destructure with the defined type
     const {
       name,
       email,
@@ -52,14 +65,7 @@ export default defineEventHandler(async (event) => {
       subject,
       message,
       recipientEmail,
-    } = body as {
-      name?: string
-      email: string
-      company?: string
-      subject?: string
-      message?: string
-      recipientEmail: string
-    }
+    } = body
 
     // Configure your "from" address (must be a verified domain with Resend)
     const configuredFromEmail =
@@ -71,7 +77,7 @@ export default defineEventHandler(async (event) => {
       configuredFromEmail.trim() === ''
     ) {
       console.error(
-        'From email is not configured correctly. Please set NUXT_PUBLIC_RESEND_FROM_EMAIL or runtimeConfig.public.resendFromEmail.'
+        '[contact.post.ts] From email is not configured correctly. Please set NUXT_PUBLIC_RESEND_FROM_EMAIL or runtimeConfig.public.resendFromEmail.'
       )
       throw createError({
         statusCode: 500,
@@ -112,25 +118,31 @@ export default defineEventHandler(async (event) => {
       text: emailTextContent,
     }
 
-    const { data, error } = await resend.emails.send(emailToSend)
+    const { data, error: resendError } = await resend.emails.send(emailToSend) // Renamed error to avoid conflict
 
-    if (error) {
-      console.error('Resend API Error:', error)
+    if (resendError) { // Check resendError
+      console.error('[contact.post.ts] Resend API Error:', resendError)
       throw createError({
-        statusCode: 500,
+        statusCode: 500, // Or use resendError.statusCode if available and appropriate
         statusMessage: 'Failed to send email.',
+        data: { name: resendError.name, message: resendError.message }
       })
     }
 
     return { message: 'Message sent successfully!', data }
-  } catch (error: any) {
-    console.error('Error in /api/contact:', error)
-    if (error.statusCode && error.statusMessage) {
-      throw error
+  } catch (error: unknown) { // Changed to unknown
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    console.error('[contact.post.ts] Error in contact form handler:', errorMessage, error);
+    
+    // If the error is already an H3Error (e.g., from createError calls above), re-throw it
+    if (typeof error === 'object' && error !== null && 'statusCode' in error && 'statusMessage' in error) {
+        throw error;
     }
+
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || 'An internal server error occurred.',
+      statusMessage: 'An internal server error occurred while processing the contact form.',
+      data: { originalError: errorMessage }
     })
   }
 })

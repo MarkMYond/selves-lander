@@ -39,43 +39,15 @@
           <div class="flex flex-row items-center justify-start gap-4">
             <BaseButton
               v-if="props.block?.buttons && props.block.buttons[0]"
-              :to="
-                isInternalLink(props.block.buttons[0])
-                  ? getButtonUrl(props.block.buttons[0])
-                  : undefined
-              "
-              :href="
-                !isInternalLink(props.block.buttons[0])
-                  ? getButtonUrl(props.block.buttons[0])
-                  : undefined
-              "
-              :target="
-                shouldOpenInNewTab(props.block.buttons[0])
-                  ? '_blank'
-                  : undefined
-              "
-              :variant="(props.block.buttons[0].variant as any) || 'primary'"
+              v-bind="resolveLinkProps(props.block.buttons[0])"
+              :variant="props.block.buttons[0].variant || 'primary'"
             >
               {{ props.block?.buttons?.[0]?.label || 'Book a Demo' }}
             </BaseButton>
             <BaseButton
               v-if="props.block?.buttons && props.block.buttons[1]"
-              :to="
-                isInternalLink(props.block.buttons[1])
-                  ? getButtonUrl(props.block.buttons[1])
-                  : undefined
-              "
-              :href="
-                !isInternalLink(props.block.buttons[1])
-                  ? getButtonUrl(props.block.buttons[1])
-                  : undefined
-              "
-              :target="
-                shouldOpenInNewTab(props.block.buttons[1])
-                  ? '_blank'
-                  : undefined
-              "
-              :variant="(props.block.buttons[1].variant as any) || 'secondary'"
+              v-bind="resolveLinkProps(props.block.buttons[1])"
+              :variant="props.block.buttons[1].variant || 'secondary'"
             >
               {{ props.block?.buttons?.[1]?.label || 'Get in Touch' }}
             </BaseButton>
@@ -136,8 +108,11 @@ import { ref, onMounted, computed, type PropType } from 'vue'
 import { useScrollAnimations } from '@/composables/useScrollAnimations'
 import { useHeroAnimations } from '@/composables/useHeroAnimations'
 import { useMediaUrl } from '@/composables/useMediaUrl'
+import { useLinkResolver } from '@/composables/useLinkResolver' // Import the new composable
 import type { HeroSection02Payload, Media, WebPage } from '@/src/payload-types'
 import BaseButton from '@/components/ui/BaseButton.vue'
+
+const { resolveLinkProps } = useLinkResolver(); // Instantiate the composable
 
 const props = defineProps({
   block: {
@@ -145,102 +120,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const isTrulyExternalUrl = (url?: string): boolean => {
-  if (!url) return false
-  return (
-    url.startsWith('http://') ||
-    url.startsWith('https://') ||
-    url.startsWith('//')
-  )
-}
-
-const isInternalLink = (button?: any): boolean => {
-  if (!button) return false
-  if (button.type === 'internal') return true
-  if (button.type === 'external') {
-    if (
-      button.externalLink &&
-      button.externalLink.startsWith('/') &&
-      !isTrulyExternalUrl(button.externalLink)
-    ) {
-      return true
-    }
-    return false
-  }
-  if (button.internalLink && !button.externalLink) return true
-  if (
-    button.externalLink &&
-    button.externalLink.startsWith('/') &&
-    !isTrulyExternalUrl(button.externalLink) &&
-    !button.internalLink
-  )
-    return true
-
-  return false
-}
-
-const getButtonUrl = (button?: any): string => {
-  if (!button) return '#'
-
-  const isEffectivelyInternal = isInternalLink(button)
-
-  if (isEffectivelyInternal) {
-    if (button.type === 'internal' && button.internalLink) {
-      const internalValue = button.internalLink
-      if (
-        typeof internalValue === 'object' &&
-        internalValue !== null &&
-        'slug' in internalValue &&
-        typeof internalValue.slug === 'string'
-      ) {
-        return `/${internalValue.slug}`
-      }
-      if (typeof internalValue === 'string') {
-        return internalValue.startsWith('/')
-          ? internalValue
-          : `/${internalValue}`
-      }
-    }
-    if (
-      button.externalLink &&
-      button.externalLink.startsWith('/') &&
-      !isTrulyExternalUrl(button.externalLink)
-    ) {
-      return button.externalLink
-    }
-    if (button.internalLink) {
-      const internalValue = button.internalLink
-      if (
-        typeof internalValue === 'object' &&
-        internalValue !== null &&
-        'slug' in internalValue &&
-        typeof internalValue.slug === 'string'
-      )
-        return `/${internalValue.slug}`
-      if (typeof internalValue === 'string')
-        return internalValue.startsWith('/')
-          ? internalValue
-          : `/${internalValue}`
-    }
-  } else {
-    if (button.externalLink) {
-      return button.externalLink
-    }
-  }
-  return '#'
-}
-
-const shouldOpenInNewTab = (button?: any): boolean => {
-  if (!button) return false
-  
-  if (button.newTab === true) return true
-  
-  const url = getButtonUrl(button)
-  if (isTrulyExternalUrl(url) && button.newTab !== false) return true
-
-  return false
-}
 
 const mediaHelpers = useMediaUrl()
 

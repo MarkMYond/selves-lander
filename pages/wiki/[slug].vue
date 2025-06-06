@@ -19,6 +19,7 @@
         Could not load the requested page. Please try again later.
       </p>
       <div
+        v-if="isDevelopment"
         class="text-xs text-left bg-red-100 p-4 rounded max-w-xl mx-auto mb-4 border border-red-300"
       >
         <p><strong>Debug Info:</strong></p>
@@ -202,6 +203,8 @@ import WikiLayout from '../../components/wiki/WikiLayout.vue'
 import { useSeo } from '../../composables/useSeo'
 import { useMediaUrl } from '../../composables/useMediaUrl'
 import PagePrevNextNav from '../../components/wiki/PagePrevNextNav.vue'
+
+const isDevelopment = computed(() => process.env.NODE_ENV === 'development');
 
 interface PopulatedParent {
   id: string
@@ -392,7 +395,6 @@ const lastUpdated = computed(() => formatDate(pageData.value?.updatedAt))
 
 const isLeftSidebarOpen = ref(false)
 const toggleLeftSidebar = () => {
-  console.log('toggleLeftSidebar')
   isLeftSidebarOpen.value = !isLeftSidebarOpen.value
 }
 

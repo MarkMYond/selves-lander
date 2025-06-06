@@ -24,10 +24,15 @@ export default defineEventHandler(async (event) => {
 
     if (!messages || !messages.length || !tabId) {
       // System prompt is optional for OpenAI, but messages and tabId are essential
-      return { error: 'Missing required fields (messages, tabId)' }
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Missing required fields (messages, tabId)',
+      });
     }
 
-    console.log(`Streaming with OpenAI model: ${modelName}`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[chat/stream.post.ts] Streaming with OpenAI model: ${modelName}`);
+    }
 
     // Prepare messages for OpenAI API
     // OpenAI expects messages in the format: { role: "user" | "assistant" | "system", content: string }
@@ -55,10 +60,11 @@ export default defineEventHandler(async (event) => {
     const lastMessage = apiMessages[apiMessages.length - 1]
     if (!lastMessage || lastMessage.role !== 'user') {
       // If the last message isn't from the user, we might be missing context or it's an invalid sequence.
-      // For now, we'll proceed, but this could be a point of error handling.
-      console.warn(
-        'The last message in the history sent to OpenAI is not from the user.'
-      )
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(
+          '[chat/stream.post.ts] The last message in the history sent to OpenAI is not from the user.'
+        );
+      }
     }
 
     // Request a streaming completion from OpenAI
@@ -83,30 +89,53 @@ export default defineEventHandler(async (event) => {
             }
           }
           controller.close()
-        } catch (error) {
-          console.error('Error processing OpenAI stream:', error)
-          controller.error(error)
+        } catch (streamProcessingError) {
+          console.error('[chat/stream.post.ts] Error processing OpenAI stream for controller:', streamProcessingError);
+          // It's important to propagate the error to the stream controller
+          controller.error(streamProcessingError instanceof Error ? streamProcessingError : new Error(String(streamProcessingError)));
         }
       },
     })
 
     return sendStream(event, readable)
   } catch (err) {
-    const error = err as Error
-    console.error('Error streaming OpenAI response:', error)
-    // Log API key status for debugging, but be careful with logging actual keys
-    console.log('OpenAI API Key available:', !!process.env.OPENAI_API_KEY)
-    console.log('OpenAI API Key length:', process.env.OPENAI_API_KEY?.length)
-    if (process.env.OPENAI_API_KEY) {
-      console.log(
-        'First 4 chars of OpenAI API key:',
-        process.env.OPENAI_API_KEY.substring(0, 4)
-      )
+    const error = err as Error; 
+    console.error('[chat/stream.post.ts] Error in OpenAI stream handler:', error);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[chat/stream.post.ts] OpenAI API Key available:', !!process.env.OPENAI_API_KEY);
+      if (process.env.OPENAI_API_KEY) {
+        console.log('[chat/stream.post.ts] OpenAI API Key length:', process.env.OPENAI_API_KEY.length);
+        console.log(
+          '[chat/stream.post.ts] First 4 chars of OpenAI API key:',
+          process.env.OPENAI_API_KEY.substring(0, 4)
+        );
+      }
     }
 
-    return {
-      error: 'Failed to stream OpenAI response',
-      details: error.message || String(error),
+    let statusCode = 500;
+    let statusMessage = 'Failed to stream OpenAI response.';
+    let errorData: Record<string, any> = { originalError: error.message || String(error) };
+
+    if (err instanceof OpenAI.APIError) {
+      statusCode = err.status || 500;
+      statusMessage = `OpenAI API Error: ${err.name}`; // err.message can be long, err.name is more concise for statusMessage
+      errorData.openaiError = {
+        name: err.name,
+        type: err.type,
+        code: err.code,
+        param: err.param,
+        message: err.message, // Include full message in data
+      };
     }
+    
+    // Note: If sendStream has already started, we can't send a new error response here.
+    // Errors during the stream itself are handled by controller.error() and will terminate the stream.
+    // This catch block handles errors *before* sendStream is successfully called or if openai.chat.completions.create fails.
+    throw createError({
+      statusCode,
+      statusMessage,
+      data: errorData,
+    });
   }
 })

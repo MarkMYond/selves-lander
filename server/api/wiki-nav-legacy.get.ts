@@ -2,12 +2,12 @@ import { defineEventHandler, getQuery, createError } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
 /**
- * API endpoint to fetch registry navigation data from the NavigationCache collection
+ * API endpoint to fetch wiki navigation data from the NavigationCache collection
  * This replaces the previous approach of using static JSON files
  *
- * @route GET /api/registry-nav
+ * @route GET /api/wiki-nav
  * @query parentId - (optional) ID of parent page to fetch children for
- * @returns Registry navigation structure
+ * @returns Wiki navigation structure
  */
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -20,15 +20,17 @@ export default defineEventHandler(async (event) => {
     // If parentId is provided, fetch children for that specific page
     if (parentId) {
       // Fetch children for a specific parent page
-      const url = `${payloadApiFullUrl}/registry-pages?where[parent][equals]=${parentId}&where[status][equals]=published&sort=sort`
-      console.log(
-        `Fetching registry page children for parent ID ${parentId} from: ${url}`
-      )
+      const url = `${payloadApiFullUrl}/wiki-pages?where[parent][equals]=${parentId}&where[status][equals]=published&sort=sort`
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[wiki-nav-legacy.get.ts] Fetching wiki page children for parent ID ${parentId} from: ${url}`);
+      }
 
       const response = await $fetch<{ docs: any[] }>(url)
 
       if (!response || !response.docs) {
-        console.error(`No children found for parent ID: ${parentId}`)
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`[wiki-nav-legacy.get.ts] No children found for parent ID: ${parentId}`);
+        }
         return []
       }
 
@@ -44,8 +46,10 @@ export default defineEventHandler(async (event) => {
     }
 
     // For top-level navigation, query Payload for the navigation data in MongoDB
-    const cacheUrl = `${payloadApiFullUrl}/navigation-cache?where[section][equals]=registry&limit=1`
-    console.log(`Fetching registry navigation from Payload cache: ${cacheUrl}`)
+    const cacheUrl = `${payloadApiFullUrl}/navigation-cache?where[section][equals]=wiki&limit=1`
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[wiki-nav-legacy.get.ts] Fetching wiki navigation from Payload cache: ${cacheUrl}`);
+    }
 
     const cacheResponse = await $fetch<{ docs: any[] }>(cacheUrl)
     if (
@@ -53,21 +57,22 @@ export default defineEventHandler(async (event) => {
       !cacheResponse.docs ||
       cacheResponse.docs.length === 0
     ) {
-      console.warn(
-        'No registry navigation cache found in Payload, falling back to direct navigation API'
-      )
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[wiki-nav-legacy.get.ts] No wiki navigation cache found in Payload, falling back to direct navigation API');
+      }
 
       // Fall back to the standard navigation endpoint
-      return await $fetch('/api/navigation?section=registry')
+      return await $fetch('/api/navigation?section=wiki') // This internal fetch should be fine
     }
 
     // Return the navigation data from cache
     return cacheResponse.docs[0].navigationData || []
   } catch (error: any) {
-    console.error('Error fetching registry navigation:', error.message || error)
+    console.error(`[wiki-nav-legacy.get.ts] Error fetching wiki navigation:`, error.message || error);
     throw createError({
       statusCode: error.statusCode || 500,
-      statusMessage: `Error fetching registry navigation: ${error.message || 'Unknown error'}`,
+      statusMessage: `Error fetching wiki navigation: ${error.message || 'Unknown error'}`,
+      data: error.data,
     })
   }
 })

@@ -2,7 +2,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import vueParser from "vue-eslint-parser";
 import eslintPluginVue from "eslint-plugin-vue";
-// import nuxtPlugin from '@nuxtjs/eslint-plugin'; // Keep commented for now
+import eslintPluginNuxt from "eslint-plugin-nuxt"; // Import the new Nuxt ESLint plugin
 
 export default [
   {
@@ -15,6 +15,7 @@ export default [
   },
   ...tseslint.configs.recommended,
   ...eslintPluginVue.configs['flat/recommended'],
+  ...eslintPluginNuxt.configs['flat/recommended'], // Add Nuxt recommended flat config
   {
     files: ["**/*.vue", "**/*.ts", "**/*.js", "**/*.mjs"],
     languageOptions: {
@@ -37,15 +38,10 @@ export default [
       'vue/no-multiple-template-root': 'off',
       // Example: Disable a typescript-eslint rule if needed
       // '@typescript-eslint/no-explicit-any': 'off',
+
+      // You can override or add Nuxt specific rules here if needed
+      // For example, if 'flat/recommended' is too strict or not strict enough for some rules.
     },
   },
-  // { // If Nuxt plugin is needed and installed later
-  //   files: ['**/*.vue'], // Or specific files needing Nuxt rules
-  //   plugins: {
-  //     nuxt: nuxtPlugin,
-  //   },
-  //   rules: {
-  //     ...nuxtPlugin.configs.recommended.rules,
-  //   },
-  // }
+  // Removed old commented out Nuxt plugin section
 ];

@@ -116,23 +116,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue' // Added computed
 import SectionHeader from '@/components/ui/SectionHeader.vue' // Still needed if form uses it, but form is static
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BlockRenderer from '@/components/BlockRenderer.vue' // For rendering Payload blocks
-import { useAsyncData, useRuntimeConfig, useError } from 'nuxt/app' // Import Nuxt composables from nuxt/app
+import { useAsyncData, useRuntimeConfig, useError, useHead } from 'nuxt/app' // Import Nuxt composables from nuxt/app, ensure useHead
 import type { WebPage as PageType } from '@/src/payload-types' // Import PageType
-
-useHead({
-  title: 'Book A Demo - TaskHub',
-  meta: [
-    {
-      name: 'description',
-      content:
-        "Schedule a personalized demo of TaskHub and see how it can transform your team's productivity.",
-    },
-  ],
-})
 
 // Fetch page data from Payload
 const config = useRuntimeConfig()
@@ -147,9 +136,31 @@ const { data: pageData, error } = await useAsyncData<PageType>(
 
 if (error.value) {
   console.error('Error fetching book-a-demo page data:', error.value)
+  // Optionally, set a specific error state or use Nuxt's showError
 }
 
+// SEO
+const pageTitle = computed(() => {
+  return pageData.value?.meta?.title || 'Book A Demo - TaskHub';
+});
+
+const pageDescription = computed(() => {
+  return pageData.value?.meta?.description || "Schedule a personalized demo of TaskHub and see how it can transform your team's productivity.";
+});
+
+useHead(() => ({ // Make useHead reactive
+  title: pageTitle.value,
+  meta: [
+    {
+      name: 'description',
+      content: pageDescription.value,
+    },
+    // Add other meta tags if needed, potentially from pageData.value.meta.image etc.
+  ],
+}))
+
 const handleSubmit = () => {
+  console.warn('[book-a-demo.vue] handleSubmit is a placeholder and needs full implementation.');
   alert('Form submitted (placeholder)!')
 }
 </script>

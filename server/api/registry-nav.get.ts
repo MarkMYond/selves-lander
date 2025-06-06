@@ -48,21 +48,14 @@ const buildPayloadQueryUrl = (
 }
 
 export default defineEventHandler(async (event): Promise<NavItem[]> => {
-  console.log('[/api/registry-nav] TRACE: Handler invoked (hierarchical logic)') // Changed log prefix
   const queryParams = getQuery(event)
   const parentId = queryParams.parentId as string | undefined
-  console.log(`[/api/registry-nav] TRACE: parentId from query: ${parentId}`) // Changed log prefix
 
   const runtimeConfig = useRuntimeConfig()
-  const payloadApiUrl = runtimeConfig.public.payloadApiUrl // This should be the base URL, e.g., http://localhost:3333
-  console.log(
-    `[/api/registry-nav] TRACE: runtimeConfig.public.payloadApiUrl: ${payloadApiUrl}`
-  ) // Changed log prefix
+  const payloadApiUrl = runtimeConfig.public.payloadApiUrl
 
   if (!payloadApiUrl) {
-    console.error(
-      '[/api/registry-nav] FATAL: payloadApiUrl is not defined in runtime config.'
-    ) // Changed log prefix
+    console.error('[registry-nav.get.ts] FATAL: payloadApiUrl is not defined in runtime config.')
     throw createError({
       statusCode: 500,
       statusMessage: 'Payload API URL is not configured.',
@@ -77,20 +70,18 @@ export default defineEventHandler(async (event): Promise<NavItem[]> => {
   if (parentId) {
     whereClauses.parent = { equals: parentId }
   } else {
-    whereClauses.parent = { exists: false }
+    // If no parentId, fetch top-level items (category is not directly used here for parent/child, but for structure)
+    // This logic assumes registry pages can be nested under other registry pages OR be top-level under a category.
+    // For this specific API, we are fetching children of a given registry page, or top-level registry pages.
+    whereClauses.parent = { exists: false } // Fetch items with no parent (top-level for registry pages)
   }
 
   const requestUrl = buildPayloadQueryUrl(payloadApiUrl, 'registry-pages', {
-    // Changed collection to 'registry-pages'
     where: whereClauses,
     sort: 'sort',
-    limit: 100,
-    depth: 0, // Set depth to 0 as we only need IDs to check for children, parent info is via parentId query
+    limit: 100, // Consider pagination if more than 100 items are expected at any level
+    depth: 0,   // We only need basic fields for the nav items themselves
   })
-
-  console.log(
-    `[/api/registry-nav] TRACE: Attempting to fetch parent/sibling items from: ${requestUrl}`
-  ) // Changed log prefix
 
   try {
     const response = await $fetch<{ docs: PayloadDoc[]; totalDocs: number }>(
@@ -101,84 +92,84 @@ export default defineEventHandler(async (event): Promise<NavItem[]> => {
       }
     )
 
-    if (!response || !response.docs) {
-      console.warn(
-        '[/api/registry-nav] WARN: No docs in response or invalid response from Payload API for parent/siblings.'
-      ) // Changed log prefix
-      return [] // Return empty array if no items found
+    if (!response || !response.docs || response.docs.length === 0) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`[registry-nav.get.ts] No docs found for parentId '${parentId}'. URL: ${requestUrl}`)
+      }
+      return []
     }
 
-    console.log(
-      `[/api/registry-nav] TRACE: Received ${response.docs.length} parent/sibling docs from Payload API.`
-    ) // Changed log prefix
+    const pageIds = response.docs.map(doc => doc.id)
+    let parentIdsWithChildren = new Set<string>()
 
-    const navItemsPromises = response.docs.map(async (doc: PayloadDoc) => {
-      // For each doc, check if it has children
-      const childrenCheckUrl = buildPayloadQueryUrl(
-        payloadApiUrl,
-        'registry-pages',
-        {
-          // Changed collection to 'registry-pages'
+    if (pageIds.length > 0) {
+      const childrenCheckRequestUrl = buildPayloadQueryUrl(payloadApiUrl, 'registry-pages', {
+        where: {
+          parent: { in: pageIds.join(',') }, // Query for children of all fetched pages
+          status: { equals: 'published' },
+          isSectionHomepage: { not_equals: true },
+        },
+        limit: 0, // We only need counts or existence, but fetching parent ID is useful
+        depth: 0, // Only need parent ID
+        select: ['parent'], // Select only the parent field
+      })
+      
+      // Actually, to get counts per parent, a more complex aggregation or fetching parent IDs is better.
+      // Let's fetch minimal data for all children and process in memory.
+      const allChildrenResponse = await $fetch<{ docs: { id: string; parent: string | { id: string } }[]; totalDocs: number }>(
+        buildPayloadQueryUrl(payloadApiUrl, 'registry-pages', {
           where: {
-            parent: { equals: doc.id },
+            parent: { in: pageIds.join(',') },
             status: { equals: 'published' },
             isSectionHomepage: { not_equals: true },
           },
-          limit: 1,
-          depth: 0, // We only need to know if at least one child exists
-        }
+          limit: 1000, // Adjust if a parent can have many children
+          depth: 0, // parent will be ID string
+          select: ['parent'], 
+        })
       )
+      
+      if (allChildrenResponse && allChildrenResponse.docs) {
+        allChildrenResponse.docs.forEach(childDoc => {
+          if (childDoc.parent) {
+            const pId = typeof childDoc.parent === 'string' ? childDoc.parent : childDoc.parent.id;
+            parentIdsWithChildren.add(pId);
+          }
+        });
+      }
+    }
 
-      console.log(
-        `[/api/registry-nav] TRACE: Checking children for doc ID ${doc.id} from: ${childrenCheckUrl}`
-      ) // Changed log prefix
-      const childrenResponse = await $fetch<{
-        docs: PayloadDoc[]
-        totalDocs: number
-      }>(childrenCheckUrl)
-      const hasChildren = childrenResponse && childrenResponse.totalDocs > 0
-      console.log(
-        `[/api/registry-nav] TRACE: Doc ID ${doc.id} hasChildren: ${hasChildren}`
-      ) // Changed log prefix
-
+    const navItems: NavItem[] = response.docs.map((doc: PayloadDoc) => {
       return {
         id: doc.id,
         title: doc.title,
         slug: doc.slug,
         icon: doc.icon,
-        hasChildren: hasChildren,
+        hasChildren: parentIdsWithChildren.has(doc.id),
       }
     })
-
-    const navItems = await Promise.all(navItemsPromises)
-    console.log(
-      '[/api/registry-nav] TRACE: Processed navItems with hasChildren:',
-      navItems.length
-    ) // Changed log prefix
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[registry-nav.get.ts] Processed ${navItems.length} navItems for parentId '${parentId}'.`)
+    }
     return navItems
+
   } catch (err: any) {
     const fetchError = err as FetchError
     console.error(
-      `[/api/registry-nav] ERROR: Error during registry navigation data processing. Initial URL: ${requestUrl}`,
+      `[registry-nav.get.ts] ERROR: Processing registry navigation. Initial URL: ${requestUrl}`,
       fetchError.message
-    ) // Changed log prefix and message
+    )
     if (fetchError.response) {
-      console.error(
-        '[/api/registry-nav] ERROR: Payload API Response Status:',
-        fetchError.response.status
-      ) // Changed log prefix
-      console.error(
-        '[/api/registry-nav] ERROR: Payload API Response Data:',
-        fetchError.response._data
-      ) // Changed log prefix
+      console.error('[registry-nav.get.ts] ERROR: Payload API Response Status:', fetchError.response.status)
+      console.error('[registry-nav.get.ts] ERROR: Payload API Response Data:', fetchError.response._data)
     }
 
     throw createError({
       statusCode: fetchError.response?.status || 500,
-      statusMessage:
-        'Failed to fetch or process navigation data from Payload API.',
+      statusMessage: 'Failed to fetch or process registry navigation data.',
       data: {
-        requestUrlSent: requestUrl, // Log the first request URL
+        requestUrlSent: requestUrl,
         originalErrorMessage: fetchError.message,
         payloadApiResponseStatus: fetchError.response?.status,
       },
