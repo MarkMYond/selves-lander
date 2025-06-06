@@ -23,7 +23,7 @@ export default defineNuxtConfig({
   ],
 
   icon: {
-    packs: ['ph'],
+    // packs: ['ph'], // Temporarily remove to test EMFILE issue
     aliases: {
       'user-duotone': 'ph:user-duotone',
       'house-duotone': 'ph:house-duotone',
