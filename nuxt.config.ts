@@ -56,9 +56,9 @@ export default defineNuxtConfig({
         '/',
       ],
       ignore: [
-        '/wiki',
-        '/registry',
-        '/wiki/**',
+        '/wiki', // Keep base ignored for now as it's SSR
+        '/registry', // Keep base ignored for now as it's SSR
+        // '/wiki/**', // Attempt not ignoring dynamic CSR routes
         '/registry/**',
         '/**/_payload.json',
       ],
@@ -70,15 +70,16 @@ export default defineNuxtConfig({
         baseURL: '/',
       },
     ],
-    routeRules: {
-      '/': { ssr: true },
-      '/wiki': { ssr: true },
-      '/wiki/**': { ssr: true }, // Removing SWR
-      '/registry': { ssr: true },
-      '/registry/**': { ssr: true }, // Removing SWR
-      '/favicon.svg': { cache: { maxAge: 60 * 60 * 24 * 30 } },
-      '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
-    },
+  },
+
+  routeRules: {
+    '/': { ssr: true },
+    '/wiki': { ssr: true },
+    '/wiki/**': { ssr: true }, // Enable SSR for wiki sub-pages
+    '/registry': { ssr: true },
+    '/registry/**': { ssr: true }, // Enable SSR for registry sub-pages
+    '/favicon.svg': { cache: { maxAge: 60 * 60 * 24 * 30 } },
+    '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
   },
 
   experimental: {

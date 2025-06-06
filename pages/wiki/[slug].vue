@@ -250,10 +250,13 @@ const config = useRuntimeConfig()
 
 const pageSlug = computed(() => {
   const slugParam = route.params.slug
-  return Array.isArray(slugParam) ? slugParam[slugParam.length - 1] : slugParam
+  const slug = Array.isArray(slugParam) ? slugParam[slugParam.length - 1] : slugParam
+  console.log('pageSlug computed:', slug, 'route.params:', route.params)
+  return slug
 })
 
 const payloadApiFullUrl = config.public.payloadApiFullUrl // Use full API URL which already includes /api
+console.log('payloadApiFullUrl:', payloadApiFullUrl)
 const { getMediaUrl } = useMediaUrl()
 
 const fetchKey = computed(() => `wiki-page-${route.fullPath}`)
@@ -262,25 +265,22 @@ const {
   pending: pagePending,
   error: pageError,
 } = await useFetch<{ docs: FetchedWikiPage[] }>(
-  () => {
-    if (!payloadApiFullUrl) {
-      console.error(
-        `Wiki Slug Page: Payload API URL is not configured for slug ${pageSlug.value}.`
-      )
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'API URL not configured',
-      })
-    }
-    return `${payloadApiFullUrl}/wiki-pages?where[slug][equals]=${pageSlug.value}&limit=1`
-  },
+  `/api/wiki-page/${pageSlug.value}`,
   {
     key: fetchKey.value,
+    server: true, // Ensure it works on server-side
     cache: 'no-cache',
     onRequestError({ request, options, error: requestError }) {
       console.error(
         `Wiki Slug Page: Error in useFetch for slug ${pageSlug.value} from ${request}:`,
         requestError
+      )
+    },
+    onResponseError({ request, response }) {
+      console.error(
+        `Wiki Slug Page: Response error for slug ${pageSlug.value}:`,
+        response.status,
+        response.statusText
       )
     },
   }
