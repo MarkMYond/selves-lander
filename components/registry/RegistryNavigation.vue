@@ -231,32 +231,8 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import type { Component, PropType } from 'vue'
-// import {
-//   PhFileText,
-//   PhBookOpen,
-//   PhFolder,
-//   PhLink,
-//   PhInfo,
-//   PhQuestion,
-//   PhGear,
-//   PhHouse,
-// } from '@phosphor-icons/vue'
+import type { PropType } from 'vue' // Removed unused Component type
 import { useRegistryNavStore } from '../../stores/registryNavStore'
-
-// const iconComponents: Record<string, Component> = {
-//   FileText: PhFileText,
-//   BookOpen: PhBookOpen,
-//   Folder: PhFolder,
-//   Link: PhLink,
-//   Info: PhInfo,
-//   Question: PhQuestion,
-//   Gear: PhGear,
-//   House: PhHouse,
-//   Default: PhFileText,
-// }
-// const getIconComponent = (iconName?: string): Component =>
-//   (iconName && iconComponents[iconName]) || iconComponents.Default
 
 const props = defineProps({
   navTitle: { type: String, default: 'Registry Home' },

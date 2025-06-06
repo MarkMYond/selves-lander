@@ -7,7 +7,7 @@
         class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 rounded-md transition-colors duration-150 text-sm flex items-center"
         active-class="bg-purple-light text-primary-700 font-semibold"
       >
-        <!-- <Icon
+        <Icon
           v-if="item.icon"
           :name="
             item.icon.startsWith('ph:')
@@ -15,7 +15,7 @@
               : `ph:${item.icon.toLowerCase()}`
           "
           class="mr-2 h-4 w-4 flex-shrink-0"
-        /> -->
+        />
         <span
           class="align-middle [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"
         >{{ item.title }}</span>

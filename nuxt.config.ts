@@ -17,13 +17,13 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxtjs/tailwindcss',
-    'nuxt-icon',
+    'nuxt-icon', // Ensure nuxt-icon is active
     '@pinia/nuxt',
     '@nuxt/image',
   ],
 
   icon: { 
-    packs: ['ph'], 
+    // packs: ['ph'], // Remove packs to avoid loading all icons
     aliases: {
       'user-duotone': 'ph:user-duotone',
       'house-duotone': 'ph:house-duotone',
@@ -35,7 +35,7 @@ export default defineNuxtConfig({
   },
 
   plugins: [
-    '~/plugins/phosphor-icons.ts',
+    '~/plugins/phosphor-icons.ts', // Ensure this plugin is active
   ],
 
   nitro: {
