@@ -42,6 +42,7 @@ dist
 # Gatsby build output
 .cache/
 public
+!public/robots.txt
 
 # SvelteKit build output
 .svelte-kit
