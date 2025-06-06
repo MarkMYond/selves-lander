@@ -28,7 +28,7 @@ describe('PricingPlans', () => {
 
     expect(planCards[0].props('price')).toBe('$8')
     expect(planCards[1].props('price')).toBe('$12.5')
-    expect(planCards[2].props('price')).toBe('') // Enterprise has no fixed price
+    expect(planCards[2].props('price')).toBe('')
   })
 })
 

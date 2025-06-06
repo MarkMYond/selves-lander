@@ -6,18 +6,19 @@
       { 'min-h-[600px]': !isGetInTouchPage },
     ]"
   >
-    <!-- Top Section: Logo and Header Link -->
     <section
       v-if="logoUrl"
       class="flex justify-between items-center mb-24 max-sm:mb-14"
     >
-      <a href="/" aria-label="Home">
-        <!-- Increased logo size by 3x -->
+      <a
+        href="/"
+        aria-label="Home"
+      >
         <img
           :src="logoUrl"
           :alt="logo?.alt || 'Logo'"
           class="h-15 max-w-full inline-block align-middle"
-        />
+        >
       </a>
 
       <!-- <button
@@ -30,7 +31,6 @@
       </button> -->
     </section>
 
-    <!-- Main Title Section -->
     <div>
       <h1
         v-if="props.mainTitlePart1"
@@ -40,15 +40,12 @@
         <span
           v-if="props.mainTitlePart2"
           class="text-primary-400 font-normal"
-          >{{ props.mainTitlePart2 }}</span
-        >
+        >{{ props.mainTitlePart2 }}</span>
       </h1>
     </div>
 
-    <!-- Spacer to push footer down with adjustable minimum height -->
-    <div :class="['flex-grow', { 'min-h-[160px]': !isGetInTouchPage }]"></div>
+    <div :class="['flex-grow', { 'min-h-[160px]': !isGetInTouchPage }]" />
 
-    <!-- Footer Section -->
     <footer>
       <p
         v-if="footerText"
@@ -56,12 +53,11 @@
       >
         {{ footerText }}
       </p>
-      <!-- Updated divider line to be brand-primary and 3px thick -->
       <div
         v-if="footerLinks && footerLinks.length > 0"
         :class="['w-full h-[3px] bg-brand-primary mb-4', dividerMarginTopClass]"
         class="hidden md:block"
-      ></div>
+      />
       <nav
         v-if="footerLinks && footerLinks.length > 0"
         class="overflow-scroll hidden md:flex"
@@ -83,9 +79,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineEmits } from 'vue' // Added defineEmits
+import { computed } from 'vue'
 import { useRoute } from 'vue-router' // Import useRoute
-import type { Media } from '../../../payload-cms/src/payload-types'
+import type { Media } from '../../src/payload-types'
 import { useMediaUrl } from '../../composables/useMediaUrl'
 import { navigateTo } from 'nuxt/app' // Import navigateTo
 

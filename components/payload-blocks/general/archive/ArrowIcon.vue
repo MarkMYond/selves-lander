@@ -11,10 +11,9 @@
     <path
       d="M11.4405 5.292L6.4085 0.268L5.2085 1.46L8.2005 4.452H0.7605V6.116H8.2005L5.2085 9.108L6.4085 10.308L11.4405 5.292Z"
       fill="currentColor"
-    ></path>
+    />
   </svg>
 </template>
 
 <script setup lang="ts">
-// Arrow icon component for the "Get started" button
 </script>

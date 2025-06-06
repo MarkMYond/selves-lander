@@ -77,15 +77,11 @@ export interface Config {
     approachTabs: ApproachTabs;
     customizedApproach: CustomizedApproach;
     caseStudySection: CaseStudySection;
-    templateSection: TemplateSection;
-    relatedTemplateSection: RelatedTemplateSection;
     ctaSection: CtaSection;
-    newTemplatesSection: NewTemplatesSectionBlock;
     productFeatures: ProductFeaturesBlock;
     sectorsSection: SectorsSectionBlockPayload;
     scheduleCallSection: ScheduleCallBlockPayload;
     pricingPlans: PricingPlansBlock;
-    travelers: TravelersBlock;
     home03Hero: Home03HeroBlock;
     brandLogos: BrandLogosBlock;
     benefitsSection: BenefitsSectionBlock;
@@ -109,7 +105,6 @@ export interface Config {
     'wiki-pages': WikiPage;
     'registry-pages': RegistryPage;
     'navigation-cache': NavigationCache;
-    templates: Template;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -123,7 +118,6 @@ export interface Config {
     'wiki-pages': WikiPagesSelect<false> | WikiPagesSelect<true>;
     'registry-pages': RegistryPagesSelect<false> | RegistryPagesSelect<true>;
     'navigation-cache': NavigationCacheSelect<false> | NavigationCacheSelect<true>;
-    templates: TemplatesSelect<false> | TemplatesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -595,76 +589,6 @@ export interface CaseStudySection {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "templateSection".
- */
-export interface TemplateSection {
-  title?: string | null;
-  description?: string | null;
-  topLink?: {
-    text?: string | null;
-    url?: string | null;
-  };
-  templates?:
-    | {
-        image: string | Media;
-        title: string;
-        link: string;
-        /**
-         * e.g., bg-red-100, bg-blue-100. Use light shades.
-         */
-        bgColor?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Select the background color.
-   */
-  sectionBackgroundColor?: ('none' | 'white' | 'brand-50' | 'gradient') | null;
-  /**
-   * Select the maximum width for the content container within this block.
-   */
-  containerWidth?: ('default' | 'medium' | 'wide' | 'full') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'templateSection';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "relatedTemplateSection".
- */
-export interface RelatedTemplateSection {
-  title?: string | null;
-  topLink?: {
-    text?: string | null;
-    url?: string | null;
-  };
-  relatedTemplates?:
-    | {
-        image: string | Media;
-        title: string;
-        description?: string | null;
-        link: string;
-        /**
-         * e.g., bg-orange-100, bg-green-100. Use light shades.
-         */
-        bgColor?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Select the background color.
-   */
-  sectionBackgroundColor?: ('none' | 'white' | 'brand-50' | 'gradient') | null;
-  /**
-   * Select the maximum width for the content container within this block.
-   */
-  containerWidth?: ('default' | 'medium' | 'wide' | 'full') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'relatedTemplateSection';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ctaSection".
  */
 export interface CtaSection {
@@ -693,64 +617,6 @@ export interface CtaSection {
   id?: string | null;
   blockName?: string | null;
   blockType: 'ctaSection';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "NewTemplatesSectionBlock".
- */
-export interface NewTemplatesSectionBlock {
-  content: {
-    superTitle?: string | null;
-    title?: string | null;
-    description: string;
-    ctaText?: string | null;
-    ctaUrl?: string | null;
-  };
-  /**
-   * Select the templates to show in this section.
-   */
-  templates: (string | Template)[];
-  /**
-   * Select the background color.
-   */
-  sectionBackgroundColor?: ('none' | 'white' | 'brand-50' | 'gradient') | null;
-  /**
-   * Select the background color.
-   */
-  contentBackgroundColor?: ('none' | 'white' | 'brand-50' | 'gradient') | null;
-  /**
-   * Select the maximum width for the content container within this block.
-   */
-  containerWidth?: ('default' | 'medium' | 'wide' | 'full') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'newTemplatesSection';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "templates".
- */
-export interface Template {
-  id: string;
-  title: string;
-  /**
-   * A unique identifier for the page, used in the URL.
-   */
-  slug: string;
-  href?: string | null;
-  category?: string | null;
-  image?: (string | null) | Media;
-  /**
-   * E.g., "FileText", "ChartLineUp". Used if no image is provided or as an alternative display.
-   */
-  iconName?: string | null;
-  /**
-   * e.g., bg-red-200, bg-white. Default is bg-white.
-   */
-  backgroundColor?: string | null;
-  hasBorder?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -948,88 +814,6 @@ export interface PricingPlansBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'pricingPlans';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TravelersBlock".
- */
-export interface TravelersBlock {
-  /**
-   * Select the background color.
-   */
-  sectionBackgroundColor?: ('none' | 'white' | 'brand-50' | 'gradient') | null;
-  /**
-   * Select the background color.
-   */
-  contentBackgroundColor?: ('none' | 'white' | 'brand-50' | 'gradient') | null;
-  /**
-   * Select the maximum width for the content container within this block.
-   */
-  containerWidth?: ('default' | 'medium' | 'wide' | 'full') | null;
-  removeTopPadding?: boolean | null;
-  removeBottomPadding?: boolean | null;
-  title?: string | null;
-  /**
-   * Select the display style for the title. "Large" matches the homepage hero title size.
-   */
-  titleStyle?: ('standard' | 'large') | null;
-  description?: string | null;
-  buttons?:
-    | {
-        text: string;
-        url: string;
-        style: 'primary' | 'secondary';
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * This text will be suggested as a starting prompt across all tabs
-   */
-  defaultConversationStarter?: string | null;
-  /**
-   * Add up to 5 conversation tabs
-   */
-  tabsFeature?:
-    | {
-        tabTitle: string;
-        /**
-         * Image to display with the tab description (before chat is activated)
-         */
-        tabImage?: (string | null) | Media;
-        /**
-         * Introductory text displayed at the top of the tab
-         */
-        tabContent: string;
-        /**
-         * This will appear as if the user has already asked this question
-         */
-        initialUserMessage: string;
-        /**
-         * This will appear as the AI's response to the initial user message
-         */
-        initialAIResponse: string;
-        /**
-         * Which AI model to use for this tab
-         */
-        modelName: 'gemini-flash-2.0' | 'gemini-2.5-flash-preview-04-17';
-        /**
-         * Instructions for how the AI should behave in this tab (not visible to users)
-         */
-        systemPrompt: string;
-        /**
-         * Name of the AI assistant in this tab
-         */
-        avatarName?: string | null;
-        /**
-         * Optional profile image for the AI assistant
-         */
-        avatarImage?: (string | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'travelers';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1574,68 +1358,6 @@ export interface WebPage {
         blockType: 'caseStudySection';
       }
     | {
-        title?: string | null;
-        description?: string | null;
-        topLink?: {
-          text?: string | null;
-          url?: string | null;
-        };
-        templates?:
-          | {
-              image: string | Media;
-              title: string;
-              link: string;
-              /**
-               * e.g., bg-red-100, bg-blue-100. Use light shades.
-               */
-              bgColor?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        /**
-         * Select the background color.
-         */
-        sectionBackgroundColor?: ('none' | 'white' | 'brand-50' | 'gradient') | null;
-        /**
-         * Select the maximum width for the content container within this block.
-         */
-        containerWidth?: ('default' | 'medium' | 'wide' | 'full') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'templateSection';
-      }
-    | {
-        title?: string | null;
-        topLink?: {
-          text?: string | null;
-          url?: string | null;
-        };
-        relatedTemplates?:
-          | {
-              image: string | Media;
-              title: string;
-              description?: string | null;
-              link: string;
-              /**
-               * e.g., bg-orange-100, bg-green-100. Use light shades.
-               */
-              bgColor?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        /**
-         * Select the background color.
-         */
-        sectionBackgroundColor?: ('none' | 'white' | 'brand-50' | 'gradient') | null;
-        /**
-         * Select the maximum width for the content container within this block.
-         */
-        containerWidth?: ('default' | 'medium' | 'wide' | 'full') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'relatedTemplateSection';
-      }
-    | {
         ctaSubTitle?: string | null;
         ctaTitle?: string | null;
         ctaButtons?:
@@ -1662,12 +1384,10 @@ export interface WebPage {
         blockName?: string | null;
         blockType: 'ctaSection';
       }
-    | NewTemplatesSectionBlock
     | ProductFeaturesBlock
     | SectorsSectionBlockPayload
     | ScheduleCallBlockPayload
     | PricingPlansBlock
-    | TravelersBlock
     | Home03HeroBlock
     | BrandLogosBlock
     | BenefitsSectionBlock
@@ -2226,10 +1946,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'navigation-cache';
         value: string | NavigationCache;
-      } | null)
-    | ({
-        relationTo: 'templates';
-        value: string | Template;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -2436,56 +2152,6 @@ export interface WebPagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        templateSection?:
-          | T
-          | {
-              title?: T;
-              description?: T;
-              topLink?:
-                | T
-                | {
-                    text?: T;
-                    url?: T;
-                  };
-              templates?:
-                | T
-                | {
-                    image?: T;
-                    title?: T;
-                    link?: T;
-                    bgColor?: T;
-                    id?: T;
-                  };
-              sectionBackgroundColor?: T;
-              containerWidth?: T;
-              id?: T;
-              blockName?: T;
-            };
-        relatedTemplateSection?:
-          | T
-          | {
-              title?: T;
-              topLink?:
-                | T
-                | {
-                    text?: T;
-                    url?: T;
-                  };
-              relatedTemplates?:
-                | T
-                | {
-                    image?: T;
-                    title?: T;
-                    description?: T;
-                    link?: T;
-                    bgColor?: T;
-                    id?: T;
-                  };
-              sectionBackgroundColor?: T;
-              containerWidth?: T;
-              id?: T;
-              blockName?: T;
-            };
         ctaSection?:
           | T
           | {
@@ -2505,12 +2171,10 @@ export interface WebPagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        newTemplatesSection?: T | NewTemplatesSectionBlockSelect<T>;
         productFeatures?: T | ProductFeaturesBlockSelect<T>;
         sectorsSection?: T | SectorsSectionBlockPayloadSelect<T>;
         scheduleCallSection?: T | ScheduleCallBlockPayloadSelect<T>;
         pricingPlans?: T | PricingPlansBlockSelect<T>;
-        travelers?: T | TravelersBlockSelect<T>;
         home03Hero?: T | Home03HeroBlockSelect<T>;
         brandLogos?: T | BrandLogosBlockSelect<T>;
         benefitsSection?: T | BenefitsSectionBlockSelect<T>;
@@ -2759,27 +2423,6 @@ export interface TextImageSectionBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "NewTemplatesSectionBlock_select".
- */
-export interface NewTemplatesSectionBlockSelect<T extends boolean = true> {
-  content?:
-    | T
-    | {
-        superTitle?: T;
-        title?: T;
-        description?: T;
-        ctaText?: T;
-        ctaUrl?: T;
-      };
-  templates?: T;
-  sectionBackgroundColor?: T;
-  contentBackgroundColor?: T;
-  containerWidth?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ProductFeaturesBlock_select".
  */
 export interface ProductFeaturesBlockSelect<T extends boolean = true> {
@@ -2909,45 +2552,6 @@ export interface PricingPlansBlockSelect<T extends boolean = true> {
       };
   compareTableTitle?: T;
   compareTableDescription?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TravelersBlock_select".
- */
-export interface TravelersBlockSelect<T extends boolean = true> {
-  sectionBackgroundColor?: T;
-  contentBackgroundColor?: T;
-  containerWidth?: T;
-  removeTopPadding?: T;
-  removeBottomPadding?: T;
-  title?: T;
-  titleStyle?: T;
-  description?: T;
-  buttons?:
-    | T
-    | {
-        text?: T;
-        url?: T;
-        style?: T;
-        id?: T;
-      };
-  defaultConversationStarter?: T;
-  tabsFeature?:
-    | T
-    | {
-        tabTitle?: T;
-        tabImage?: T;
-        tabContent?: T;
-        initialUserMessage?: T;
-        initialAIResponse?: T;
-        modelName?: T;
-        systemPrompt?: T;
-        avatarName?: T;
-        avatarImage?: T;
-        id?: T;
-      };
   id?: T;
   blockName?: T;
 }
@@ -3325,22 +2929,6 @@ export interface NavigationCacheSelect<T extends boolean = true> {
   section?: T;
   navigationData?: T;
   lastGenerated?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "templates_select".
- */
-export interface TemplatesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  href?: T;
-  category?: T;
-  image?: T;
-  iconName?: T;
-  backgroundColor?: T;
-  hasBorder?: T;
   updatedAt?: T;
   createdAt?: T;
 }

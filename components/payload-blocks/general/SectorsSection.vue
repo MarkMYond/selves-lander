@@ -36,8 +36,7 @@
               <a
                 :href="content.ctaUrl"
                 class="text-xl leading-7 text-right cursor-pointer decoration-zinc-800 outline-zinc-800 text-brand-900 max-sm:text-base max-sm:leading-6 hover:underline"
-                >{{ content.ctaText }} →</a
-              >
+              >{{ content.ctaText }} →</a>
             </div>
           </div>
         </div>
@@ -50,7 +49,7 @@
             :key="sector.id || index"
             :title="sector.title || ''"
             :image="sector.image"
-            :iconName="sector.iconName || undefined"
+            :icon-name="sector.iconName || undefined"
             :background-color="sector.backgroundColor || ''"
             :href="sector.href || '#'"
           />
@@ -66,19 +65,16 @@ import { computed } from 'vue'
 import type {
   SectorsSectionBlockPayload,
   Media,
-} from '../../../../payload-cms/src/payload-types'
+} from '../../../src/payload-types'
 import { useMediaUrl } from '../../../composables/useMediaUrl'
 
-// Updated props to accept a block prop instead of direct properties
 const props = defineProps<{
   block: SectorsSectionBlockPayload
 }>()
 
-// Extract content for easier access in the template
 const content = props.block.content || {}
 const sectors = props.block.sectors || []
 
-// Map Payload container width values to Tailwind classes
 const mappedContainerWidth = computed(() => {
   switch (props.block.containerWidth) {
     case 'medium':
@@ -93,11 +89,10 @@ const mappedContainerWidth = computed(() => {
   }
 })
 
-// Map Payload background color values to Tailwind classes
 const mappedContentBgColor = computed(() => {
   switch (props.block.contentBackgroundColor) {
     case 'light-grey':
-      return 'bg-brand-50' // Changed bg-light-grey to bg-brand-50
+      return 'bg-brand-50'
     case 'brand-50':
       return 'bg-brand-50'
     case 'brand-900':
@@ -110,11 +105,10 @@ const mappedContentBgColor = computed(() => {
   }
 })
 
-// Map Payload background color values to Tailwind classes for Section Background
 const mappedSectionBgColor = computed(() => {
   switch (props.block.sectionBackgroundColor) {
     case 'light-grey':
-      return 'bg-brand-50' // Changed bg-light-grey to bg-brand-50
+      return 'bg-brand-50'
     case 'brand-50':
       return 'bg-brand-50'
     case 'brand-900':

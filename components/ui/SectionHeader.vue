@@ -1,23 +1,44 @@
 <template>
-  <div class="section-header text-left space-y-2 md:flex md:flex-row md:items-start md:gap-8">
-    <!-- Text Content Column -->
-    <div :class="[titleImage && typeof titleImage === 'object' && titleImage.url ? 'md:w-3/4' : 'md:w-full', 'space-y-2']">
-      <div v-if="eyebrowText" 
-           class="inline-block px-4 py-1 rounded-full"
-           :class="[eyebrowBackgroundColorClass]">
-        <p class="text-body-14 font-medium text-brandNeutral-04">{{ eyebrowText }}</p>
+  <div
+    class="section-header text-left space-y-2 md:flex md:flex-row md:items-start md:gap-8"
+  >
+    <div
+      :class="[
+        titleImage && typeof titleImage === 'object' && titleImage.url
+          ? 'md:w-3/4'
+          : 'md:w-full',
+        'space-y-2',
+      ]"
+    >
+      <div
+        v-if="eyebrowText"
+        class="inline-block px-4 py-1 rounded-full"
+        :class="[eyebrowBackgroundColorClass]"
+      >
+        <p class="text-body-14 font-medium text-brandNeutral-04">
+          {{ eyebrowText }}
+        </p>
       </div>
       <div class="space-y-4">
-        <h2 v-if="title" class="text-h3 md:text-h2 font-bold text-brandNeutral-04 max-w-xl leading-[1.1]" v-html="title"></h2>
-        <p v-if="subtitle" class="text-body-18 text-brandNeutral-03 max-w-2xl" v-html="subtitle"></p>
+        <h2
+          v-if="title"
+          class="text-h3 md:text-h2 font-bold text-brandNeutral-04 max-w-xl leading-[1.1]"
+          v-html="title"
+        />
+        <p
+          v-if="subtitle"
+          class="text-body-18 text-brandNeutral-03 max-w-2xl"
+          v-html="subtitle"
+        />
       </div>
     </div>
-    <!-- Image Column (Desktop Only) -->
-    <div v-if="titleImage && typeof titleImage === 'object' && titleImage.url" 
-         class="hidden md:block md:w-1/4 mt-4 md:mt-0">
-      <img 
-        :src="getMediaUrl(titleImage)" 
-        :alt="titleImage.alt || title || 'Header image'" 
+    <div
+      v-if="titleImage && typeof titleImage === 'object' && titleImage.url"
+      class="hidden md:block md:w-1/4 mt-4 md:mt-0"
+    >
+      <img
+        :src="getMediaUrl(titleImage)"
+        :alt="titleImage.alt || title || 'Header image'"
         class="w-full h-auto rounded-lg object-contain mx-auto"
         loading="lazy"
       >
@@ -26,9 +47,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from 'vue';
-import { useMediaUrl } from '@/composables/useMediaUrl';
-import type { Media } from '@/src/payload-types'; // Assuming Media type is available
+import { computed, type PropType } from 'vue'
+import { useMediaUrl } from '@/composables/useMediaUrl'
+import type { Media } from '@/src/payload-types' // Assuming Media type is available
 
 const props = defineProps({
   eyebrowText: {
@@ -36,7 +57,7 @@ const props = defineProps({
     required: false,
     default: null,
   },
-  eyebrowBackgroundColor: { 
+  eyebrowBackgroundColor: {
     type: [String, null] as PropType<string | null>,
     required: false,
     default: 'bg-brandTheme-02',
@@ -55,24 +76,20 @@ const props = defineProps({
     required: false,
     default: null,
   },
-  // titleImageAlt: { 
+  // titleImageAlt: {
   //   type: String,
   //   required: false,
   // },
-});
+})
 
-const { getMediaUrl } = useMediaUrl();
+const { getMediaUrl } = useMediaUrl()
 
 const eyebrowBackgroundColorClass = computed(() => {
   // If a specific class is passed, use it, otherwise use the default.
   // This allows direct Tailwind classes from Payload.
-  return props.eyebrowBackgroundColor;
-});
+  return props.eyebrowBackgroundColor
+})
 </script>
 
 <style scoped>
-/* Add any specific scoped styles if needed */
-.section-header {
-  /* Placeholder for any root-level styling if necessary */
-}
 </style>

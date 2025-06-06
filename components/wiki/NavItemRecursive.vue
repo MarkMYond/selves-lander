@@ -7,46 +7,78 @@
         class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 rounded-md transition-colors duration-150 text-sm flex items-center"
         active-class="bg-purple-light text-primary-700 font-semibold"
       >
-        <Icon v-if="item.icon" :name="item.icon.startsWith('ph:') ? `ph:${item.icon.substring(3).toLowerCase()}` : `ph:${item.icon.toLowerCase()}`" class="mr-2 h-4 w-4 flex-shrink-0" />
-        <span class="align-middle [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']">{{ item.title }}</span>
+        <Icon
+          v-if="item.icon"
+          :name="
+            item.icon.startsWith('ph:')
+              ? `ph:${item.icon.substring(3).toLowerCase()}`
+              : `ph:${item.icon.toLowerCase()}`
+          "
+          class="mr-2 h-4 w-4 flex-shrink-0"
+        />
+        <span
+          class="align-middle [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"
+        >{{ item.title }}</span>
       </NuxtLink>
       <button
         v-if="item.hasChildren"
-        @click="() => navStore.toggleExpand(item.id)"
         class="p-1 ml-2 rounded-md text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
         :aria-expanded="item.expanded ? 'true' : 'false'"
-        :aria-label="item.expanded ? `Collapse ${item.title}` : `Expand ${item.title}`"
+        :aria-label="
+          item.expanded ? `Collapse ${item.title}` : `Expand ${item.title}`
+        "
+        @click="() => navStore.toggleExpand(item.id)"
       >
-        <span v-if="item.loadingChildren" class="text-xs">...</span>
+        <span
+          v-if="item.loadingChildren"
+          class="text-xs"
+        >...</span>
         <span v-else>{{ item.expanded ? '-' : '+' }}</span>
       </button>
     </div>
-    <ul v-if="item.expanded && item.children && item.children.length > 0" 
-        :class="['mt-1 pl-3 border-l border-primary-200 space-y-0']" :style="{ marginLeft: `${(level + 1) * 0.5}rem` }">
-      <NavItemRecursive v-for="childItem in item.children" :key="childItem.id" :item="childItem" :level="level + 1" />
+    <ul
+      v-if="item.expanded && item.children && item.children.length > 0"
+      :class="['mt-1 pl-3 border-l border-primary-200 space-y-0']"
+      :style="{ marginLeft: `${(level + 1) * 0.5}rem` }"
+    >
+      <NavItemRecursive
+        v-for="childItem in item.children"
+        :key="childItem.id"
+        :item="childItem"
+        :level="level + 1"
+      />
     </ul>
-    <p v-if="item.expanded && item.children && item.children.length === 0 && !item.loadingChildren && item.hasChildren" 
-       :class="['mt-1 pl-3 text-xs text-gray-500']" :style="{ marginLeft: `${(level + 1) * 0.5}rem` }">
+    <p
+      v-if="
+        item.expanded &&
+          item.children &&
+          item.children.length === 0 &&
+          !item.loadingChildren &&
+          item.hasChildren
+      "
+      :class="['mt-1 pl-3 text-xs text-gray-500']"
+      :style="{ marginLeft: `${(level + 1) * 0.5}rem` }"
+    >
       No sub-pages.
     </p>
   </li>
 </template>
 
 <script setup lang="ts">
-import { defineProps, type PropType, defineAsyncComponent } from 'vue';
-import { useWikiNavStore } from '../../stores/wikiNavStore';
+import { type PropType, defineAsyncComponent } from 'vue'
+import { useWikiNavStore } from '../../stores/wikiNavStore'
 
 // Define NavItem type matching the one in WikiNavigation.vue or a shared types file
 interface NavItem {
-  id: string;
-  title: string;
-  slug?: string;
-  icon?: string;
-  isCategory?: boolean;
-  children?: NavItem[];
-  hasChildren?: boolean;
-  expanded?: boolean;
-  loadingChildren?: boolean;
+  id: string
+  title: string
+  slug?: string
+  icon?: string
+  isCategory?: boolean
+  children?: NavItem[]
+  hasChildren?: boolean
+  expanded?: boolean
+  loadingChildren?: boolean
 }
 
 // Props
@@ -59,9 +91,9 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-});
+})
 
-const navStore = useWikiNavStore();
+const navStore = useWikiNavStore()
 
 // Since this component is recursively calling itself, and it's loaded via defineAsyncComponent
 // by its parent, Vue 3 should handle the recursive self-reference.

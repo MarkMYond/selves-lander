@@ -1,29 +1,28 @@
 <template>
-  <!-- Only render if blocks array is present and has items -->
   <div v-if="blocks && blocks.length > 0">
-    <template v-for="(block, i) in blocks" :key="block.id || i">
+    <template
+      v-for="(block, i) in blocks"
+      :key="block.id || i"
+    >
       <component
-        v-if="getComponentType(block)"
         :is="getComponentType(block)"
+        v-if="getComponentType(block)"
         :block="block"
       />
-      <!-- Optional: Could add an else block here to render a placeholder or warning for unmapped blocks -->
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, markRaw, defineAsyncComponent } from 'vue'
+import { markRaw, defineAsyncComponent } from 'vue'
 import type { PropType } from 'vue'
 
-// Define block types
 export interface BaseBlock {
-  id?: string | null // Allow id to be string, null, or undefined
+  id?: string | null
   blockType: string
   [key: string]: any
 }
 
-// Define props for the component
 const props = defineProps({
   blocks: {
     type: Array as PropType<BaseBlock[]>,
@@ -31,9 +30,7 @@ const props = defineProps({
   },
 })
 
-// Map of block types to component names
 const blockComponents = {
-  // Wiki/Registry Blocks
   content: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/wiki-registry/ContentBlock.vue')
@@ -103,8 +100,6 @@ const blockComponents = {
     )
   ),
 
-  // General Web Page Blocks
-  // heroSection: markRaw(defineAsyncComponent(() => import('./payload-blocks/general/archive/HeroSection.vue'))), // Properly commented out
   b2HeroSection: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/general/B2HeroSection.vue')
@@ -114,7 +109,7 @@ const blockComponents = {
     defineAsyncComponent(
       () => import('./payload-blocks/general/AiSupportSection.vue')
     )
-  ), // Match slug 'aiSupportSection'
+  ),
   approachTabs: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/general/ApproachTabs.vue')
@@ -144,12 +139,12 @@ const blockComponents = {
     defineAsyncComponent(
       () => import('./payload-blocks/general/SolutionCard.vue')
     )
-  ), // Note: Often nested
+  ),
   solutionItem: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/general/SolutionItem.vue')
     )
-  ), // Note: Often nested
+  ),
   solutionsList: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/general/SolutionsList.vue')
@@ -178,73 +173,45 @@ const blockComponents = {
       () => import('./payload-blocks/general/UpdatedTestimonialsCarousel.vue')
     )
   ),
-  newTemplatesSection: markRaw(
-    defineAsyncComponent(
-      () => import('./payload-blocks/general/NewTemplatesSection.vue')
-    )
-  ),
-  // travelEraExplorer: markRaw(defineAsyncComponent(() => import('./payload-blocks/general/archive/TravelEraExplorer.vue'))), // Properly commented out
-  // Add mappings for the missing blocks
   caseStudySection: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/general/CaseStudiesSection.vue')
     )
   ),
-  templateSection: markRaw(
-    defineAsyncComponent(
-      () => import('./payload-blocks/general/TemplatesSection.vue')
-    )
-  ), // Component moved
   sectorsSection: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/general/SectorsSection.vue')
     )
-  ), // Added mapping for SectorsSection
-  // featureGrid: markRaw(defineAsyncComponent(() => import('./payload-blocks/general/FeatureGrid.vue'))), // Removed - Component likely doesn't exist / block is admin-only
+  ),
   productFeatures: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/general/ProductFeatures.vue')
     )
-  ), // Uncommented - File now exists
+  ),
   pricingPlans: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/general/PricingPlans.vue')
     )
-  ), // ADDED PRICING PLANS
+  ),
   scheduleCallSection: markRaw(
     defineAsyncComponent(
       () => import('./payload-blocks/general/ScheduleCallSection.vue')
     )
-  ), // ADDED SCHEDULE CALL SECTION
-  // travelers: markRaw(
-  //   defineAsyncComponent(
-  //     () => import('./payload-blocks/general/TravelersBlock.vue')
-  //   )
-  // ), // ADDED TRAVELERS BLOCK
+  ),
   home03Hero: markRaw(
-    defineAsyncComponent(
-      () => import('./payload-blocks/Home03Hero.vue')
-    )
+    defineAsyncComponent(() => import('./payload-blocks/Home03Hero.vue'))
   ),
   brandLogos: markRaw(
-    defineAsyncComponent(
-      () => import('./payload-blocks/BrandLogos.vue')
-    )
+    defineAsyncComponent(() => import('./payload-blocks/BrandLogos.vue'))
   ),
   benefitsSection: markRaw(
-    defineAsyncComponent(
-      () => import('./payload-blocks/BenefitsSection.vue')
-    )
+    defineAsyncComponent(() => import('./payload-blocks/BenefitsSection.vue'))
   ),
   faqSection: markRaw(
-    defineAsyncComponent(
-      () => import('./payload-blocks/FaqSection.vue')
-    )
+    defineAsyncComponent(() => import('./payload-blocks/FaqSection.vue'))
   ),
   dashboardSection: markRaw(
-    defineAsyncComponent(
-      () => import('./payload-blocks/DashboardSection.vue')
-    )
+    defineAsyncComponent(() => import('./payload-blocks/DashboardSection.vue'))
   ),
   whatMakesUsDifferentSection: markRaw(
     defineAsyncComponent(
@@ -267,9 +234,7 @@ const blockComponents = {
     )
   ),
   heroSection02: markRaw(
-    defineAsyncComponent(
-      () => import('./payload-blocks/HeroSection02.vue')
-    )
+    defineAsyncComponent(() => import('./payload-blocks/HeroSection02.vue'))
   ),
   WhyChooseUsSection: markRaw(
     defineAsyncComponent(
@@ -286,17 +251,14 @@ const blockComponents = {
       () => import('./payload-blocks/RecentArticlesSection.vue')
     )
   ),
-  ContactForm: markRaw( // Added ContactFormBlock
-    defineAsyncComponent(
-      () => import('./payload-blocks/ContactFormBlock.vue')
-    )
+  ContactForm: markRaw(
+    defineAsyncComponent(() => import('./payload-blocks/ContactFormBlock.vue'))
   ),
 }
 
-// Function to determine which component to render based on the block type
 const getComponentType = (block: BaseBlock | null | undefined) => {
   if (!block || !block.blockType) {
-    console.warn('Block is missing blockType:', block)
+    // console.warn('Block is missing blockType:', block)
     return null
   }
 
@@ -304,7 +266,7 @@ const getComponentType = (block: BaseBlock | null | undefined) => {
     blockComponents[block.blockType as keyof typeof blockComponents]
 
   if (!component) {
-    console.warn(`No component found for block type: ${block.blockType}`)
+    // console.warn(`No component found for block type: ${block.blockType}`)
     return null
   }
 

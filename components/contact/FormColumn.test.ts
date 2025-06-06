@@ -41,19 +41,15 @@ describe('FormColumn', () => {
   })
 
   it('submits the form and shows success message', async () => {
-    // Fill required fields
     await wrapper.find('input[name="First-name"]').setValue('John')
     await wrapper.find('input[name="Last-name"]').setValue('Doe')
     await wrapper.find('input[name="Email"]').setValue('john@example.com')
     await wrapper.find('input[value="Designer"]').setValue(true)
 
-    // Submit form
     await wrapper.find('form').trigger('submit')
 
-    // Wait for the simulated API call
     await flushPromises()
 
-    // Check if success message is shown
     expect((wrapper.vm as any).formState.success).toBe(true)
     expect(wrapper.find('[aria-label="Email Form success"]').isVisible()).toBe(
       true
@@ -61,36 +57,29 @@ describe('FormColumn', () => {
   })
 
   it('handles form submission errors', async () => {
-    // Mock console.error to prevent test output pollution
     const originalConsoleError = console.error
     console.error = vi.fn()
 
-    // Mock the handleSubmit method to throw an error
     vi.spyOn(wrapper.vm as any, 'handleSubmit').mockImplementation(async () => {
       ;(wrapper.vm as any).formState.error = true
       ;(wrapper.vm as any).formState.submitting = false
       throw new Error('Test error')
     })
 
-    // Fill required fields
     await wrapper.find('input[name="First-name"]').setValue('John')
     await wrapper.find('input[name="Last-name"]').setValue('Doe')
     await wrapper.find('input[name="Email"]').setValue('john@example.com')
     await wrapper.find('input[value="Designer"]').setValue(true)
 
-    // Submit form
     await wrapper.find('form').trigger('submit')
 
-    // Wait for the simulated API call
     await flushPromises()
 
-    // Check if error message is shown
     expect((wrapper.vm as any).formState.error).toBe(true)
     expect(wrapper.find('[aria-label="Email Form failure"]').isVisible()).toBe(
       true
     )
 
-    // Restore console.error
     console.error = originalConsoleError
   })
 })

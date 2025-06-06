@@ -2,12 +2,16 @@
   <RegistryLayout
     :nav-parent-id="null"
     nav-title="Registry Home"
-    :isLeftSidebarOpen="isLeftSidebarOpen"
-    @closeLeftSidebar="isLeftSidebarOpen = false"
+    :is-left-sidebar-open="isLeftSidebarOpen"
+    @close-left-sidebar="isLeftSidebarOpen = false"
   >
-    <!-- Error State -->
-    <div v-if="error || !pageData" class="py-12 text-center">
-      <div class="w-24 h-24 mx-auto mb-6 text-4xl">🔩</div>
+    <div
+      v-if="error || !pageData"
+      class="py-12 text-center"
+    >
+      <div class="w-24 h-24 mx-auto mb-6 text-4xl">
+        🔩
+      </div>
       <h1 class="text-3xl font-bold text-gray-700 mb-3">
         Registry Page Not Found
       </h1>
@@ -23,66 +27,69 @@
       </NuxtLink>
     </div>
 
-    <!-- Page Content -->
     <div v-else>
-      <!-- Breadcrumbs/History -->
       <div class="max-w-3xl mx-auto px-6 pt-8">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <div class="flex items-center">
               <button
-                @click="$router.back()"
                 class="p-1 rounded hover:bg-brand-100 dark:hover:bg-slate-700 text-brand-400 hover:text-brand-500 dark:hover:text-brand-300"
                 aria-label="Go back"
+                @click="$router.back()"
               >
-                <Icon name="ph:arrow-left" size="16" />
+                <Icon
+                  name="ph:arrow-left"
+                  size="16"
+                />
               </button>
               <button
-                @click="$router.forward()"
                 class="p-1 rounded hover:bg-brand-100 dark:hover:bg-slate-700 text-brand-400 hover:text-brand-500 dark:hover:text-brand-300"
                 aria-label="Go forward"
+                @click="$router.forward()"
               >
-                <Icon name="ph:arrow-right" size="16" />
+                <Icon
+                  name="ph:arrow-right"
+                  size="16"
+                />
               </button>
             </div>
-            <!-- Simplified Breadcrumb -->
             <div class="text-sm text-brand-primary dark:text-primary-300">
               <NuxtLink
                 to="/registry"
                 class="hover:text-brand-primary/80 dark:hover:text-primary-200"
-                >Registry</NuxtLink
               >
+                Registry
+              </NuxtLink>
               <span
                 v-if="
                   pageData.category && typeof pageData.category === 'object'
                 "
                 class="mx-1"
-                >/</span
-              >
+              >/</span>
               <span
                 v-if="
                   pageData.category && typeof pageData.category === 'object'
                 "
-                >{{ pageData.category.name }}</span
-              >
+              >{{ pageData.category.name }}</span>
               <span class="mx-1">/</span>
               <span
                 class="font-medium text-brand-primary dark:text-primary-300"
-                >{{ pageData.title }}</span
-              >
+              >{{ pageData.title }}</span>
             </div>
           </div>
           <button
-            @click="isLeftSidebarOpen = true"
             class="p-1 rounded hover:bg-brand-100 text-gray-500 hover:text-gray-600 ml-auto lg:hidden"
             aria-label="Toggle table of contents"
+            @click="isLeftSidebarOpen = true"
           >
-            <Icon name="ph:list" size="16" />
+            <Icon
+              name="ph:list"
+              size="16"
+            />
           </button>
         </div>
       </div>
 
-      <!-- Micro-header -->
       <template v-if="showMicroHeader">
         <div
           :class="[
@@ -96,17 +103,16 @@
               :src="backgroundImageUrl"
               alt="Page Icon"
               class="absolute left-8 -bottom-10 h-52 w-52 md:h-60 md:w-60 object-contain z-10"
-            />
+            >
             <Icon
-              name="ph:squares-four"
               v-else
+              name="ph:squares-four"
               class="absolute left-8 -bottom-10 text-white z-10 h-52 w-52 md:h-60 md:w-60"
             />
           </div>
         </div>
       </template>
 
-      <!-- Container for constrained content -->
       <div
         class="max-w-3xl mx-auto px-6 pb-8"
         :class="{ 'pt-8': !showMicroHeader }"
@@ -130,9 +136,9 @@
         <PagePrevNextNav
           v-if="
             registryNavData &&
-            registryNavData.length > 0 &&
-            pageData &&
-            pageSlug
+              registryNavData.length > 0 &&
+              pageData &&
+              pageSlug
           "
           :nav-data="registryNavData"
           :current-page-slug="pageSlug"
@@ -144,20 +150,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue' // Added onMounted
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// Phosphor Icons replaced with Nuxt Icon component
 import slugify from 'slugify'
 import type { RegistryPage, Category, Media } from '../../src/payload-types'
 import BlockRenderer from '../../components/BlockRenderer.vue'
-import RegistryLayout from '../../components/registry/RegistryLayout.vue' // Changed import
+import RegistryLayout from '../../components/registry/RegistryLayout.vue'
 import { useSeo } from '../../composables/useSeo'
-import { useMediaUrl } from '../../composables/useMediaUrl' // Import useMediaUrl
+import { useMediaUrl } from '../../composables/useMediaUrl'
 import { useRuntimeConfig } from 'nuxt/app'
-// PagePrevNextNav component and usePayloadNavigation composable are expected to be auto-imported by Nuxt.
-// ref from 'vue' is also auto-imported.
 
-// Type Definitions
 type SectionHeaderBlock = {
   id: string
   blockType: 'sectionHeaderBlock'
@@ -184,14 +186,12 @@ type FetchedRegistryPage = Omit<
   }
 }
 
-// Component Logic
-const { getMediaUrl } = useMediaUrl() // Destructure getMediaUrl
+const { getMediaUrl } = useMediaUrl()
 const route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
-const payloadApiFullUrl = config.public.payloadApiFullUrl // Use full API URL that already includes /api
+const payloadApiFullUrl = config.public.payloadApiFullUrl
 
-// Fetch navigation data for the 'registry' section
 const registrySectionSlug = ref('registry')
 const {
   navData: registryNavData,
@@ -204,53 +204,48 @@ const pageSlug = computed(() => {
   return Array.isArray(slugParam) ? slugParam[slugParam.length - 1] : slugParam
 })
 
-// Use a unique key for useFetch that includes the full path to force refetching on navigation
 const fetchKey = computed(() => `registry-page-${route.fullPath}`)
 const {
   data: pageResponse,
   pending,
   error,
 } = await useFetch<{ docs: FetchedRegistryPage[] }>(
-  () => `/registry-pages?where[slug][equals]=${pageSlug.value}&depth=2&limit=1`, // Removed leading /api from path
+  () => `/registry-pages?where[slug][equals]=${pageSlug.value}&depth=2&limit=1`,
   {
-    baseURL: payloadApiFullUrl, // Use the full API URL with /api
+    baseURL: payloadApiFullUrl,
     key: fetchKey.value,
-    async transform(response) {
-      if (!payloadApiFullUrl) {
-        console.error(
-          `Registry Slug Page: Payload API URL is not configured for slug ${pageSlug.value}.`
-        )
-        return { docs: [] }
-      }
-      if (!response || !response.docs) {
-        console.warn(
-          `Registry Slug Page: No docs found in page response for slug ${pageSlug.value} or response is null.`
-        )
-        return { docs: [] }
-      }
+  async transform(response) {
+    if (!payloadApiFullUrl) {
+      // console.error(
+      //   `Registry Slug Page: Payload API URL is not configured for slug ${pageSlug.value}.`
+      // )
+      return { docs: [] }
+    }
+    if (!response || !response.docs) {
+      // console.warn(
+      //   `Registry Slug Page: No docs found in page response for slug ${pageSlug.value} or response is null.`
+      // )
+      return { docs: [] }
+    }
       return response
-    },
-    onRequestError({ request, options, error: requestError }) {
-      console.error(
-        `Registry Slug Page: Error fetching page data for slug ${pageSlug.value} from ${options.baseURL}${request}:`,
-        requestError
-      )
-    },
-    // Disable caching to ensure fresh content on navigation
-    cache: 'no-cache',
-    // Disable automatic refetching to give us full control
+  },
+  onRequestError({ request, options, error: requestError }) {
+    // console.error(
+    //   `Registry Slug Page: Error fetching page data for slug ${pageSlug.value} from ${options.baseURL}${request}:`,
+    //   requestError
+    // )
+  },
+  cache: 'no-cache',
     watch: false,
   }
 )
 
 const pageData = computed(() => pageResponse.value?.docs?.[0])
 
-// Background Settings
 const backgroundImageUrl = computed(() => {
   const bgSettings = pageData.value?.backgroundSettings
   const bgImage = bgSettings?.backgroundImage
 
-  // First, check if we have an object with a URL that's already a full URL (CDN)
   if (
     typeof bgImage === 'object' &&
     bgImage !== null &&
@@ -261,21 +256,19 @@ const backgroundImageUrl = computed(() => {
       bgImage.url.startsWith('http://') ||
       bgImage.url.startsWith('https://')
     ) {
-      return bgImage.url // Return CDN URL directly
+      return bgImage.url
     }
-    // Otherwise use the getMediaUrl function to construct the URL properly
     return getMediaUrl(bgImage)
   }
 
-  // Handle string paths
   if (typeof bgImage === 'string') {
     if (bgImage.startsWith('http://') || bgImage.startsWith('https://')) {
-      return bgImage // Return direct URL
+      return bgImage
     }
     return getMediaUrl(bgImage)
   }
 
-  return undefined // No image
+  return undefined
 })
 
 const backgroundOverlayValue = computed(
@@ -284,17 +277,14 @@ const backgroundOverlayValue = computed(
 
 const headerBgClass = computed(() => {
   const overlay = backgroundOverlayValue.value
-  // Check if the overlay value is one of the defined background class values
   const validBgValues =
     /^(brandTheme-(01|02|03|04)|brandNeutral-(01|02|03|04)|light-grey)$/
   if (overlay && validBgValues.test(overlay)) {
-    return `bg-${overlay}` // Apply the dynamic background class
+    return `bg-${overlay}`
   }
-  // Fallback to brandNeutral-01 if value is 'default-gradient' or invalid/not set
-  return 'bg-brandNeutral-01' // Fallback to Neutral White
+  return 'bg-brandNeutral-01'
 })
 
-// Determine if the header should be shown (only if image exists or a specific primary color is selected)
 const showMicroHeader = computed(() => {
   const overlay = backgroundOverlayValue.value
   const isPrimaryColorSelected =
@@ -303,7 +293,6 @@ const showMicroHeader = computed(() => {
   return !!backgroundImageUrl.value || isPrimaryColorSelected
 })
 
-// Date Formatting
 const formatDate = (dateString?: string | null): string | null => {
   if (!dateString) return null
   try {
@@ -313,13 +302,12 @@ const formatDate = (dateString?: string | null): string | null => {
       day: 'numeric',
     })
   } catch (e) {
-    console.error('Error formatting date:', e)
+    // console.error('Error formatting date:', e)
     return null
   }
 }
 const lastUpdated = computed(() => formatDate(pageData.value?.updatedAt))
 
-// Table of Contents
 const tableOfContents = computed((): TocItem[] => {
   if (!pageData.value?.pageBuilder) return []
   return pageData.value.pageBuilder
@@ -338,25 +326,20 @@ const tableOfContents = computed((): TocItem[] => {
     })
 })
 
-// Apply SEO with our new composable
-useSeo(pageData.value, 'article') // Use 'article' type for registry pages
+useSeo(pageData.value, 'article')
 
-// Right Sidebar
 const isRightSidebarOpen = ref(false)
 const toggleRightSidebar = () => {
   isRightSidebarOpen.value = !isRightSidebarOpen.value
 }
 
-// Left Sidebar
-const isLeftSidebarOpen = ref(false) // Default to closed on mobile
+const isLeftSidebarOpen = ref(false)
 const toggleLeftSidebar = () => {
   isLeftSidebarOpen.value = !isLeftSidebarOpen.value
 }
 
-// Ensure left sidebar is open on larger screens initially
 onMounted(() => {
   if (window.innerWidth >= 1024) {
-    // lg breakpoint
     isLeftSidebarOpen.value = true
   }
 })

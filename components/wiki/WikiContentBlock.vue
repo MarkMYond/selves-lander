@@ -1,16 +1,16 @@
 <template>
-  <div class="wiki-content-block prose prose-slate max-w-none dark:prose-invert">
-    <slot></slot>
+  <div
+    class="wiki-content-block prose prose-slate max-w-none dark:prose-invert"
+  >
+    <slot />
   </div>
 </template>
 
 <script setup lang="ts">
-// No props or special logic needed, just a wrapper component
 </script>
 
 <style scoped>
 .wiki-content-block {
-  /* Add any specific styling for wiki content */
 }
 
 .wiki-content-block h2 {

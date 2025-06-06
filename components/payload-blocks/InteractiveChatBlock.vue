@@ -1,42 +1,74 @@
 <template>
-  <div :class="['py-6 sm:py-8 md:py-10', sectionBackgroundColorClass, sectionPaddingClasses]">
-    <div :class="['container mx-auto px-4 sm:px-6 lg:px-8', containerWidthClass]">
+  <div
+    :class="[
+      'py-6 sm:py-8 md:py-10',
+      sectionBackgroundColorClass,
+      sectionPaddingClasses,
+    ]"
+  >
+    <div
+      :class="['container mx-auto px-4 sm:px-6 lg:px-8', containerWidthClass]"
+    >
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        <!-- Left Column: Text Content -->
-        <div :class="['md:pr-8', contentBackgroundColorClass, contentPaddingClasses]">
-          <h2 v-if="block.title" :class="['font-bold mb-4', titleSizeClass]">
+        <div
+          :class="[
+            'md:pr-8',
+            contentBackgroundColorClass,
+            contentPaddingClasses,
+          ]"
+        >
+          <h2
+            v-if="block.title"
+            :class="['font-bold mb-4', titleSizeClass]"
+          >
             {{ block.title }}
           </h2>
-          <div v-if="block.description" class="prose max-w-none" v-html="block.description"></div>
-          <div v-if="block.buttons && block.buttons.length > 0" class="mt-6 space-x-4">
+          <div
+            v-if="block.description"
+            class="prose max-w-none"
+            v-html="block.description"
+          />
+          <div
+            v-if="block.buttons && block.buttons.length > 0"
+            class="mt-6 space-x-4"
+          >
             <a
               v-for="(button, index) in block.buttons"
               :key="index"
               :href="button.url"
-              :class="['inline-block px-6 py-3 rounded-md text-base font-medium', buttonStyle(button.style)]"
+              :class="[
+                'inline-block px-6 py-3 rounded-md text-base font-medium',
+                buttonStyle(button.style),
+              ]"
             >
               {{ button.text }}
             </a>
           </div>
         </div>
 
-        <!-- Right Column: Interactive Chat Element -->
         <div class="border-[3px] border-brand-primary rounded-lg p-4 md:p-6">
           <div class="flex mb-4 border-b border-gray-300">
             <button
               v-for="(tab, index) in tabs"
               :key="index"
-              @click="activeTab = tab.id"
               :class="[
                 'py-2 px-4 font-medium text-sm focus:outline-none',
-                activeTab === tab.id ? 'border-b-2 border-brand-primary text-brand-primary' : 'text-gray-500 hover:text-gray-700'
+                activeTab === tab.id
+                  ? 'border-b-2 border-brand-primary text-brand-primary'
+                  : 'text-gray-500 hover:text-gray-700',
               ]"
+              @click="activeTab = tab.id"
             >
               {{ tab.name }}
             </button>
           </div>
-          <div class="min-h-[200px] flex items-center justify-center bg-gray-50 rounded">
-            <p v-if="activeTabContent" class="text-gray-700 text-lg">
+          <div
+            class="min-h-[200px] flex items-center justify-center bg-gray-50 rounded"
+          >
+            <p
+              v-if="activeTabContent"
+              class="text-gray-700 text-lg"
+            >
               {{ activeTabContent }}
             </p>
           </div>
@@ -48,8 +80,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { PropType } from 'vue' // Corrected import for PropType
-import type { InteractiveChatBlock } from './builderTypes' // Assuming this type will be defined
+import type { PropType } from 'vue'
+import type { InteractiveChatBlock } from './builderTypes'
 
 const props = defineProps({
   block: {
@@ -58,7 +90,7 @@ const props = defineProps({
   },
 })
 
-const activeTab = ref('lost-card') // Default active tab
+const activeTab = ref('lost-card')
 
 const tabs = [
   { id: 'lost-card', name: 'Lost card', content: 'LostCardContent' },
@@ -68,24 +100,30 @@ const tabs = [
 ]
 
 const activeTabContent = computed(() => {
-  const currentTab = tabs.find(tab => tab.id === activeTab.value)
+  const currentTab = tabs.find((tab) => tab.id === activeTab.value)
   return currentTab ? currentTab.content : ''
 })
 
 const sectionBackgroundColorClass = computed(() => {
   if (props.block.sectionBackgroundColor === 'brand-50') return 'bg-brand-50'
   if (props.block.sectionBackgroundColor === 'white') return 'bg-white'
-  if (props.block.sectionBackgroundColor === 'light-grey') return 'bg-light-grey' // Ensure this class exists in Tailwind
-  if (props.block.sectionBackgroundColor === 'brand-900') return 'bg-brand-900 text-white' // Assuming text should be white on dark bg
-  return 'bg-transparent' // Default or no background
+  if (props.block.sectionBackgroundColor === 'light-grey')
+    return 'bg-light-grey'
+  if (props.block.sectionBackgroundColor === 'brand-900')
+    return 'bg-brand-900 text-white'
+  return 'bg-transparent'
 })
 
 const contentBackgroundColorClass = computed(() => {
-  if (props.block.contentBackgroundColor === 'brand-50') return 'bg-brand-50 p-6 rounded-lg'
-  if (props.block.contentBackgroundColor === 'white') return 'bg-white p-6 rounded-lg'
-  if (props.block.contentBackgroundColor === 'light-grey') return 'bg-light-grey p-6 rounded-lg'
-  if (props.block.contentBackgroundColor === 'brand-900') return 'bg-brand-900 text-white p-6 rounded-lg'
-  return '' // No specific background for content, or transparent
+  if (props.block.contentBackgroundColor === 'brand-50')
+    return 'bg-brand-50 p-6 rounded-lg'
+  if (props.block.contentBackgroundColor === 'white')
+    return 'bg-white p-6 rounded-lg'
+  if (props.block.contentBackgroundColor === 'light-grey')
+    return 'bg-light-grey p-6 rounded-lg'
+  if (props.block.contentBackgroundColor === 'brand-900')
+    return 'bg-brand-900 text-white p-6 rounded-lg'
+  return ''
 })
 
 const containerWidthClass = computed(() => {
@@ -99,7 +137,7 @@ const containerWidthClass = computed(() => {
     case 'md':
       return 'max-w-screen-md'
     default:
-      return 'max-w-screen-xl' // Default width
+      return 'max-w-screen-xl'
   }
 })
 
@@ -115,30 +153,25 @@ const sectionPaddingClasses = computed(() => {
 })
 
 const contentPaddingClasses = computed(() => {
-  // If contentBackgroundColor is applied, padding is added there.
-  // Otherwise, add some default padding if needed, or manage via prose.
   return !props.block.contentBackgroundColor ? 'py-4' : ''
 })
 
-
 const titleSizeClass = computed(() => {
-  return props.block.titleStyle === 'large' ? 'text-4xl md:text-5xl lg:text-6xl' : 'text-3xl md:text-4xl'
+  return props.block.titleStyle === 'large'
+    ? 'text-4xl md:text-5xl lg:text-6xl'
+    : 'text-3xl md:text-4xl'
 })
 
 const buttonStyle = (style: string | undefined) => {
   if (style === 'secondary') {
     return 'bg-transparent border-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white'
   }
-  // Default to primary
   return 'bg-brand-primary text-white hover:bg-opacity-90'
 }
 </script>
 
 <style scoped>
-/* Scoped styles if needed */
 .prose :deep(p) {
-  /* Example: Custom styling for paragraphs within prose */
   margin-bottom: 1em;
 }
-/* Add any specific styles for tabs or chat elements here if Tailwind classes are not sufficient */
 </style>

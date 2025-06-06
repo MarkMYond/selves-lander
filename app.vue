@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col min-h-screen">
     <AppHeader />
-    <NuxtLoadingIndicator color="#d9e8f0" /> <!-- Updated to brandTheme.02 (light blue) -->
-    <main class="flex-1 relative">
+    <NuxtLoadingIndicator color="#d9e8f0" />
+    <main class="flex-1 relative px-3">
       <NuxtPage />
     </main>
     <TheFooter v-if="showFooter" />
@@ -17,6 +17,6 @@ const route = useRoute()
 
 // Determine if the footer should be shown
 const showFooter = computed(() => {
-  return !route.path.startsWith('/wiki') && !route.path.startsWith('/registry');
+  return !route.path.startsWith('/wiki') && !route.path.startsWith('/registry')
 })
 </script>

@@ -4,7 +4,6 @@ import ScheduleCallForm from './ScheduleCallForm.vue'
 import InfoColumn from './InfoColumn.vue'
 import FormColumn from './FormColumn.vue'
 
-// Mock the child components
 vi.mock('./InfoColumn.vue', () => ({
   default: {
     name: 'InfoColumn',

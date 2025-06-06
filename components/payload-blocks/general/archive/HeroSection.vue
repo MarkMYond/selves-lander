@@ -22,89 +22,90 @@
             v-if="block.headline"
             class="mb-6 text-7xl text-center leading-[95px] max-md:mb-6 max-md:text-7xl max-md:leading-[79px] max-sm:mb-5 max-sm:text-5xl max-sm:leading-[59px]"
           >
-             <!-- Simple rendering for now: -->
-             {{ block.headline }}
+            {{ block.headline }}
           </h1>
-          <!-- Render decorative images inline above buttons -->
-          <div v-if="block.decorativeImages && block.decorativeImages.length > 0" class="mt-8 flex justify-center items-center gap-4 flex-wrap">
-             <template v-for="(item) in block.decorativeImages" :key="item.id">
-               <!-- Conditionally render link or plain image -->
-               <a v-if="item.url && item.image?.url"
-                  :href="item.url"
-                  class="block">
-                 <img
-                   :src="getMediaUrl(item.image)"
-                   :alt="item.image.alt || 'Decorative image'"
-                   class="h-36 object-contain" />
-               </a>
-               <img v-else-if="item.image?.url"
-                    :src="getMediaUrl(item.image)"
-                    :alt="item.image.alt || 'Decorative image'"
-                    class="h-36 object-contain" />
-             </template>
-           </div>
+          <div
+            v-if="block.decorativeImages && block.decorativeImages.length > 0"
+            class="mt-8 flex justify-center items-center gap-4 flex-wrap"
+          >
+            <template
+              v-for="item in block.decorativeImages"
+              :key="item.id"
+            >
+              <a
+                v-if="item.url && item.image?.url"
+                :href="item.url"
+                class="block"
+              >
+                <img
+                  :src="getMediaUrl(item.image as any)"
+                  :alt="item.image.alt || 'Decorative image'"
+                  class="h-36 object-contain"
+                >
+              </a>
+              <img
+                v-else-if="item.image?.url"
+                :src="getMediaUrl(item.image as any)"
+                :alt="item.image.alt || 'Decorative image'"
+                class="h-36 object-contain"
+              >
+            </template>
+          </div>
 
-           <!-- Add button rendering -->
-           <div v-if="block.ctaButtons && block.ctaButtons.length > 0" class="mt-8 flex justify-center gap-4">
-             <a
-               v-for="(button, index) in block.ctaButtons"
-               :key="index"
-               :href="button.url"
-               :class="[
-                 'inline-flex items-center justify-center px-6 py-3 text-lg font-medium text-center rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary',
-                 index === 0
-                   ? 'bg-brand-primary text-white hover:bg-primary-600' // Primary style
-                   : 'bg-transparent border-2 border-brand-primary text-brand-primary hover:bg-primary-100' // Secondary style
-               ]"
-             >
+          <div
+            v-if="block.ctaButtons && block.ctaButtons.length > 0"
+            class="mt-8 flex justify-center gap-4"
+          >
+            <a
+              v-for="(button, index) in block.ctaButtons"
+              :key="index"
+              :href="button.url"
+              :class="[
+                'inline-flex items-center justify-center px-6 py-3 text-lg font-medium text-center rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary',
+                index === 0
+                  ? 'bg-brand-primary text-white hover:bg-primary-600'
+                  : 'bg-transparent border-2 border-brand-primary text-brand-primary hover:bg-primary-100',
+              ]"
+            >
               {{ button.text }}
             </a>
           </div>
         </div>
       </div>
     </div>
-    <!-- Background image rendering removed -->
-    <!-- Removed absolute positioned decorative images container -->
   </header>
 </template>
 
-<style scoped>
-/* No position classes needed anymore */
-</style>
-
 <script setup lang="ts">
- import { useMediaUrl } from '../../../../composables/useMediaUrl';
- import { useRuntimeConfig } from 'nuxt/app';
- 
- // Get config and media URL helper
- const config = useRuntimeConfig();
- const { getMediaUrl } = useMediaUrl();
+import { useMediaUrl } from '../../../../composables/useMediaUrl'
+import { useRuntimeConfig } from 'nuxt/app'
 
- // Removed getPositionClass helper function as it's no longer needed
+const config = useRuntimeConfig()
+const { getMediaUrl } = useMediaUrl()
 
- // Define props to accept the block data from Payload
- defineProps<{
+defineProps<{
   block: {
-    blockType: 'builderHeroSection';
-    headline?: string;
-    subHeadline?: string;
+    blockType: 'builderHeroSection'
+    headline?: string
+    subHeadline?: string
     ctaButtons?: Array<{
-      text: string;
-      url: string;
-      id?: string | null;
-    }>;
-    // backgroundImage prop removed
-  decorativeImages?: Array<{
-    image?: {
-      id: string;
-      alt?: string | null;
-      url?: string | null;
-    } | null;
-    url?: string | null;
-    id?: string | null;
-  }> | null;
-  id?: string | null;
-}
-}>();
-
+      text: string
+      url: string
+      id?: string | null
+    }>
+    decorativeImages?: Array<{
+      image?: {
+        id: string
+        alt?: string | null
+        url?: string | null
+      } | null
+      url?: string | null
+      id?: string | null
+    }> | null
+    id?: string | null
+  }
+}>()
 </script>
+
+<style scoped>
+</style>

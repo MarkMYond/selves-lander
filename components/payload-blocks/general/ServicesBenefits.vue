@@ -1,10 +1,12 @@
 <template>
-  <div class="pt-20 max-md:pt-20 max-sm:pt-12" :class="sectionBgClass">
+  <div
+    class="pt-20 max-md:pt-20 max-sm:pt-12"
+    :class="sectionBgClass"
+  >
     <div
       class="relative px-28 mx-auto max-md:px-16 max-sm:px-7"
       :class="containerClass"
     >
-      <!-- Apply content background class -->
       <div
         class="rounded-xl px-12 py-20 relative overflow-hidden"
         :class="contentBgClass"
@@ -12,15 +14,20 @@
         <div
           class="flex gap-14 gap-14 gap-y-14 gap-y-14 items-center mx-auto max-md:flex-col max-md:gap-12 max-md:gap-12 max-md:gap-y-12 max-md:gap-y-12 max-md: max-sm:gap-12 max-sm:gap-12 max-sm:gap-y-12 max-sm:gap-y-12"
         >
-          <!-- Use getMediaUrl for the image src -->
-          <div v-if="block.benefits?.[0]?.icon" class="flex-1">
+          <div
+            v-if="block.benefits?.[0]?.icon"
+            class="flex-1"
+          >
             <img
               :alt="block.benefits[0].icon?.alt || 'Benefit illustration'"
               :src="getMediaUrl(block.benefits[0].icon)"
               class="w-full max-w-full align-middle overflow-x-clip overflow-y-clip"
-            />
+            >
           </div>
-          <div v-else class="flex-1 text-center italic text-gray-500">
+          <div
+            v-else
+            class="flex-1 text-center italic text-gray-500"
+          >
             [Benefit Image Placeholder]
           </div>
 
@@ -47,33 +54,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue' // Import computed
-import { useMediaUrl } from '../../../composables/useMediaUrl' // Import useMediaUrl
-import type { Media } from '../../../../payload-cms/src/payload-types' // Import Media type
+import { computed } from 'vue'
+import { useMediaUrl } from '../../../composables/useMediaUrl'
+import type { Media } from '../../../src/payload-types'
 
-// const config = useRuntimeConfig() // No longer needed
-const { getMediaUrl } = useMediaUrl() // Use the composable
+const { getMediaUrl } = useMediaUrl()
 
 const props = defineProps<{
-  // Assign props to a variable
   block: {
     blockType: 'servicesBenefits'
     title?: string
     description?: string
     benefits?: Array<{
-      icon?: Media | null // Use Media type
+      icon?: Media | null
       benefitTitle?: string
       benefitDescription?: string
       id?: string | null
     }>
-    sectionBackgroundColor?: string | null // Added
-    contentBackgroundColor?: string | null // Added
-    containerWidth?: 'default' | 'medium' | 'wide' | 'full' | null // Added
+    sectionBackgroundColor?: string | null
+    contentBackgroundColor?: string | null
+    containerWidth?: 'default' | 'medium' | 'wide' | 'full' | null
     id?: string | null
   }
 }>()
 
-// Background and Container Classes
 const sectionBgClass = computed(() => {
   switch (props.block?.sectionBackgroundColor) {
     case 'light-grey':
@@ -101,7 +105,7 @@ const containerClass = computed(() => {
     case 'full':
       return 'max-w-none'
     default:
-      return 'max-w-7xl' // Default to wide
+      return 'max-w-7xl'
   }
 })
 </script>

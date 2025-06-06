@@ -2,17 +2,22 @@
   <WikiLayout
     :nav-parent-id="navParentId"
     :nav-title="navTitle"
-    :isLeftSidebarOpen="isLeftSidebarOpen"
-    @closeLeftSidebar="isLeftSidebarOpen = false"
+    :is-left-sidebar-open="isLeftSidebarOpen"
+    @close-left-sidebar="isLeftSidebarOpen = false"
   >
-    <!-- Error State (Simplified condition) -->
-    <div v-if="pageError" class="py-12 text-center">
-      <div class="w-24 h-24 mx-auto mb-6 text-4xl">🔍</div>
-      <h1 class="text-3xl font-bold text-gray-700 mb-3">Error Loading Page</h1>
+    <div
+      v-if="pageError"
+      class="py-12 text-center"
+    >
+      <div class="w-24 h-24 mx-auto mb-6 text-4xl">
+        🔍
+      </div>
+      <h1 class="text-3xl font-bold text-gray-700 mb-3">
+        Error Loading Page
+      </h1>
       <p class="mt-3 text-gray-500 max-w-md mx-auto mb-6">
         Could not load the requested page. Please try again later.
       </p>
-      <!-- Debug Info -->
       <div
         class="text-xs text-left bg-red-100 p-4 rounded max-w-xl mx-auto mb-4 border border-red-300"
       >
@@ -29,8 +34,7 @@
         <p>Error Data:</p>
         <pre
           class="mt-1 text-xs whitespace-pre-wrap break-all bg-white p-2 border rounded"
-          >{{ JSON.stringify(pageError?.data, null, 2) || 'N/A' }}</pre
-        >
+        >{{ JSON.stringify(pageError?.data, null, 2) || 'N/A' }}</pre>
       </div>
       <NuxtLink
         to="/wiki"
@@ -40,14 +44,19 @@
       </NuxtLink>
     </div>
 
-    <!-- Page Not Found State -->
-    <div v-else-if="!pageData && !pagePending" class="py-12 text-center">
-      <div class="w-24 h-24 mx-auto mb-6 text-4xl">🤷</div>
-      <h1 class="text-3xl font-bold text-gray-700 mb-3">Page Not Found</h1>
+    <div
+      v-else-if="!pageData && !pagePending"
+      class="py-12 text-center"
+    >
+      <div class="w-24 h-24 mx-auto mb-6 text-4xl">
+        🤷
+      </div>
+      <h1 class="text-3xl font-bold text-gray-700 mb-3">
+        Page Not Found
+      </h1>
       <p class="mt-3 text-gray-500 max-w-md mx-auto mb-6">
         The wiki page you're looking for doesn't exist or has been moved. (Slug:
-        <code>{{ pageSlug }}</code
-        >)
+        <code>{{ pageSlug }}</code>)
       </p>
       <NuxtLink
         to="/wiki"
@@ -57,25 +66,30 @@
       </NuxtLink>
     </div>
 
-    <!-- Page Content -->
     <div v-if="pageData">
       <div class="max-w-3xl mx-auto px-6 pt-8">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <div class="flex items-center">
               <button
-                @click="$router.back()"
                 class="p-1 rounded hover:bg-brand-100 dark:hover:bg-slate-700 text-brand-400 hover:text-brand-500 dark:hover:text-brand-300"
                 aria-label="Go back"
+                @click="$router.back()"
               >
-                <Icon name="ph:arrow-left" size="16" />
+                <Icon
+                  name="ph:arrow-left"
+                  size="16"
+                />
               </button>
               <button
-                @click="$router.forward()"
                 class="p-1 rounded hover:bg-brand-100 dark:hover:bg-slate-700 text-brand-400 hover:text-brand-500 dark:hover:text-brand-300"
                 aria-label="Go forward"
+                @click="$router.forward()"
               >
-                <Icon name="ph:arrow-right" size="16" />
+                <Icon
+                  name="ph:arrow-right"
+                  size="16"
+                />
               </button>
             </div>
             <div class="text-sm text-brand-primary dark:text-primary-300">
@@ -83,34 +97,35 @@
                 to="/wiki"
                 prefetch
                 class="hover:text-brand-primary/80 dark:hover:text-primary-200"
-                >Wiki</NuxtLink
               >
+                Wiki
+              </NuxtLink>
               <span
                 v-if="
                   pageData.category && typeof pageData.category === 'object'
                 "
                 class="mx-1"
-                >/</span
-              >
+              >/</span>
               <span
                 v-if="
                   pageData.category && typeof pageData.category === 'object'
                 "
-                >{{ pageData.category.name }}</span
-              >
+              >{{ pageData.category.name }}</span>
               <span class="mx-1">/</span>
               <span
                 class="font-medium text-brand-primary dark:text-primary-300"
-                >{{ pageData.title }}</span
-              >
+              >{{ pageData.title }}</span>
             </div>
 
             <button
-              @click="isLeftSidebarOpen = true"
               class="p-1 rounded hover:bg-brand-100 text-gray-500 hover:text-gray-600 ml-auto lg:hidden"
               aria-label="Toggle table of contents"
+              @click="isLeftSidebarOpen = true"
             >
-              <Icon name="ph:list" size="16" />
+              <Icon
+                name="ph:list"
+                size="16"
+              />
             </button>
           </div>
         </div>
@@ -129,10 +144,10 @@
               :src="backgroundImageUrl"
               alt="Page Icon"
               class="absolute left-8 -bottom-10 h-52 w-52 md:h-60 md:w-60 object-contain z-10"
-            />
+            >
             <Icon
-              name="ph:book-open"
               v-else
+              name="ph:book-open"
               class="absolute left-8 -bottom-10 text-white z-10 h-52 w-52 md:h-60 md:w-60"
             />
           </div>
@@ -162,12 +177,12 @@
         <PagePrevNextNav
           v-if="
             siblingNavData &&
-            siblingNavData.length > 0 &&
-            siblingNavData[0] &&
-            siblingNavData[0].pages &&
-            siblingNavData[0].pages.length > 1 &&
-            pageData &&
-            pageSlug
+              siblingNavData.length > 0 &&
+              siblingNavData[0] &&
+              siblingNavData[0].pages &&
+              siblingNavData[0].pages.length > 1 &&
+              pageData &&
+              pageSlug
           "
           :nav-data="siblingNavData"
           :current-page-slug="pageSlug"
@@ -181,13 +196,12 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// Phosphor icons replaced with Nuxt Icon component
 import type { WikiPage, Category, Media } from '../../src/payload-types'
 import BlockRenderer from '../../components/BlockRenderer.vue'
 import WikiLayout from '../../components/wiki/WikiLayout.vue'
 import { useSeo } from '../../composables/useSeo'
 import { useMediaUrl } from '../../composables/useMediaUrl'
-import PagePrevNextNav from '../../components/wiki/PagePrevNextNav.vue' // Ensure this is imported
+import PagePrevNextNav from '../../components/wiki/PagePrevNextNav.vue'
 
 interface PopulatedParent {
   id: string
@@ -216,15 +230,11 @@ type FetchedWikiPage = Omit<
   }
 }
 interface SiblingNavItem {
-  // For PagePrevNextNav
   slug: string
   title: string
-  id: string // PagePrevNextNav might need id from FlattenedNavPage
-  // icon?: string; // Add if PagePrevNextNav uses it
-  // hasChildren?: boolean; // Add if PagePrevNextNav uses it
+  id: string
 }
 
-// Define NavCategoryGroup structure if not globally available or to be explicit
 interface NavCategoryGroup {
   id: string
   name: string
@@ -254,22 +264,16 @@ const {
       console.error(
         `Wiki Slug Page: Payload API URL is not configured for slug ${pageSlug.value}.`
       )
-      // Throw an error or return a value that indicates failure,
-      // which can be caught by the error handling in the template.
-      // This specific fetch doesn't have its own try/catch, relying on useFetch's error state.
-      // To ensure pageError is populated correctly, we might need to throw.
       throw createError({
         statusCode: 500,
         statusMessage: 'API URL not configured',
       })
     }
-    // payloadApiFullUrl already includes /api, so we just append the collection and query
     return `${payloadApiFullUrl}/wiki-pages?where[slug][equals]=${pageSlug.value}&limit=1`
   },
   {
     key: fetchKey.value,
     cache: 'no-cache',
-    // Add onRequestError for better logging, though pageError should capture it
     onRequestError({ request, options, error: requestError }) {
       console.error(
         `Wiki Slug Page: Error in useFetch for slug ${pageSlug.value} from ${request}:`,
@@ -284,7 +288,6 @@ const pageData = computed(() => pageResponse.value?.docs?.[0])
 const navParentId = null
 const navTitle = 'Wiki Home'
 
-// Fetch sibling navigation data for PagePrevNextNav
 const siblingNavData = ref<NavCategoryGroup[]>([])
 watchEffect(async () => {
   if (
@@ -324,7 +327,6 @@ watchEffect(async () => {
   }
 })
 
-// Background Settings
 const backgroundImageUrl = computed(() => {
   const bgSettings = pageData.value?.backgroundSettings
   const bgImage = bgSettings?.backgroundImage
@@ -362,7 +364,7 @@ const headerBgClass = computed(() => {
   if (overlay && validBgValues.test(overlay)) {
     return `bg-${overlay}`
   }
-  return 'bg-brandNeutral-01' // Fallback to Neutral White
+  return 'bg-brandNeutral-01'
 })
 
 const showMicroHeader = computed(() => {
@@ -388,8 +390,7 @@ const formatDate = (dateString?: string | null): string | null => {
 }
 const lastUpdated = computed(() => formatDate(pageData.value?.updatedAt))
 
-// Left Sidebar
-const isLeftSidebarOpen = ref(false) // Default to closed on mobile
+const isLeftSidebarOpen = ref(false)
 const toggleLeftSidebar = () => {
   console.log('toggleLeftSidebar')
   isLeftSidebarOpen.value = !isLeftSidebarOpen.value

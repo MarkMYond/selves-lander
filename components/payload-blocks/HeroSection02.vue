@@ -1,63 +1,128 @@
 <template>
-  <section class="hero-background-pattern"> <!-- Styling will include relative positioning -->
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8"> <!-- Standard inner container -->
-      <div data-w-id="cf4bb090-9bc9-05d3-4165-d605cde8167b" style="opacity:0" class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16" ref="heroWrapperRef">
-        <div class="lg:w-1/2 space-y-8 text-left"> <!-- Alignment: text-left -->
+  <section class="hero-background-pattern">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div
+        ref="heroWrapperRef"
+        data-w-id="cf4bb090-9bc9-05d3-4165-d605cde8167b"
+        style="opacity: 0"
+        class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16"
+      >
+        <div class="lg:w-1/2 space-y-8 text-left">
           <div class="space-y-6">
-            <!-- New Eyebrow Section -->
-            <div v-if="props.block?.eyebrowText" class="flex justify-start"> <!-- Ensure left alignment for the pill itself -->
-              <p class="text-body-14 font-medium text-brandNeutral-04 bg-brandTheme-02 rounded-full inline-block px-3 py-1">
+            <div
+              v-if="props.block?.eyebrowText"
+              class="flex justify-start"
+            >
+              <p
+                class="text-body-14 font-medium text-brandNeutral-04 bg-brandTheme-02 rounded-full inline-block px-3 py-1"
+              >
                 {{ props.block.eyebrowText }}
               </p>
             </div>
-            <!-- End New Eyebrow Section -->
-            <h1 class="text-5xl md:text-display-h1 font-bold tracking-custom-tightest text-brandNeutral-04 leading-1" v-html="props.block?.heading || 'Transform the way your team works<br>'"></h1> <!-- text-5xl for mobile, md:text-display-h1 for tablet+ -->
-            <div class="max-w-xl"> <!-- Removed mx-auto lg:mx-0 for left alignment -->
-              <p class="text-body-18 md:text-body-20 leading-1.7 text-brandNeutral-03">{{ props.block?.subheading || 'Streamline your workflow, manage projects, and empower your team with task management solution.' }}</p> <!-- Typography & Color -->
+            <h1
+              class="text-5xl md:text-display-h1 font-bold tracking-custom-tightest text-brandNeutral-04 leading-1"
+              v-html="
+                props.block?.heading || 'Transform the way your team works<br>'
+              "
+            />
+            <div class="max-w-xl">
+              <p
+                class="text-body-18 md:text-body-20 leading-1.7 text-brandNeutral-03"
+              >
+                {{
+                  props.block?.subheading ||
+                    'Streamline your workflow, manage projects, and empower your team with task management solution.'
+                }}
+              </p>
             </div>
           </div>
-          <div class="flex flex-row items-center justify-start gap-4"> <!-- Alignment: justify-start, changed flex-col sm:flex-row to flex-row -->
+          <div class="flex flex-row items-center justify-start gap-4">
             <BaseButton
               v-if="props.block?.buttons && props.block.buttons[0]"
-              :to="isInternalLink(props.block.buttons[0]) ? getButtonUrl(props.block.buttons[0]) : undefined"
-              :href="!isInternalLink(props.block.buttons[0]) ? getButtonUrl(props.block.buttons[0]) : undefined"
-              :target="shouldOpenInNewTab(props.block.buttons[0]) ? '_blank' : undefined"
-              :variant="props.block.buttons[0].variant as any || 'primary'" 
+              :to="
+                isInternalLink(props.block.buttons[0])
+                  ? getButtonUrl(props.block.buttons[0])
+                  : undefined
+              "
+              :href="
+                !isInternalLink(props.block.buttons[0])
+                  ? getButtonUrl(props.block.buttons[0])
+                  : undefined
+              "
+              :target="
+                shouldOpenInNewTab(props.block.buttons[0])
+                  ? '_blank'
+                  : undefined
+              "
+              :variant="(props.block.buttons[0].variant as any) || 'primary'"
             >
               {{ props.block?.buttons?.[0]?.label || 'Book a Demo' }}
             </BaseButton>
             <BaseButton
               v-if="props.block?.buttons && props.block.buttons[1]"
-              :to="isInternalLink(props.block.buttons[1]) ? getButtonUrl(props.block.buttons[1]) : undefined"
-              :href="!isInternalLink(props.block.buttons[1]) ? getButtonUrl(props.block.buttons[1]) : undefined"
-              :target="shouldOpenInNewTab(props.block.buttons[1]) ? '_blank' : undefined"
-              :variant="props.block.buttons[1].variant as any || 'secondary'"
+              :to="
+                isInternalLink(props.block.buttons[1])
+                  ? getButtonUrl(props.block.buttons[1])
+                  : undefined
+              "
+              :href="
+                !isInternalLink(props.block.buttons[1])
+                  ? getButtonUrl(props.block.buttons[1])
+                  : undefined
+              "
+              :target="
+                shouldOpenInNewTab(props.block.buttons[1])
+                  ? '_blank'
+                  : undefined
+              "
+              :variant="(props.block.buttons[1].variant as any) || 'secondary'"
             >
               {{ props.block?.buttons?.[1]?.label || 'Get in Touch' }}
             </BaseButton>
           </div>
         </div>
         <div class="lg:w-1/2 mt-10 lg:mt-0">
-          <!-- Single Hero Image -->
-          <div v-if="props.block?.heroImage" class="transform transition-transform duration-500 hover:scale-105">
-            <img 
-              :src="mediaHelpers.getMediaUrl(props.block.heroImage) || '/webflow-assets/images/hero-card-2.1.png'" 
-              loading="lazy" 
-              :alt="getImageAlt(props.block.heroImage) || 'Hero Image'" 
+          <div
+            v-if="props.block?.heroImage"
+            class="transform transition-transform duration-500 hover:scale-105"
+          >
+            <img
+              :src="
+                mediaHelpers.getMediaUrl(props.block.heroImage) ||
+                  '/webflow-assets/images/hero-card-2.1.png'
+              "
+              loading="lazy"
+              :alt="getImageAlt(props.block.heroImage) || 'Hero Image'"
               class="w-3/4 mx-auto lg:w-full h-auto object-cover rounded-xl shadow-lg"
             >
           </div>
-          <!-- Fallback if no image provided -->
-          <div v-else class="w-full h-auto bg-brandNeutral-02 rounded-xl shadow-lg flex items-center justify-center aspect-[4/3]">
-            <p class="text-brandNeutral-03">Hero image placeholder</p>
+          <div
+            v-else
+            class="w-full h-auto bg-brandNeutral-02 rounded-xl shadow-lg flex items-center justify-center aspect-[4/3]"
+          >
+            <p class="text-brandNeutral-03">
+              Hero image placeholder
+            </p>
           </div>
 
-          <div class="mt-6 flex justify-end" v-if="props.block?.arrowButtonText">
-            <div class="inline-flex items-center p-3 bg-primary text-primary-foreground rounded-full shadow-lg cursor-pointer hover:brightness-90 transition-colors duration-150 ease-in-out"> <!-- Color & Hover -->
+          <div
+            v-if="props.block?.arrowButtonText"
+            class="mt-6 flex justify-end"
+          >
+            <div
+              class="inline-flex items-center p-3 bg-primary text-primary-foreground rounded-full shadow-lg cursor-pointer hover:brightness-90 transition-colors duration-150 ease-in-out"
+            >
               <div class="mr-2">
-                <p class="text-body-14 font-medium">{{ props.block?.arrowButtonText }}</p> <!-- Typography -->
+                <p class="text-body-14 font-medium">
+                  {{ props.block?.arrowButtonText }}
+                </p>
               </div>
-              <img src="~/assets/images/shape-1.svg" loading="lazy" alt="Arrow Shape" class="h-5 w-5">
+              <img
+                src="~/assets/images/shape-1.svg"
+                loading="lazy"
+                alt="Arrow Shape"
+                class="h-5 w-5"
+              >
             </div>
           </div>
         </div>
@@ -67,139 +132,154 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, type PropType } from 'vue';
-import { useScrollAnimations } from '@/composables/useScrollAnimations';
-import { useHeroAnimations } from '@/composables/useHeroAnimations';
-import { useMediaUrl } from '@/composables/useMediaUrl'; // Import useMediaUrl
-import type { HeroSection02Payload, Media, WebPage } from '@/src/payload-types';
-import BaseButton from '@/components/ui/BaseButton.vue'; // Fixed import path
+import { ref, onMounted, computed, type PropType } from 'vue'
+import { useScrollAnimations } from '@/composables/useScrollAnimations'
+import { useHeroAnimations } from '@/composables/useHeroAnimations'
+import { useMediaUrl } from '@/composables/useMediaUrl'
+import type { HeroSection02Payload, Media, WebPage } from '@/src/payload-types'
+import BaseButton from '@/components/ui/BaseButton.vue'
 
-// Define props
 const props = defineProps({
-  block: { 
+  block: {
     type: Object as PropType<HeroSection02Payload>,
     required: true,
   },
-});
+})
 
-// Helper function to determine if a link is truly external (starts with http, https, //)
 const isTrulyExternalUrl = (url?: string): boolean => {
-  if (!url) return false;
-  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//');
-};
+  if (!url) return false
+  return (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('//')
+  )
+}
 
-// Revised Helper function to determine if a button is an internal link
 const isInternalLink = (button?: any): boolean => {
-  if (!button) return false;
-  if (button.type === 'internal') return true;
+  if (!button) return false
+  if (button.type === 'internal') return true
   if (button.type === 'external') {
-    // If type is external, but the link is a relative path, treat as internal for Nuxt routing
-    if (button.externalLink && button.externalLink.startsWith('/') && !isTrulyExternalUrl(button.externalLink)) {
-      return true; 
+    if (
+      button.externalLink &&
+      button.externalLink.startsWith('/') &&
+      !isTrulyExternalUrl(button.externalLink)
+    ) {
+      return true
     }
-    return false; // It's a true external link or type is external without a relative path
+    return false
   }
-  // Fallback if type is not set:
-  // Prefer internal if internalLink is present and externalLink is not, 
-  // or if externalLink is a relative path and internalLink is not present.
-  if (button.internalLink && !button.externalLink) return true;
-  if (button.externalLink && button.externalLink.startsWith('/') && !isTrulyExternalUrl(button.externalLink) && !button.internalLink) return true;
-  
-  return false; // Default to external if ambiguous or truly external
-};
+  if (button.internalLink && !button.externalLink) return true
+  if (
+    button.externalLink &&
+    button.externalLink.startsWith('/') &&
+    !isTrulyExternalUrl(button.externalLink) &&
+    !button.internalLink
+  )
+    return true
 
-// Revised Helper function to get button URL
+  return false
+}
+
 const getButtonUrl = (button?: any): string => {
-  if (!button) return '#';
+  if (!button) return '#'
 
-  const isEffectivelyInternal = isInternalLink(button);
+  const isEffectivelyInternal = isInternalLink(button)
 
   if (isEffectivelyInternal) {
-    // If type was 'internal', prioritize internalLink field
     if (button.type === 'internal' && button.internalLink) {
-      const internalValue = button.internalLink;
-      if (typeof internalValue === 'object' && internalValue !== null && 'slug' in internalValue && typeof internalValue.slug === 'string') {
-        return `/${internalValue.slug}`;
+      const internalValue = button.internalLink
+      if (
+        typeof internalValue === 'object' &&
+        internalValue !== null &&
+        'slug' in internalValue &&
+        typeof internalValue.slug === 'string'
+      ) {
+        return `/${internalValue.slug}`
       }
       if (typeof internalValue === 'string') {
-        return internalValue.startsWith('/') ? internalValue : `/${internalValue}`;
+        return internalValue.startsWith('/')
+          ? internalValue
+          : `/${internalValue}`
       }
     }
-    // If type was 'external' but externalLink is a relative path (now treated as internal)
-    if (button.externalLink && button.externalLink.startsWith('/') && !isTrulyExternalUrl(button.externalLink)) {
-      return button.externalLink;
+    if (
+      button.externalLink &&
+      button.externalLink.startsWith('/') &&
+      !isTrulyExternalUrl(button.externalLink)
+    ) {
+      return button.externalLink
     }
-    // Fallback for effectively internal if internalLink was primary but malformed or type was missing
-    if (button.internalLink) { 
-        const internalValue = button.internalLink;
-        if (typeof internalValue === 'object' && internalValue !== null && 'slug' in internalValue && typeof internalValue.slug === 'string') return `/${internalValue.slug}`;
-        if (typeof internalValue === 'string') return internalValue.startsWith('/') ? internalValue : `/${internalValue}`;
+    if (button.internalLink) {
+      const internalValue = button.internalLink
+      if (
+        typeof internalValue === 'object' &&
+        internalValue !== null &&
+        'slug' in internalValue &&
+        typeof internalValue.slug === 'string'
+      )
+        return `/${internalValue.slug}`
+      if (typeof internalValue === 'string')
+        return internalValue.startsWith('/')
+          ? internalValue
+          : `/${internalValue}`
     }
-  } else { // Truly External link (type was 'external' and externalLink is a full URL)
+  } else {
     if (button.externalLink) {
-      return button.externalLink;
+      return button.externalLink
     }
   }
-  return '#'; // Fallback if no valid link found
-};
+  return '#'
+}
 
-// Revised Helper function to determine if link should open in new tab
 const shouldOpenInNewTab = (button?: any): boolean => {
-  if (!button) return false;
+  if (!button) return false
   
-  // Open in new tab if newTab is explicitly true
-  if (button.newTab === true) return true;
+  if (button.newTab === true) return true
   
-  // Open in new tab if it's a truly external URL (and newTab is not explicitly false)
-  // This means type: 'external' with a full URL like https://...
-  // We use getButtonUrl to ensure we are checking the final URL that will be used.
-  const url = getButtonUrl(button);
-  if (isTrulyExternalUrl(url) && button.newTab !== false) return true;
-  
-  return false;
-};
+  const url = getButtonUrl(button)
+  if (isTrulyExternalUrl(url) && button.newTab !== false) return true
 
-// Use the composable for image URL
-const mediaHelpers = useMediaUrl(); // Call composable and store its result
+  return false
+}
 
-// Helper function to get image alt text
-const getImageAlt = (imageField: string | Media | null | undefined): string | undefined => {
+const mediaHelpers = useMediaUrl()
+
+const getImageAlt = (
+  imageField: string | Media | null | undefined
+): string | undefined => {
   if (imageField && typeof imageField === 'object' && imageField?.alt) {
-    return imageField.alt;
+    return imageField.alt
   }
-  return undefined;
-};
+  return undefined
+}
 
-// Scroll animations
-const { registerElement: registerScrollElement } = useScrollAnimations();
-// Hero animations
-const { initializeHeroAnimations } = useHeroAnimations();
+const { registerElement: registerScrollElement } = useScrollAnimations()
+const { initializeHeroAnimations } = useHeroAnimations()
 
-const heroWrapperRef = ref<HTMLElement | null>(null);
+const heroWrapperRef = ref<HTMLElement | null>(null)
 
 onMounted(() => {
   if (heroWrapperRef.value) {
-    const id = heroWrapperRef.value.getAttribute('data-w-id');
+    const id = heroWrapperRef.value.getAttribute('data-w-id')
     if (id) {
-      registerScrollElement(id, heroWrapperRef.value);
+      registerScrollElement(id, heroWrapperRef.value)
     }
   }
-  initializeHeroAnimations();
-});
+  initializeHeroAnimations()
+})
 </script>
 
 <style scoped>
-.hero-background-pattern { /* Styles for background on the outer section */
-  position: relative; /* Added for positioning */
-  top: -5.625rem; /* Pulls section up by 90px (5rem + 10px). Adjust as needed. */
+.hero-background-pattern {
+  position: relative;
+  top: -5.625rem;
   background-image: url('~/assets/images/pattern-shape2.png');
-  background-position: 0% 0%; /* Top left */
+  background-position: 0% 0%;
   background-repeat: no-repeat;
-  background-size: cover; 
-  padding-top: 145px; /* Large padding to push content down, revealing background */
-  padding-bottom: 56px; /* Halved bottom padding */
+  background-size: cover;
+  padding-top: 145px;
+  padding-bottom: 56px;
   overflow: hidden;
-  margin-bottom: -5.625rem; /* Compensate for the shifted space in layout */
+  margin-bottom: -5.625rem;
 }
-/* Styles specific to this hero section can be added here if needed */
 </style>

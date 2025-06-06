@@ -11,9 +11,12 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-remixco-blue text-white hover:bg-remixco-blue/90',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-input hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        destructive:
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline:
+          'border border-input hover:bg-accent hover:text-accent-foreground',
+        secondary:
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
       },
@@ -28,7 +31,7 @@ const buttonVariants = cva(
       variant: 'default',
       size: 'default',
     },
-  },
+  }
 )
 
 // Define props including 'to' and 'href' for navigation
@@ -48,23 +51,28 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const componentIs = computed(() => {
-  if (props.to) return NuxtLink;
-  if (props.href) return 'a';
-  return props.as;
-});
+  if (props.to) return NuxtLink
+  if (props.href) return 'a'
+  return props.as
+})
 
 const linkProps = computed(() => {
-  if (props.to) return { to: props.to };
-  if (props.href) return { href: props.href };
-  return {};
-});
+  if (props.to) return { to: props.to }
+  if (props.href) return { href: props.href }
+  return {}
+})
 </script>
 
 <template>
   <component
     :is="componentIs"
     v-bind="linkProps"
-    :class="cn(buttonVariants({ variant: props.variant, size: props.size }), props.class)"
+    :class="
+      cn(
+        buttonVariants({ variant: props.variant, size: props.size }),
+        props.class
+      )
+    "
   >
     <slot />
   </component>

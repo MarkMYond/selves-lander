@@ -3,15 +3,12 @@ import { computed, ref } from 'vue'
 import type { ProductFeaturesBlock, Media } from '../../../src/payload-types'
 import { useMediaUrl } from '../../../composables/useMediaUrl'
 
-// Import useIcons composable
 const { getIconName } = useIcons()
 
-// Define function to get icon with duotone variant
 const getIconWithVariant = (iconName: string) => {
   return getIconName(iconName.toLowerCase(), 'duotone')
 }
 
-// Update props to accept a block prop
 const props = defineProps<{
   block: ProductFeaturesBlock
 }>()
@@ -24,14 +21,11 @@ interface FeatureItem {
   id?: string | null
 }
 
-// Extract data from the block prop
 const features = (props.block.features || []) as FeatureItem[]
 const defaultImage = props.block.defaultImage as Media
 
-// Get the media URL helper function
 const { getMediaUrl } = useMediaUrl()
 
-// Map Payload container width values to Tailwind classes
 const mappedContainerWidth = computed(() => {
   switch (props.block.containerWidth) {
     case 'medium':
@@ -46,44 +40,48 @@ const mappedContainerWidth = computed(() => {
   }
 })
 
-// Map Payload background color values to Tailwind classes
 const mappedSectionBgColor = computed(() => {
   switch (props.block.sectionBackgroundColor) {
-    case 'light-grey':
-      return 'bg-brand-50' // Changed bg-light-grey to bg-brand-50
+    // case 'light-grey': // Not a valid type for ProductFeaturesBlock.sectionBackgroundColor
+    //   return 'bg-brand-50'
     case 'brand-50':
       return 'bg-brand-50'
-    case 'brand-900':
-      return 'bg-brand-900 text-white'
-    case 'brand-primary':
-      return 'bg-brand-primary text-white'
+    // case 'brand-900': // Not a valid type for ProductFeaturesBlock.sectionBackgroundColor
+    //   return 'bg-brand-900 text-white'
+    // case 'brand-primary': // Not a valid type for ProductFeaturesBlock.sectionBackgroundColor
+    //   return 'bg-brand-primary text-white'
     case 'white':
+    // Handle 'none', 'gradient', null, undefined explicitly if needed
     default:
-      return 'bg-white'
+      if (props.block?.sectionBackgroundColor === 'none' || !props.block?.sectionBackgroundColor) {
+        return 'bg-transparent';
+      }
+      return 'bg-' + props.block.sectionBackgroundColor
   }
 })
 
-// New computed property for image column background
 const mappedImageColumnBgColor = computed(() => {
   switch (props.block.imageColumnBackgroundColor) {
-    case 'light-grey':
-      return 'bg-brand-50' // Changed bg-light-grey to bg-brand-50
+    // case 'light-grey': // Not a valid type for ProductFeaturesBlock.imageColumnBackgroundColor
+    //   return 'bg-brand-50'
     case 'brand-50':
       return 'bg-brand-50'
-    case 'brand-900':
-      return 'bg-brand-900 text-white'
-    case 'brand-primary':
-      return 'bg-brand-primary text-white'
+    // case 'brand-900': // Not a valid type for ProductFeaturesBlock.imageColumnBackgroundColor
+    //   return 'bg-brand-900 text-white'
+    // case 'brand-primary': // Not a valid type for ProductFeaturesBlock.imageColumnBackgroundColor
+    //   return 'bg-brand-primary text-white'
     case 'white':
+    // Handle 'none', 'gradient', null, undefined explicitly if needed
     default:
-      return 'bg-white'
+      if (props.block?.imageColumnBackgroundColor === 'none' || !props.block?.imageColumnBackgroundColor) {
+        return 'bg-transparent';
+      }
+      return 'bg-' + props.block.imageColumnBackgroundColor
   }
 })
 
-// State to track the index of the hovered feature
 const selectedFeatureIndex = ref<number | null>(null)
 
-// Functions to update the hovered state
 function selectFeature(index: number) {
   selectedFeatureIndex.value = index
 }
@@ -91,7 +89,6 @@ function clearSelection() {
   selectedFeatureIndex.value = null
 }
 
-// Computed property for the image URL, now dynamic based on hover
 const currentImageUrl = computed(() => {
   const selectedFeature =
     selectedFeatureIndex.value !== null
@@ -107,16 +104,14 @@ const currentImageUrl = computed(() => {
 <template>
   <section :class="['py-12 md:py-16', mappedSectionBgColor]">
     <div :class="['mx-auto px-4 sm:px-6 lg:px-8', mappedContainerWidth]">
-      <!-- Changed to md:grid-cols-5 for 40/60 split -->
       <div class="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-12 items-center">
-        <!-- Feature List (40%) -->
         <div class="md:col-span-2 divide-y divide-[#C9B7FF]">
           <div
             v-for="(feature, index) in features"
             :key="feature.id || index"
+            class="group cursor-pointer p-4 transition-all duration-500 hover:bg-[#C9B7FF]"
             @mouseenter="selectFeature(index)"
             @mouseleave="clearSelection"
-            class="group cursor-pointer p-4 transition-all duration-500 hover:bg-[#C9B7FF]"
           >
             <div class="flex items-center mb-1">
               <Icon
@@ -139,7 +134,6 @@ const currentImageUrl = computed(() => {
           </div>
         </div>
 
-        <!-- Image Display (60%) -->
         <div
           :class="[
             'flex flex-col justify-center items-center md:col-span-3 p-10 h-full rounded-2xl border-[3px] border-brand-primary',
@@ -151,14 +145,16 @@ const currentImageUrl = computed(() => {
             :src="currentImageUrl"
             alt="Feature image"
             class="max-w-full h-auto"
-          />
+          >
           <div
             v-else
             class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center"
           >
             <span class="text-gray-500">No image available</span>
           </div>
-          <p class="text-xl mt-4">Coming soon...</p>
+          <p class="text-xl mt-4">
+            Coming soon...
+          </p>
         </div>
       </div>
     </div>

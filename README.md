@@ -30,6 +30,7 @@ npm run generate:wiki-nav
 This will fetch all categories and wiki pages from Payload CMS and generate a JSON file in the public directory.
 
 The navigation is also automatically regenerated whenever:
+
 1. A wiki page is created or updated
 2. A wiki page is deleted
 

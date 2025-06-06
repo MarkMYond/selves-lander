@@ -10,7 +10,14 @@ const props = defineProps<Props>()
 </script>
 
 <template>
-  <p :class="cn('text-base leading-relaxed text-muted-foreground [font-variant-ligatures:stylistic] [font-feature-settings:\'ss01\']', props.class)">
+  <p
+    :class="
+      cn(
+        'text-base leading-relaxed text-muted-foreground [font-variant-ligatures:stylistic] [font-feature-settings:\'ss01\']',
+        props.class
+      )
+    "
+  >
     <slot />
   </p>
 </template>

@@ -26,7 +26,7 @@ export const useScrollAnimations = () => {
           entries.forEach((entry) => {
             const element = entry.target as HTMLElement
             const elementId = element.getAttribute('data-w-id')
-            
+
             if (entry.isIntersecting) {
               // Add animation class when element enters viewport
               element.classList.add('animate-in')
@@ -37,7 +37,7 @@ export const useScrollAnimations = () => {
         },
         {
           threshold: 0.1,
-          rootMargin: '0px 0px -50px 0px'
+          rootMargin: '0px 0px -50px 0px',
         }
       )
 
@@ -60,6 +60,6 @@ export const useScrollAnimations = () => {
 
   return {
     registerElement,
-    unregisterElement
+    unregisterElement,
   }
 }

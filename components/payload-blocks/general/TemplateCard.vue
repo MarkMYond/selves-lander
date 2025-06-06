@@ -31,18 +31,16 @@ const iconNameFormatted = computed(() => {
 </script>
 
 <template>
-  <!-- Use NuxtLink for internal URLs, regular anchor for external -->
   <NuxtLink
     v-if="!isExternalUrl(href)"
     :to="href"
     :class="[
-      'relative flex flex-col justify-center p-4 md:p-6 rounded-2xl transition-shadow cursor-pointer duration-[0.2s] z-[2] max-sm:shrink-0 max-sm:w-60 max-sm:transition-none max-sm:duration-0',
+      'relative flex flex-col justify-center p-4 md:p-6 rounded-2xl transition-shadow cursor-pointer duration-&lsqb;0.2s&rsqb; z-[2] max-sm:shrink-0 max-sm:w-60 max-sm:transition-none max-sm:duration-0',
       imageUrl ? 'aspect-[3/4]' : 'min-h-[150px] md:min-h-[200px]',
       backgroundColor || 'bg-white',
       hasBorder ? 'border-[3px] border-solid border-brand-primary' : '',
     ]"
   >
-    <!-- Image Area: Only render if imageUrl is present -->
     <div
       v-if="imageUrl"
       class="flex-grow mb-4 flex items-center justify-center"
@@ -51,19 +49,23 @@ const iconNameFormatted = computed(() => {
         :alt="imageAlt || title || 'Template visual'"
         :src="imageUrl"
         class="inline-block w-full max-w-full h-auto max-h-48 object-contain align-middle select-none"
-      />
+      >
     </div>
 
-    <!-- Bottom section with Icon + Text -->
     <div
       class="pt-4 flex flex-row items-start"
       :class="{ 'mt-auto': imageUrl }"
     >
-      <!-- Icon Column -->
-      <div v-if="iconNameFormatted" class="mr-4 flex-shrink-0">
-        <Icon :name="iconNameFormatted" size="40" class="text-brand-primary" />
+      <div
+        v-if="iconNameFormatted"
+        class="mr-4 flex-shrink-0"
+      >
+        <Icon
+          :name="iconNameFormatted"
+          size="40"
+          class="text-brand-primary"
+        />
       </div>
-      <!-- Text Column (Title & Category) -->
       <div class="flex flex-col flex-grow">
         <div class="mb-1 cursor-pointer">
           <p
@@ -80,22 +82,20 @@ const iconNameFormatted = computed(() => {
         </p>
       </div>
     </div>
-  </NuxtLink>
+    </NuxtLink>
 
-  <!-- External link version -->
   <a
     v-else
     :href="href"
     target="_blank"
     rel="noopener noreferrer"
     :class="[
-      'relative flex flex-col justify-center p-4 md:p-6 rounded-2xl transition-shadow cursor-pointer duration-[0.2s] z-[2] max-sm:shrink-0 max-sm:w-60 max-sm:transition-none max-sm:duration-0',
+      'relative flex flex-col justify-center p-4 md:p-6 rounded-2xl transition-shadow cursor-pointer duration-&lsqb;0.2s&rsqb; z-[2] max-sm:shrink-0 max-sm:w-60 max-sm:transition-none max-sm:duration-0',
       imageUrl ? 'aspect-[3/4]' : 'min-h-[150px] md:min-h-[200px]',
       backgroundColor || 'bg-white',
       hasBorder ? 'border-[3px] border-solid border-brand-primary' : '',
     ]"
   >
-    <!-- Image Area: Only render if imageUrl is present -->
     <div
       v-if="imageUrl"
       class="flex-grow mb-4 flex items-center justify-center"
@@ -104,19 +104,23 @@ const iconNameFormatted = computed(() => {
         :alt="imageAlt || title || 'Template visual'"
         :src="imageUrl"
         class="inline-block w-full max-w-full h-auto max-h-48 object-contain align-middle select-none"
-      />
+      >
     </div>
 
-    <!-- Bottom section with Icon + Text -->
     <div
       class="pt-4 flex flex-row items-start"
       :class="{ 'mt-auto': imageUrl }"
     >
-      <!-- Icon Column -->
-      <div v-if="iconNameFormatted" class="mr-4 flex-shrink-0">
-        <Icon :name="iconNameFormatted" size="40" class="text-brand-primary" />
+      <div
+        v-if="iconNameFormatted"
+        class="mr-4 flex-shrink-0"
+      >
+        <Icon
+          :name="iconNameFormatted"
+          size="40"
+          class="text-brand-primary"
+        />
       </div>
-      <!-- Text Column (Title & Category) -->
       <div class="flex flex-col flex-grow">
         <div class="mb-1 cursor-pointer">
           <p

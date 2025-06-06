@@ -5,14 +5,14 @@ import { cn } from '@/lib/utils'
 
 const props = withDefaults(
   defineProps<AvatarRootProps & { class?: HTMLAttributes['class'] }>(),
-  {},
+  {}
 )
 
 const computedClasses = computed(() =>
   cn(
     'relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full',
-    props.class,
-  ),
+    props.class
+  )
 )
 </script>
 
