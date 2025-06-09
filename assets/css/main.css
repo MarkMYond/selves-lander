@@ -21,6 +21,10 @@ body {
   font-family: 'Satoshi', sans-serif;
 }
 
+h3 {
+  text-align: left !important; /* Ensure this overrides other styles */
+}
+
 /* About Page Specific Overrides */
 /* Contain the introductory image in FeaturesWithIntroSection (via SectionHeader) */
 .page-about .section-header > div:nth-of-type(2) img {
