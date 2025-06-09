@@ -195,7 +195,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { WikiPage, Category, Media } from '../../src/payload-types'
 import BlockRenderer from '../../components/BlockRenderer.vue'
@@ -203,6 +203,7 @@ import WikiLayout from '../../components/wiki/WikiLayout.vue'
 import { useSeo } from '../../composables/useSeo'
 import { useMediaUrl } from '../../composables/useMediaUrl'
 import PagePrevNextNav from '../../components/wiki/PagePrevNextNav.vue'
+import { useWikiNavStore } from '../../stores/wikiNavStore'
 
 const isDevelopment = computed(() => process.env.NODE_ENV === 'development');
 
@@ -250,13 +251,10 @@ const config = useRuntimeConfig()
 
 const pageSlug = computed(() => {
   const slugParam = route.params.slug
-  const slug = Array.isArray(slugParam) ? slugParam[slugParam.length - 1] : slugParam
-  console.log('pageSlug computed:', slug, 'route.params:', route.params)
-  return slug
+  return Array.isArray(slugParam) ? slugParam[slugParam.length - 1] : slugParam
 })
 
 const payloadApiFullUrl = config.public.payloadApiFullUrl // Use full API URL which already includes /api
-console.log('payloadApiFullUrl:', payloadApiFullUrl)
 const { getMediaUrl } = useMediaUrl()
 
 const fetchKey = computed(() => `wiki-page-${route.fullPath}`)
@@ -265,22 +263,25 @@ const {
   pending: pagePending,
   error: pageError,
 } = await useFetch<{ docs: FetchedWikiPage[] }>(
-  `/api/wiki-page/${pageSlug.value}`,
+  () => {
+    if (!payloadApiFullUrl) {
+      console.error(
+        `Wiki Slug Page: Payload API URL is not configured for slug ${pageSlug.value}.`
+      )
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'API URL not configured',
+      })
+    }
+    return `${payloadApiFullUrl}/wiki-pages?where[slug][equals]=${pageSlug.value}&limit=1`
+  },
   {
     key: fetchKey.value,
-    server: true, // Ensure it works on server-side
     cache: 'no-cache',
     onRequestError({ request, options, error: requestError }) {
       console.error(
         `Wiki Slug Page: Error in useFetch for slug ${pageSlug.value} from ${request}:`,
         requestError
-      )
-    },
-    onResponseError({ request, response }) {
-      console.error(
-        `Wiki Slug Page: Response error for slug ${pageSlug.value}:`,
-        response.status,
-        response.statusText
       )
     },
   }
@@ -397,6 +398,191 @@ const isLeftSidebarOpen = ref(false)
 const toggleLeftSidebar = () => {
   isLeftSidebarOpen.value = !isLeftSidebarOpen.value
 }
+
+// Auto-expand navigation for current page
+const wikiNavStore = useWikiNavStore()
+
+// Helper function to search for a page by slug in the navigation tree
+const findPageBySlug = (items: any[], targetSlug: string): any => {
+  for (const item of items) {
+    // Check if this item itself matches (for direct page matches)
+    if (item.slug === targetSlug) {
+      return item
+    }
+    
+    // Search in children - this handles both category children and nested page children
+    if (item.children && item.children.length > 0) {
+      const found = findPageBySlug(item.children, targetSlug)
+      if (found) {
+        return found
+      }
+    }
+  }
+  
+  return null
+}
+
+// Helper function to find the full path to a page by working backwards from the page
+const findPagePath = async (targetSlug: string): Promise<string[]> => {
+  try {
+    // First, find the page in Payload CMS to get its parent chain
+    const config = useRuntimeConfig()
+    const payloadApiUrl = config.public.payloadApiFullUrl
+    
+    const fetchUrl = `${payloadApiUrl}/wiki-pages?where[slug][equals]=${targetSlug}&depth=5`
+    
+    const pageResponse = await $fetch<{docs: any[]}>(fetchUrl)
+    
+    if (!pageResponse.docs || pageResponse.docs.length === 0) {
+      return []
+    }
+    
+    const page = pageResponse.docs[0]
+    
+    // Build the path by following parent references
+    const path: string[] = []
+    let currentPage = page
+    
+    // Add the current page to the path
+    path.unshift(currentPage.id)
+    
+    // Walk up the parent chain
+    while (currentPage.parent) {
+      const parentId = typeof currentPage.parent === 'object' ? currentPage.parent.id : currentPage.parent
+      path.unshift(parentId)
+      
+      // Fetch the parent to continue walking up the chain
+      const parentFetchUrl = `${payloadApiUrl}/wiki-pages?where[id][equals]=${parentId}&depth=2`
+      
+      const parentResponse = await $fetch<{docs: any[]}>(parentFetchUrl)
+      if (parentResponse.docs && parentResponse.docs.length > 0) {
+        currentPage = parentResponse.docs[0]
+      } else {
+        break
+      }
+    }
+    
+    return path
+    
+  } catch (error) {
+    console.error('Error finding page path:', error)
+    return []
+  }
+}
+
+// Helper function to expand navigation along a specific path
+const expandNavigationPath = async (path: string[]): Promise<any> => {
+  if (path.length === 0) return null
+  
+  // Helper function to find an item anywhere in the navigation tree
+  const findItemInTree = (items: any[], targetId: string): any => {
+    for (const item of items) {
+      if (item.id === targetId) {
+        return item
+      }
+      if (item.children && item.children.length > 0) {
+        const found = findItemInTree(item.children, targetId)
+        if (found) return found
+      }
+    }
+    return null
+  }
+  
+  // Helper function to find the path to an item (returns array of parent items)
+  const findPathToItem = (items: any[], targetId: string, currentPath: any[] = []): any[] | null => {
+    for (const item of items) {
+      const newPath = [...currentPath, item]
+      
+      if (item.id === targetId) {
+        return newPath
+      }
+      
+      if (item.children && item.children.length > 0) {
+        const found = findPathToItem(item.children, targetId, newPath)
+        if (found) return found
+      }
+    }
+    return null
+  }
+  
+  let targetPage = null
+  
+  // Process each item in the path
+  for (let i = 0; i < path.length; i++) {
+    const targetId = path[i]
+    
+    // Find the item anywhere in the navigation tree
+    const item = findItemInTree(wikiNavStore.processedNavigationItems, targetId)
+    
+    if (!item) {
+      break
+    }
+    
+    // If this is the last item in the path, we found our target
+    if (i === path.length - 1) {
+      targetPage = item
+      break
+    }
+    
+    // If not the last item, we need to expand it to ensure its children are loaded
+    if (item.hasChildren && !item.expanded) {
+      await wikiNavStore.toggleExpand(item.id)
+    }
+    
+    // Also expand all parent items in the path to this item to ensure proper navigation tree state
+    const pathToItem = findPathToItem(wikiNavStore.processedNavigationItems, targetId)
+    if (pathToItem) {
+      for (const parentItem of pathToItem.slice(0, -1)) { // Exclude the target item itself
+        if (parentItem.hasChildren && !parentItem.expanded) {
+          await wikiNavStore.toggleExpand(parentItem.id)
+        }
+      }
+    }
+  }
+  
+  return targetPage
+}
+
+// Helper function to recursively find and expand to a page by slug
+const findAndExpandToPage = async (targetSlug: string): Promise<any> => {
+  // First try to find the page in the current navigation items
+  let foundPage = findPageBySlug(wikiNavStore.processedNavigationItems, targetSlug)
+  
+  if (foundPage) {
+    return foundPage
+  }
+  
+  // If not found, try to get the full path from CMS and expand along it
+  const path = await findPagePath(targetSlug)
+  
+  if (path.length > 0) {
+    const expandedPage = await expandNavigationPath(path)
+    if (expandedPage) {
+      return expandedPage
+    }
+  }
+  
+  return null
+}
+
+// Watch for route changes and expand navigation accordingly
+watchEffect(async () => {
+  if (pageSlug.value && wikiNavStore.isInitialized) {
+    // Use the recursive search function to find deeply nested pages
+    await findAndExpandToPage(pageSlug.value)
+  }
+})
+
+// Ensure navigation is expanded on page load
+onMounted(async () => {
+  // Ensure the navigation store is initialized
+  await wikiNavStore.ensureInitialized()
+  
+  // If we have a current page slug, try to expand its path using recursive search
+  if (pageSlug.value) {
+    await findAndExpandToPage(pageSlug.value)
+  }
+})
 
 useSeo(pageData.value, 'article')
 </script>

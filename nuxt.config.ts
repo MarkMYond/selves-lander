@@ -70,16 +70,15 @@ export default defineNuxtConfig({
         baseURL: '/',
       },
     ],
-  },
-
-  routeRules: {
-    '/': { ssr: true },
-    '/wiki': { ssr: true },
-    '/wiki/**': { ssr: true }, // Enable SSR for wiki sub-pages
-    '/registry': { ssr: true },
-    '/registry/**': { ssr: true }, // Enable SSR for registry sub-pages
-    '/favicon.svg': { cache: { maxAge: 60 * 60 * 24 * 30 } },
-    '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
+    routeRules: {
+      '/': { ssr: true },
+      '/wiki': { ssr: true },
+      '/wiki/**': { ssr: false }, // Force client-side rendering for sub-pages
+      '/registry': { ssr: true },
+      '/registry/**': { ssr: false }, // Force client-side rendering for sub-pages
+      '/favicon.svg': { cache: { maxAge: 60 * 60 * 24 * 30 } },
+      '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
+    },
   },
 
   experimental: {
