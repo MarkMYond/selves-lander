@@ -2,7 +2,7 @@
   <section class="">
     <div class="container mx-auto px-[30px] max-w-[1500px]">
       <div
-        class="relative z-10 flex flex-col gap-20 bg-[#f8f4f1] bg-[url('/webflow-assets/images/pattern-hero3.png')] bg-center bg-no-repeat bg-cover rounded-tl-[24px] rounded-tr-[24px] max-w-[1360px] mx-auto pt-10 px-10"
+        class="relative z-10 flex flex-col gap-20 bg-[#f8f4f1] bg-center bg-no-repeat bg-cover rounded-tl-[24px] rounded-tr-[24px] max-w-[1360px] mx-auto pt-10 px-10"
       >
         <div
           class="flex flex-col items-center gap-6 text-center max-w-[934px] mx-auto"

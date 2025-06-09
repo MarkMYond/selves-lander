@@ -76,7 +76,7 @@ export default defineNuxtConfig({
       '/wiki/**': { ssr: false }, // Force client-side rendering for sub-pages
       '/registry': { ssr: true },
       '/registry/**': { ssr: false }, // Force client-side rendering for sub-pages
-      '/favicon.svg': { cache: { maxAge: 60 * 60 * 24 * 30 } },
+      '/favicon.png': { cache: { maxAge: 60 * 60 * 24 * 30 } },
       '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
     },
   },
@@ -96,7 +96,7 @@ export default defineNuxtConfig({
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
       ],
       script: [
         {

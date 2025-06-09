@@ -8,9 +8,9 @@
         :data-w-id="block.dataWId || '96f4d3d9-d9a0-c250-9d0a-736521598813'"
         class="bg-brandNeutral-02 rounded-xl p-12 md:p-16 flex flex-col gap-y-12 relative overflow-hidden"
       >
-        <div
+        <!-- <div
           class="absolute inset-0 z-10 bg-[url('~/assets/images/pattern-hero3.png')] bg-center bg-no-repeat bg-cover opacity-20"
-        />
+        /> -->
 
         <div
           class="overview-arrow-shape absolute z-0 bottom-0 left-0 w-full h-full bg-[url('~/assets/images/overview-arrow-shape.svg')] bg-bottom-left bg-no-repeat opacity-30"
