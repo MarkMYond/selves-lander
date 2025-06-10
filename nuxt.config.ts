@@ -71,12 +71,6 @@ export default defineNuxtConfig({
         maxAge: 31536000 // 1 year cache for static assets
       },
     ],
-    storage: {
-      assets: {
-        driver: 'fs',
-        base: './public'
-      }
-    },
     routeRules: {
       '/': { ssr: true },
       '/wiki': { ssr: true },

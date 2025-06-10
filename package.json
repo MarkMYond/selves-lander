@@ -13,7 +13,7 @@
     "postinstall": "nuxt prepare",
     "generate:wiki-nav": "node scripts/generate-wiki-navigation.js",
     "prebuild": "echo 'Ensuring favicon exists...' && ls -la public/favicon-v2.png || echo 'Warning: favicon-v2.png not found'",
-    "postbuild": "echo 'Build complete. Checking output...' && ls -la .output/public/ | grep favicon || echo 'Warning: favicon not found in build output'"
+    "postbuild": "echo 'Build complete. Checking output...' && ls -la .vercel/output/static/ | grep favicon || echo 'Warning: favicon not found in build output'"
   },
   "dependencies": {
     "@google/genai": "^0.12.0",
