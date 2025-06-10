@@ -44,10 +44,11 @@
       ]
     }
   ],
-  "routes": [
+  "redirects": [
     {
-      "src": "/admin/(.*)",
-      "dest": "https://payload-sigma-ten.vercel.app/admin/$1"
+      "source": "/admin/:path*",
+      "destination": "https://payload-sigma-ten.vercel.app/admin/:path*",
+      "permanent": false
     }
   ],
   "env": {
