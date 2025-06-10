@@ -14,11 +14,6 @@
       Homepage content not found. Please ensure a page with slug 'home' is
       published in Payload.
     </div>
-
-    <!-- Temporary debug link -->
-    <div style="position: fixed; bottom: 10px; left: 10px; background: yellow; padding: 5px; z-index: 9999;">
-      <a href="/favicon-v2.png" target="_blank">Test Favicon Link</a>
-    </div>
   </div>
 </template>
 
