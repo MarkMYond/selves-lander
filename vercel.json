@@ -44,13 +44,6 @@
       ]
     }
   ],
-  "redirects": [
-    {
-      "source": "/admin/:path*",
-      "destination": "https://payload-sigma-ten.vercel.app/admin/:path*",
-      "permanent": false
-    }
-  ],
   "env": {
     "NUXT_PUBLIC_PAYLOAD_API_URL": "https://cms.taash.ai"
   },
