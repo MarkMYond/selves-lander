@@ -5,51 +5,43 @@
   "buildCommand": "pnpm run build",
   "headers": [
     {
-      "source": "/(.*).png",
+      "source": "/favicon-v2.png",
       "headers": [
         {
           "key": "Content-Type",
           "value": "image/png"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
     {
-      "source": "/(.*).ico",
+      "source": "/favicon.svg",
+      "headers": [
+        {
+          "key": "Content-Type", 
+          "value": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "source": "/favicon.ico",
       "headers": [
         {
           "key": "Content-Type",
           "value": "image/x-icon"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
     {
-      "source": "/(.*).svg",
+      "source": "/(.*\\.(png|jpg|jpeg|gif|webp))",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "image/svg+xml"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
+          "value": "image/$2"
         }
       ]
     }
   ],
   "env": {
     "NUXT_PUBLIC_PAYLOAD_API_URL": "https://cms.taash.ai"
-  },
-  "github": {
-    "silent": true,
-    "autoAlias": true,
-    "autoJobCancelation": true
   }
 }
