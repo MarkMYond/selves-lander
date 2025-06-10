@@ -1748,6 +1748,12 @@ export interface WikiPage {
    * Optional icon name for navigation display.
    */
   icon?: string | null;
+  /**
+   * Background color for the icon circle. Select "None" for no background.
+   */
+  iconBackgroundColor?:
+    | ('none' | 'bg-pink-100' | 'bg-blue-100' | 'bg-green-100' | 'bg-yellow-100' | 'bg-purple-100')
+    | null;
   backgroundSettings?: {
     /**
      * Optional background image for the page.
@@ -1832,6 +1838,12 @@ export interface RegistryPage {
    * Optional icon name for navigation display.
    */
   icon?: string | null;
+  /**
+   * Background color for the icon circle. Select "None" for no background.
+   */
+  iconBackgroundColor?:
+    | ('none' | 'bg-pink-100' | 'bg-blue-100' | 'bg-green-100' | 'bg-yellow-100' | 'bg-purple-100')
+    | null;
   backgroundSettings?: {
     /**
      * Optional background image for the page.
@@ -2865,6 +2877,7 @@ export interface WikiPagesSelect<T extends boolean = true> {
   isSectionHomepage?: T;
   parent?: T;
   icon?: T;
+  iconBackgroundColor?: T;
   backgroundSettings?:
     | T
     | {
@@ -2902,6 +2915,7 @@ export interface RegistryPagesSelect<T extends boolean = true> {
   isSectionHomepage?: T;
   parent?: T;
   icon?: T;
+  iconBackgroundColor?: T;
   backgroundSettings?:
     | T
     | {

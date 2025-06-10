@@ -10,6 +10,7 @@ export interface ApiNavItem {
   title: string;
   slug?: string;
   icon?: string;
+  iconBackgroundColor?: string; // Added for icon background
   isCategory?: boolean;
   hasChildren?: boolean;
   children?: ApiNavItem[]; // Children from API might be pre-fetched
@@ -17,6 +18,7 @@ export interface ApiNavItem {
 
 // Generic Processed Nav Item for client-side state
 export interface ProcessedNavItem extends Omit<ApiNavItem, 'children'> {
+  iconBackgroundColor?: string; // Added for icon background
   expanded: boolean;
   loadingChildren: boolean;
   children: ProcessedNavItem[];
@@ -56,6 +58,7 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
           ...item,
           slug: item.slug,
           icon: item.icon,
+          iconBackgroundColor: item.iconBackgroundColor, // Carry over the new field
           expanded: !!item.isCategory, // Categories expanded by default
           loadingChildren: false,
           children: processedChildren,
@@ -158,6 +161,7 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
           title: string;
           slug?: string;
           icon?: string;
+          iconBackgroundColor?: string; // Add here for fallback data
           children?: { id: string }[]; // Assuming children might be an array of objects with id
         }
         const response = await $fetch<{ docs: PayloadPageDoc[] }>(fallbackUrl);
@@ -168,6 +172,7 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
             title: page.title,
             slug: page.slug,
             icon: page.icon,
+            iconBackgroundColor: page.iconBackgroundColor, // Add here
             isCategory: false, 
             hasChildren: !!(page.children && page.children.length > 0),
           }));

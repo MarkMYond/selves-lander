@@ -64,9 +64,34 @@
                 <NuxtLink
                   :to="`/registry/${page.slug}`"
                   prefetch
-                  class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 rounded-md transition-colors duration-150"
+                  class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 rounded-md transition-colors duration-150 flex items-center"
                   active-class="bg-purple-light text-primary-700 font-semibold"
                 >
+                  <span
+                    v-if="page.icon && page.iconBackgroundColor && page.iconBackgroundColor !== 'none'"
+                    :class="[
+                      'w-6 h-6 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
+                      page.iconBackgroundColor,
+                    ]"
+                  >
+                    <Icon
+                      :name="
+                        page.icon.startsWith('ph:')
+                          ? `ph:${page.icon.substring(3).toLowerCase()}`
+                          : `ph:${page.icon.toLowerCase()}`
+                      "
+                      class="h-4 w-4"
+                    />
+                  </span>
+                  <Icon
+                    v-else-if="page.icon"
+                    :name="
+                      page.icon.startsWith('ph:')
+                        ? `ph:${page.icon.substring(3).toLowerCase()}`
+                        : `ph:${page.icon.toLowerCase()}`
+                    "
+                    class="mr-2 h-4 w-4 flex-shrink-0"
+                  />
                   <span
                     class="align-middle text-sm [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"
                   >{{ page.title }}</span>
@@ -107,6 +132,31 @@
                     active-class="bg-purple-light text-primary-700 font-semibold"
                   >
                     <span
+                      v-if="childPage.icon && childPage.iconBackgroundColor && childPage.iconBackgroundColor !== 'none'"
+                      :class="[
+                        'w-6 h-6 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
+                        childPage.iconBackgroundColor,
+                      ]"
+                    >
+                      <Icon
+                        :name="
+                          childPage.icon.startsWith('ph:')
+                            ? `ph:${childPage.icon.substring(3).toLowerCase()}`
+                            : `ph:${childPage.icon.toLowerCase()}`
+                        "
+                        class="h-4 w-4"
+                      />
+                    </span>
+                    <Icon
+                      v-else-if="childPage.icon"
+                      :name="
+                        childPage.icon.startsWith('ph:')
+                          ? `ph:${childPage.icon.substring(3).toLowerCase()}`
+                          : `ph:${childPage.icon.toLowerCase()}`
+                      "
+                      class="mr-2 h-4 w-4 flex-shrink-0"
+                    />
+                    <span
                       class="align-middle [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"
                     >{{ childPage.title }}</span>
                   </NuxtLink>
@@ -144,9 +194,34 @@
             <NuxtLink
               :to="`/registry/${item.slug}`"
               prefetch
-              class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 rounded-md transition-colors duration-150"
+              class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-2 rounded-md transition-colors duration-150 flex items-center"
               active-class="bg-purple-light text-primary-700 font-semibold"
             >
+              <span
+                v-if="item.icon && item.iconBackgroundColor && item.iconBackgroundColor !== 'none'"
+                :class="[
+                  'w-6 h-6 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
+                  item.iconBackgroundColor,
+                ]"
+              >
+                <Icon
+                  :name="
+                    item.icon.startsWith('ph:')
+                      ? `ph:${item.icon.substring(3).toLowerCase()}`
+                      : `ph:${item.icon.toLowerCase()}`
+                  "
+                  class="h-4 w-4"
+                />
+              </span>
+              <Icon
+                v-else-if="item.icon"
+                :name="
+                  item.icon.startsWith('ph:')
+                    ? `ph:${item.icon.substring(3).toLowerCase()}`
+                    : `ph:${item.icon.toLowerCase()}`
+                "
+                class="mr-2 h-4 w-4 flex-shrink-0"
+              />
               <span
                 class="align-middle text-sm [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"
               >{{ item.title }}</span>

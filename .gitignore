@@ -87,3 +87,4 @@ build/
 
 original_payload_config.ts
 env
+.vercel

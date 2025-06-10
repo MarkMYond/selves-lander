@@ -77,9 +77,6 @@ export default defineNuxtConfig({
       '/wiki/**': { ssr: false }, // Force client-side rendering for sub-pages
       '/registry': { ssr: true },
       '/registry/**': { ssr: false }, // Force client-side rendering for sub-pages
-      '/favicon-v2.png': { headers: { 'Content-Type': 'image/png' } },
-      '/favicon.svg': { headers: { 'Content-Type': 'image/svg+xml' } },
-      '/favicon.ico': { headers: { 'Content-Type': 'image/x-icon' } },
       '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
     },
   },

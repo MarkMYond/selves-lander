@@ -7,8 +7,24 @@
         class="flex-grow text-brandNeutral-04 hover:bg-purple-light hover:text-primary-700 p-1 rounded-md transition-colors duration-150 text-sm flex items-center"
         active-class="bg-purple-light text-primary-700 font-semibold"
       >
+        <span
+          v-if="item.icon && item.iconBackgroundColor && item.iconBackgroundColor !== 'none'"
+          :class="[
+            'w-6 h-6 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
+            item.iconBackgroundColor,
+          ]"
+        >
+          <Icon
+            :name="
+              item.icon.startsWith('ph:')
+                ? `ph:${item.icon.substring(3).toLowerCase()}`
+                : `ph:${item.icon.toLowerCase()}`
+            "
+            class="h-4 w-4" 
+          />
+        </span>
         <Icon
-          v-if="item.icon"
+          v-else-if="item.icon"
           :name="
             item.icon.startsWith('ph:')
               ? `ph:${item.icon.substring(3).toLowerCase()}`
@@ -74,6 +90,7 @@ interface NavItem {
   title: string
   slug?: string
   icon?: string
+  iconBackgroundColor?: string; // Added for icon background
   isCategory?: boolean
   children?: NavItem[]
   hasChildren?: boolean
