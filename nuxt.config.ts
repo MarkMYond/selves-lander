@@ -76,7 +76,6 @@ export default defineNuxtConfig({
       '/wiki/**': { ssr: false }, // Force client-side rendering for sub-pages
       '/registry': { ssr: true },
       '/registry/**': { ssr: false }, // Force client-side rendering for sub-pages
-      '/favicon-v2.png': { headers: { 'cache-control': 'public, max-age=0, must-revalidate', 'content-type': 'image/png' } },
       '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
     },
   },
@@ -96,7 +95,9 @@ export default defineNuxtConfig({
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
       link: [
-        { rel: 'icon', type: 'image/png', href: '/favicon-v2.png' },
+        { rel: 'icon', type: 'image/png', href: '/favicon-v2.png', sizes: '32x32' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'apple-touch-icon', href: '/favicon-v2.png' },
       ],
       script: [
         {
