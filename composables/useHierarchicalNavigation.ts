@@ -2,23 +2,23 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Ref } from 'vue';
 import { $fetch } from 'ofetch';
-import { useRuntimeConfig } from '#app'; // Import useRuntimeConfig
+import { useRuntimeConfig } from '#app'; 
 
-// Generic API Nav Item (can be extended by specific stores if needed)
+// Generic API Nav Item
 export interface ApiNavItem {
   id: string;
   title: string;
   slug?: string;
   icon?: string;
-  iconBackgroundColor?: string; // Added for icon background
+  iconBackgroundColor?: string;
   isCategory?: boolean;
   hasChildren?: boolean;
-  children?: ApiNavItem[]; // Children from API might be pre-fetched
+  children?: ApiNavItem[];
 }
 
-// Generic Processed Nav Item for client-side state
+// Generic Processed Nav Item
 export interface ProcessedNavItem extends Omit<ApiNavItem, 'children'> {
-  iconBackgroundColor?: string; // Added for icon background
+  iconBackgroundColor?: string;
   expanded: boolean;
   loadingChildren: boolean;
   children: ProcessedNavItem[];
@@ -26,12 +26,11 @@ export interface ProcessedNavItem extends Omit<ApiNavItem, 'children'> {
 
 interface HierarchicalNavigationStoreOptions {
   storeId: string;
-  primaryNavEndpoint: string; // e.g., /api/wiki-nav or /api/registry-nav
-  childrenNavEndpointPattern?: (parentId: string) => string; // e.g., (id) => `/api/wiki-nav?parentId=${id}` - Now optional
-  // Fallback if primary/children endpoints fail or return no data
-  directApiFallbackPattern?: (parentId: string | null | undefined) => string; // e.g., (id) => id ? `/api/payload/collection?parent=${id}` : `/api/payload/collection?topLevel` - Now optional
-  collectionSlug: string; // e.g., 'wiki-pages' or 'registry-pages' for fallback (still useful for other potential features or if directApiFallbackPattern is used)
-  staticJsonFallbackUrl?: string; // Optional: e.g., /wiki-navigation.json
+  primaryNavEndpoint: string;
+  childrenNavEndpointPattern?: (parentId: string) => string;
+  directApiFallbackPattern?: (parentId: string | null | undefined) => string;
+  collectionSlug: string;
+  staticJsonFallbackUrl?: string;
 }
 
 export function createHierarchicalNavigationStore(options: HierarchicalNavigationStoreOptions) {
@@ -41,47 +40,35 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
     const error: Ref<Error | null> = ref(null);
     const isInitialized: Ref<boolean> = ref(false);
 
-    const processApiItemsRecursive = (
-      apiItems: ApiNavItem[],
-      // level = 0 // Debugging parameter removed
-    ): ProcessedNavItem[] => {
-      // Debugging logs removed
+    const processApiItemsRecursive = (apiItems: ApiNavItem[]): ProcessedNavItem[] => {
       if (!apiItems || apiItems.length === 0) {
         return [];
       }
       return apiItems.map((item) => {
-        // Debugging logs removed
-        
-        const processedChildren = item.children ? processApiItemsRecursive(item.children /*, level + 1 */) : []; // Debugging parameter removed
-        
-        const processedItem: ProcessedNavItem = {
+        const processedChildren = item.children ? processApiItemsRecursive(item.children) : [];
+        return {
           ...item,
           slug: item.slug,
           icon: item.icon,
-          iconBackgroundColor: item.iconBackgroundColor, // Carry over the new field
-          expanded: !!item.isCategory, // Categories expanded by default
+          iconBackgroundColor: item.iconBackgroundColor,
+          expanded: !!item.isCategory, // Categories expanded by default, other items not.
           loadingChildren: false,
           children: processedChildren,
         };
-        // Debugging logs removed
-        return processedItem;
       });
     };
 
-    const fetchNavItems = async (
-      parentId: string | null | undefined,
-    ): Promise<ProcessedNavItem[]> => {
+    const fetchNavItems = async (parentId: string | null | undefined): Promise<ProcessedNavItem[]> => {
       const runtimeConfig = useRuntimeConfig();
-      
       let relativeEndpointUrl: string;
       let isFetchingChildren = false;
 
       if (parentId) {
         if (!options.childrenNavEndpointPattern) {
           if (process.env.NODE_ENV === 'development') {
-            console.warn(`[${options.storeId}] fetchNavItems called with parentId but childrenNavEndpointPattern is not defined. Returning empty for children of ${parentId}.`);
+            console.warn(`[${options.storeId}] fetchNavItems: childrenNavEndpointPattern not defined. Cannot fetch children for ${parentId}.`);
           }
-          return []; // Cannot fetch children if pattern is not defined
+          return [];
         }
         relativeEndpointUrl = options.childrenNavEndpointPattern(parentId);
         isFetchingChildren = true;
@@ -89,19 +76,11 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
         relativeEndpointUrl = options.primaryNavEndpoint;
       }
 
-      // For frontend navigation endpoints (start with /api/), use them as-is (relative to current host)
-      // For Payload endpoints, construct full URL using payloadApiFullUrl
-      let fullEndpointUrl;
       const payloadApiFullUrl = runtimeConfig.public.payloadApiFullUrl || '';
-      const payloadServerRoot = payloadApiFullUrl.endsWith('/api') 
-                                 ? payloadApiFullUrl.slice(0, -4) // Remove /api
-                                 : payloadApiFullUrl;
-      
-      if (relativeEndpointUrl.startsWith('/api/wiki-nav') || relativeEndpointUrl.startsWith('/api/registry-nav')) {
-        // These are Nuxt frontend API endpoints, use as-is (relative to current host)
-        fullEndpointUrl = relativeEndpointUrl;
-      } else {
-        // These are direct Payload API endpoints, construct full URL
+      const payloadServerRoot = payloadApiFullUrl.endsWith('/api') ? payloadApiFullUrl.slice(0, -4) : payloadApiFullUrl;
+      let fullEndpointUrl = relativeEndpointUrl;
+
+      if (!relativeEndpointUrl.startsWith('/api/wiki-nav') && !relativeEndpointUrl.startsWith('/api/registry-nav')) {
         if (payloadServerRoot) {
           const rootEndsWithSlash = payloadServerRoot.endsWith('/');
           const relStartsWithSlash = relativeEndpointUrl.startsWith('/');
@@ -112,103 +91,59 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
           } else {
             fullEndpointUrl = payloadServerRoot + relativeEndpointUrl;
           }
-        } else {
-          // If no payloadServerRoot, assume relativeEndpointUrl is a full path or relative to current host
-          fullEndpointUrl = relativeEndpointUrl; 
         }
       }
       
-      if (process.env.NODE_ENV === 'development' && !payloadServerRoot && relativeEndpointUrl.startsWith('/api')) {
-        console.warn(`[${options.storeId}] payloadApiFullUrl in runtimeConfig.public might be missing or incorrect. API calls will be relative to the Nuxt host.`);
-      }
-      
-      try {
-        // Ensure fullEndpointUrl is defined before fetching.
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[${options.storeId}] Fetching nav items from: ${fullEndpointUrl}`);
-        }
-        const apiItems = await $fetch<ApiNavItem[]>(fullEndpointUrl); 
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[${options.storeId}] Raw apiItems from ${fullEndpointUrl}:`, JSON.parse(JSON.stringify(apiItems || null)));
-        }
-        if (apiItems && apiItems.length > 0) {
-          const processed = processApiItemsRecursive(apiItems);
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`[${options.storeId}] Processed items from ${fullEndpointUrl}:`, JSON.parse(JSON.stringify(processed)));
-          }
-          return processed;
-        }
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(`[${options.storeId}] Endpoint ${fullEndpointUrl} returned empty or no data (apiItems was null, undefined, or empty array). Attempting fallbacks.`);
-        }
-      } catch (e) {
-        console.error(`[${options.storeId}] Failed to fetch from ${fullEndpointUrl}. Attempting fallbacks. Error:`, e);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[${options.storeId}] Fetching nav items from: ${fullEndpointUrl}`);
       }
 
-      // Fallback to direct API call if primary/children endpoint fails or returns no data
-      // Only attempt this if directApiFallbackPattern is defined
+      try {
+        const apiItems = await $fetch<ApiNavItem[]>(fullEndpointUrl);
+        if (apiItems && apiItems.length > 0) {
+          return processApiItemsRecursive(apiItems);
+        }
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[${options.storeId}] Endpoint ${fullEndpointUrl} returned empty. Attempting fallbacks.`);
+        }
+      } catch (e) {
+        console.error(`[${options.storeId}] Failed to fetch from ${fullEndpointUrl}. Error:`, e);
+      }
+
       if (options.directApiFallbackPattern) {
         try {
           const relativeFallbackUrl = options.directApiFallbackPattern(parentId);
-          // Construct full fallback URL using Payload API URL
           const fallbackUrl = payloadServerRoot ? payloadServerRoot + relativeFallbackUrl : relativeFallbackUrl;
           if (process.env.NODE_ENV === 'development') {
-            console.log(`[${options.storeId}] Attempting direct API fallback from: ${fallbackUrl}`);
+            console.log(`[${options.storeId}] Attempting direct API fallback: ${fallbackUrl}`);
           }
-          // Define a more specific type for Payload documents if available, using a generic one for now
-          interface PayloadPageDoc {
-          id: string;
-          title: string;
-          slug?: string;
-          icon?: string;
-          iconBackgroundColor?: string; // Add here for fallback data
-          children?: { id: string }[]; // Assuming children might be an array of objects with id
-        }
-        const response = await $fetch<{ docs: PayloadPageDoc[] }>(fallbackUrl);
-        
-        if (response && response.docs && response.docs.length > 0) {
-          const transformedItems = response.docs.map((page: PayloadPageDoc): ApiNavItem => ({
-            id: page.id,
-            title: page.title,
-            slug: page.slug,
-            icon: page.icon,
-            iconBackgroundColor: page.iconBackgroundColor, // Add here
-            isCategory: false, 
-            hasChildren: !!(page.children && page.children.length > 0),
-          }));
-          return processApiItemsRecursive(transformedItems);
-        }
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(`[${options.storeId}] Direct API fallback ${fallbackUrl} returned no data.`);
+          interface PayloadPageDoc { id: string; title: string; slug?: string; icon?: string; iconBackgroundColor?: string; children?: { id: string }[]; }
+          const response = await $fetch<{ docs: PayloadPageDoc[] }>(fallbackUrl);
+          if (response?.docs?.length > 0) {
+            const transformedItems = response.docs.map((page): ApiNavItem => ({
+              id: page.id, title: page.title, slug: page.slug, icon: page.icon, iconBackgroundColor: page.iconBackgroundColor,
+              isCategory: false, hasChildren: !!(page.children && page.children.length > 0),
+            }));
+            return processApiItemsRecursive(transformedItems);
           }
         } catch (e) {
-          // Check if options.directApiFallbackPattern exists before trying to call it in the error message
-          const relativeFallbackUrl = options.directApiFallbackPattern ? options.directApiFallbackPattern(parentId) : 'undefined pattern';
-          const fullFallbackUrl = payloadServerRoot ? payloadServerRoot + relativeFallbackUrl : relativeFallbackUrl;
-          console.error(`[${options.storeId}] Direct API fallback failed for ${fullFallbackUrl}. Error:`, e);
+          console.error(`[${options.storeId}] Direct API fallback failed. Error:`, e);
         }
       }
       
-      // Fallback to static JSON if provided and all else fails (typically for top-level only)
-      // Static JSON fallback should use relative path to Nuxt server or be a full URL itself.
       if (!isFetchingChildren && options.staticJsonFallbackUrl) {
         try {
-          // Assuming staticJsonFallbackUrl is relative to Nuxt server or a full URL
           const staticUrl = options.staticJsonFallbackUrl.startsWith('http') ? options.staticJsonFallbackUrl : (runtimeConfig.app.baseURL || '') + options.staticJsonFallbackUrl;
           if (process.env.NODE_ENV === 'development') {
-            console.log(`[${options.storeId}] Attempting static JSON fallback from: ${staticUrl}`);
+            console.log(`[${options.storeId}] Attempting static JSON fallback: ${staticUrl}`);
           }
           const staticItems = await $fetch<ApiNavItem[]>(staticUrl);
-          if (process.env.NODE_ENV === 'development') {
-             console.log(`[${options.storeId}] Raw staticItems from ${staticUrl}:`, JSON.parse(JSON.stringify(staticItems || null)));
-          }
           return processApiItemsRecursive(staticItems);
         } catch (e) {
-          console.error(`[${options.storeId}] Static JSON fallback failed for ${options.staticJsonFallbackUrl}. Error:`, e);
+          console.error(`[${options.storeId}] Static JSON fallback failed. Error:`, e);
         }
       }
-      
-      return []; // Return empty if all fallbacks fail
+      return [];
     };
 
     const ensureInitialized = async () => {
@@ -218,13 +153,9 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
         try {
           processedNavigationItems.value = await fetchNavItems(null);
           isInitialized.value = true;
-        } catch (e: unknown) { // Changed to unknown
+        } catch (e: any) {
           console.error(`[${options.storeId}] Failed to fetch initial navigation:`, e);
-          if (e instanceof Error) {
-            error.value = e;
-          } else {
-            error.value = new Error('An unknown error occurred during initialization.');
-          }
+          error.value = e instanceof Error ? e : new Error('Unknown error during initialization.');
           processedNavigationItems.value = [];
         } finally {
           pending.value = false;
@@ -232,113 +163,102 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
       }
     };
 
-    const findItemById = (
-      items: ProcessedNavItem[],
-      id: string,
-    ): ProcessedNavItem | null => {
+    const findItemById = (items: ProcessedNavItem[], id: string): ProcessedNavItem | null => {
       for (const item of items) {
         if (item.id === id) return item;
-        if (item.children && item.children.length > 0) {
-          const foundInChildren = findItemById(item.children, id);
-          if (foundInChildren) return foundInChildren;
+        if (item.children?.length) {
+          const found = findItemById(item.children, id);
+          if (found) return found;
         }
       }
       return null;
     };
 
-    // findItemAndItsAncestorsById removed.
-
-    const toggleExpand = async (itemId: string) => {
+    // Internal helper to load children for an item if not already loaded.
+    // Does NOT change the 'expanded' state by itself.
+    const ensureChildrenLoaded = async (itemId: string): Promise<ProcessedNavItem[]> => {
       const item = findItemById(processedNavigationItems.value, itemId);
       if (!item) {
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(`[${options.storeId}] Item not found for toggleExpand: ${itemId}`);
-        }
-        return;
+        if (process.env.NODE_ENV === 'development') console.warn(`[${options.storeId}] ensureChildrenLoaded: Item not found: ${itemId}`);
+        return [];
       }
-
-      // If expanding and item has children but children array is empty, fetch children
-      if (!item.expanded && item.hasChildren && (!item.children || item.children.length === 0)) {
+      // Only fetch if it has children, they aren't loaded, and not currently loading
+      if (item.hasChildren && (!item.children || item.children.length === 0) && !item.loadingChildren) {
         item.loadingChildren = true;
         try {
           const children = await fetchNavItems(itemId);
-          item.children = children;
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`[${options.storeId}] Fetched ${children.length} children for item ${itemId}`);
-          }
+          item.children = children; // Assign fetched children
+          if (process.env.NODE_ENV === 'development') console.log(`[${options.storeId}] ensureChildrenLoaded: Fetched ${children.length} children for ${itemId}`);
+          return children; // Return newly fetched children
         } catch (e) {
-          console.error(`[${options.storeId}] Failed to fetch children for item ${itemId}:`, e);
-          // Set children to empty array to prevent repeated fetching attempts
-          item.children = [];
+          console.error(`[${options.storeId}] ensureChildrenLoaded: Failed to fetch children for ${itemId}:`, e);
+          item.children = []; // Set to empty on error
+          return [];
         } finally {
           item.loadingChildren = false;
         }
       }
+      return item.children || []; // Return existing children or empty array if hasChildren is false
+    };
 
-      item.expanded = !item.expanded;
+    const toggleExpand = async (itemId: string) => {
+      const item = findItemById(processedNavigationItems.value, itemId);
+      if (!item) {
+        if (process.env.NODE_ENV === 'development') console.warn(`[${options.storeId}] toggleExpand: Item not found: ${itemId}`);
+        return;
+      }
+      // If expanding for the first time (not yet expanded AND children not loaded), ensure children are loaded.
+      if (!item.expanded && item.hasChildren && (!item.children || item.children.length === 0)) {
+         await ensureChildrenLoaded(itemId);
+      }
+      item.expanded = !item.expanded; // Then toggle the state
     };
 
     const getPathAndEnsureExpanded = async (targetId: string): Promise<ProcessedNavItem[] | null> => {
-      // If on server and store is not already initialized, abort.
-      // This function's complex async operations are better suited for client-side.
-      // Assumes that if pre-expanded state is needed for SSR, 'isInitialized' would be true
-      // due to a Nuxt server plugin or similar server-side data fetching strategy.
       if (process.server && !isInitialized.value) {
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(`[${options.storeId}] getPathAndEnsureExpanded: Called on server when store not initialized. Aborting SSR execution of this function to prevent potential issues. Navigation expansion will occur client-side.`);
-        }
-        return null; 
+        if (process.env.NODE_ENV === 'development') console.warn(`[${options.storeId}] getPathAndEnsureExpanded: Called on server, store not initialized. Aborting.`);
+        return null;
       }
+      if (!isInitialized.value) await ensureInitialized();
 
-      if (!isInitialized.value) {
-        // This should now primarily run on the client, or if isInitialized was somehow true on server.
-        await ensureInitialized();
-      }
-
-      async function findRecursive(
-        currentLevelItems: ProcessedNavItem[],
-        idToFind: string,
-        pathAccumulator: ProcessedNavItem[]
-      ): Promise<ProcessedNavItem[] | null> {
-        for (const item of currentLevelItems) {
-          const currentPath = [...pathAccumulator, item];
-
-          if (item.id === idToFind) {
-            // Target found. Now, iterate over the determined path and ensure each node is expanded.
-            // toggleExpand will just flip the boolean, as child fetching is removed from it.
-            // The children arrays are assumed to be populated from the initial full tree fetch.
+      async function findRecursive(currentItems: ProcessedNavItem[], idToFind: string, path: ProcessedNavItem[]): Promise<ProcessedNavItem[] | null> {
+        for (const item of currentItems) {
+          const currentPath = [...path, item];
+          if (item.id === idToFind) { // Target found
+            // Now, iterate over the determined path and ensure each node is expanded and children loaded.
             for (const nodeInPath of currentPath) {
               const storeNode = findItemById(processedNavigationItems.value, nodeInPath.id);
-              if (storeNode && !storeNode.expanded) {
-                // No await needed if toggleExpand is synchronous (which it is now)
-                toggleExpand(storeNode.id); 
+              if (storeNode && storeNode.hasChildren) {
+                // Ensure children are loaded first. This won't change 'expanded' state.
+                await ensureChildrenLoaded(storeNode.id); 
+                if (!storeNode.expanded) { // Now, if it's not expanded, mark it so.
+                  if (process.env.NODE_ENV === 'development') console.log(`[${options.storeId}] getPath: Setting node ${storeNode.title} (ID: ${storeNode.id}) to expanded as it is on the direct path.`);
+                  storeNode.expanded = true; 
+                }
               }
-              // No need to explicitly load children here if the tree is full from primaryNavEndpoint.
-              // If storeNode.hasChildren is true but storeNode.children is empty,
-              // it means the API provided it that way (e.g. an empty category).
             }
-            return currentPath; // Return the path of ProcessedNavItems
+            return currentPath;
           }
 
-          // If not the target, and item has children, we need to search deeper.
           if (item.hasChildren) {
-            // We search the item.children directly. It's assumed to be populated if hasChildren is true.
-            // No dynamic fetching of children during search, rely on the initially loaded tree.
-            const childrenToExplore = item.children; 
+            let childrenToExplore = item.children;
+            // If children are needed for search but not loaded, fetch them using ensureChildrenLoaded.
+            // This does NOT change the 'expanded' state of 'item' itself, only loads its children.
+            if ((!childrenToExplore || childrenToExplore.length === 0) && !item.loadingChildren) {
+              if (process.env.NODE_ENV === 'development') console.log(`[${options.storeId}] findRecursive: Item '${item.title}' (ID: ${item.id}) needs children for search. Ensuring they are loaded...`);
+              childrenToExplore = await ensureChildrenLoaded(item.id);
+              if (process.env.NODE_ENV === 'development') console.log(`[${options.storeId}] findRecursive: After ensureChildrenLoaded for '${item.title}', children count: ${childrenToExplore?.length || 0}`);
+            }
             
             if (childrenToExplore && childrenToExplore.length > 0) {
-              const foundInChildren = await findRecursive(childrenToExplore, idToFind, currentPath);
-              if (foundInChildren) {
-                // If target was found deeper, the expansion of the path (including current 'item')
-                // would have been handled when 'idToFind' was matched.
-                return foundInChildren;
-              }
+              const foundPath = await findRecursive(childrenToExplore, idToFind, currentPath);
+              if (foundPath) return foundPath;
             }
           }
         }
-        return null; // Target not found in this branch
+        return null;
       }
-
+      if (process.env.NODE_ENV === 'development') console.log(`[${options.storeId}] getPathAndEnsureExpanded: Starting search for targetId: ${targetId}`);
       return findRecursive(processedNavigationItems.value, targetId, []);
     };
 
@@ -350,8 +270,7 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
       ensureInitialized,
       toggleExpand,
       findItemById,
-      // findItemAndItsAncestorsById, // Removed
-      getPathAndEnsureExpanded, // Added new function
+      getPathAndEnsureExpanded,
     };
   });
 }

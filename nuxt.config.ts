@@ -27,78 +27,9 @@ export default defineNuxtConfig({
   sitemap: { 
     hostname: 'https://taash.ai', 
     gzip: true,
-    routes: async () => {
-      console.log('[Sitemap] Starting dynamic route generation...');
-      const dynamicRoutes: { url: string; lastmod?: string }[] = [];
-      const payloadApiUrl = (process.env.NUXT_PUBLIC_PAYLOAD_API_URL || 'https://cms.taash.ai').replace(/\/$/, '');
-      console.log(`[Sitemap] Using Payload API URL: ${payloadApiUrl}`);
-
-      // Helper function to get full path for hierarchical collections
-      const getFullPath = (pageId: string, pagesMap: Map<string, { slug: string; parent?: string | { id: string } }>): string => {
-        const page = pagesMap.get(pageId);
-        if (!page) return '';
-        let pathSegments: string[] = [page.slug];
-        let currentPage = page;
-        while (currentPage.parent) {
-          const parentId = typeof currentPage.parent === 'string' ? currentPage.parent : currentPage.parent.id;
-          const parentPage = pagesMap.get(parentId);
-          if (parentPage) {
-            pathSegments.unshift(parentPage.slug);
-            currentPage = parentPage;
-          } else {
-            break; // Parent not found, stop
-          }
-        }
-        return pathSegments.join('/');
-      };
-
-      const collectionsToFetch = [
-        { slug: 'web-pages', pathPrefix: '', isHierarchical: false }, 
-        { slug: 'wiki-pages', pathPrefix: '/wiki', isHierarchical: true },
-        { slug: 'registry-pages', pathPrefix: '/registry', isHierarchical: true } 
-      ];
-
-      for (const collection of collectionsToFetch) {
-        try {
-          console.log(`[Sitemap] Fetching data for collection: ${collection.slug}`);
-          const queryParams = 'limit=0&depth=0&select=id,slug,updatedAt' + 
-                              (collection.isHierarchical ? ',parent' : '') +
-                              '&where[status][equals]=published&where[meta.noIndex][not_equals]=true';
-          
-          const response = await $fetch<{ docs: { id: string; slug: string; updatedAt: string; parent?: string | { id: string } }[] }>(
-            `${payloadApiUrl}/api/${collection.slug}?${queryParams}`
-          );
-          console.log(`[Sitemap] Fetched ${response.docs?.length || 0} documents for ${collection.slug}.`);
-
-          if (response.docs) {
-            if (collection.isHierarchical) {
-              const pagesMap = new Map(response.docs.map(doc => [doc.id, doc]));
-              response.docs.forEach(page => {
-                const fullPath = getFullPath(page.id, pagesMap);
-                if (fullPath) {
-                  dynamicRoutes.push({ 
-                    url: `${collection.pathPrefix}/${fullPath}`, 
-                    lastmod: page.updatedAt 
-                  });
-                }
-              });
-            } else { // For non-hierarchical like web-pages
-              response.docs.forEach(page => {
-                const pageUrl = page.slug === 'home' ? '/' : `${collection.pathPrefix}/${page.slug}`;
-                dynamicRoutes.push({ 
-                  url: pageUrl, 
-                  lastmod: page.updatedAt 
-                });
-              });
-            }
-          }
-        } catch (e) {
-          console.error(`[Sitemap] Error fetching sitemap data for ${collection.slug}:`, e);
-        }
-      }
-      console.log(`[Sitemap] Generated ${dynamicRoutes.length} dynamic routes:`, JSON.stringify(dynamicRoutes.slice(0, 5), null, 2) + (dynamicRoutes.length > 5 ? '...' : '')); // Log first 5 routes
-      return dynamicRoutes;
-    },
+    sources: [
+      '/api/__sitemap__/urls'
+    ],
     defaults: {
       changefreq: 'daily',
       priority: 0.7,

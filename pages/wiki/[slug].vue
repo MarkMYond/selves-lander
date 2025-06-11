@@ -198,6 +198,7 @@
 import { computed, ref, watchEffect, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { WikiPage, Category, Media } from '../../src/payload-types'
+import type { SeoPageData } from '../../composables/useSeo' 
 import BlockRenderer from '../../components/BlockRenderer.vue'
 import WikiLayout from '../../components/wiki/WikiLayout.vue'
 import { useSeo } from '../../composables/useSeo'
@@ -224,7 +225,7 @@ type FetchedWikiPage = Omit<
   WikiPage,
   'category' | 'pageBuilder' | 'backgroundSettings' | 'parent'
 > & {
-  title: string // Ensure title is explicitly part of the type
+  title: string 
   pageBuilder?: PageBuilderBlock[]
   category?: Category | string
   parent?: PopulatedParent | string
@@ -254,7 +255,8 @@ const pageSlug = computed(() => {
   return Array.isArray(slugParam) ? slugParam[slugParam.length - 1] : slugParam
 })
 
-const payloadApiFullUrl = config.public.payloadApiFullUrl // Use full API URL which already includes /api
+const payloadApiFullUrl = config.public.payloadApiFullUrl 
+console.log(`[Wiki Slug Page] Using payloadApiFullUrl: ${payloadApiFullUrl} for slug: ${pageSlug.value}`); 
 const { getMediaUrl } = useMediaUrl()
 
 const fetchKey = computed(() => `wiki-page-${route.fullPath}`)
@@ -395,162 +397,63 @@ const formatDate = (dateString?: string | null): string | null => {
 const lastUpdated = computed(() => formatDate(pageData.value?.updatedAt))
 
 const isLeftSidebarOpen = ref(false)
-const toggleLeftSidebar = () => {
-  isLeftSidebarOpen.value = !isLeftSidebarOpen.value
-}
 
 // Auto-expand navigation for current page
 const wikiNavStore = useWikiNavStore()
 
-// Helper function to search for a page by slug in the navigation tree
-const findPageBySlug = (items: any[], targetSlug: string): any => {
-  for (const item of items) {
-    if (item.slug === targetSlug) {
-      return item
-    }
-    if (item.children && item.children.length > 0) {
-      const found = findPageBySlug(item.children, targetSlug)
-      if (found) return found
-    }
-  }
-  return null
-}
-
-// Helper function to find the full path to a page by working backwards from the page
-const findPagePath = async (targetSlug: string): Promise<string[]> => {
-  console.log('[Wiki Auto-Expand] Finding path for page:', targetSlug)
-  
-  try {
-    // First, find the page in Payload CMS to get its parent chain
-    const config = useRuntimeConfig()
-    const payloadApiUrl = config.public.payloadApiFullUrl
-    
-    const pageResponse = await $fetch<{docs: any[]}>(`${payloadApiUrl}/wiki-pages?where[slug][equals]=${targetSlug}&depth=5`)
-    
-    if (!pageResponse.docs || pageResponse.docs.length === 0) {
-      console.log('[Wiki Auto-Expand] Page not found in CMS')
-      return []
-    }
-    
-    const page = pageResponse.docs[0]
-    console.log('[Wiki Auto-Expand] Found page in CMS:', page)
-    
-    // Build the path by following parent references
-    const path: string[] = []
-    let currentPage = page
-    
-    // Add the current page to the path
-    path.unshift(currentPage.id)
-    
-    // Walk up the parent chain
-    while (currentPage.parent) {
-      const parentId = typeof currentPage.parent === 'object' ? currentPage.parent.id : currentPage.parent
-      path.unshift(parentId)
-      
-      // Fetch the parent to continue walking up the chain
-      const parentResponse = await $fetch<{docs: any[]}>(`${payloadApiUrl}/wiki-pages?where[id][equals]=${parentId}&depth=2`)
-      if (parentResponse.docs && parentResponse.docs.length > 0) {
-        currentPage = parentResponse.docs[0]
-      } else {
-        break
-      }
-    }
-    
-    console.log('[Wiki Auto-Expand] Built path:', path)
-    return path
-    
-  } catch (error) {
-    console.error('[Wiki Auto-Expand] Error finding page path:', error)
-    return []
-  }
-}
-
-// Helper function to expand navigation along a specific path
-const expandNavigationPath = async (path: string[]): Promise<any> => {
-  console.log('[Wiki Auto-Expand] Expanding navigation along path:', path)
-  
-  if (path.length === 0) return null
-  
-  // Start from the root and expand each level in the path
-  let currentItems = wikiNavStore.processedNavigationItems
-  let targetPage = null
-  
-  for (let i = 0; i < path.length; i++) {
-    const targetId = path[i]
-    console.log(`[Wiki Auto-Expand] Looking for item with id: ${targetId}`)
-    
-    // Find the item in current level
-    const item = currentItems.find(item => item.id === targetId)
-    
-    if (!item) {
-      console.log(`[Wiki Auto-Expand] Item with id ${targetId} not found in current level`)
-      break
-    }
-    
-    console.log(`[Wiki Auto-Expand] Found item: ${item.title}`)
-    
-    // If this is the last item in the path, we found our target
-    if (i === path.length - 1) {
-      targetPage = item
-      console.log('[Wiki Auto-Expand] Found target page:', targetPage)
-      break
-    }
-    
-    // If not the last item, expand it to get children
-    if (item.hasChildren && !item.expanded) {
-      console.log(`[Wiki Auto-Expand] Expanding ${item.title} to continue path`)
-      await wikiNavStore.toggleExpand(item.id)
-    }
-    
-    // Move to the children for the next iteration
-    if (item.children && item.children.length > 0) {
-      currentItems = item.children
-    } else {
-      console.log(`[Wiki Auto-Expand] ${item.title} has no children, cannot continue path`)
-      break
-    }
-  }
-  
-  return targetPage
-}
-
-// Watch for route changes and expand navigation accordingly
+// Watch for route changes and pageData availability to expand navigation
 watchEffect(async () => {
-  if (pageSlug.value && wikiNavStore.isInitialized) {
-    console.log('[Wiki Auto-Expand] Looking for page with slug:', pageSlug.value)
-    
-    // Use the recursive search function to find deeply nested pages
-    const currentPage = await findAndExpandToPage(pageSlug.value)
-    
-    if (currentPage) {
-      console.log('[Wiki Auto-Expand] Successfully found and expanded to page:', currentPage)
-      // Use the store's getPathAndEnsureExpanded function to ensure full path is expanded
-      await wikiNavStore.getPathAndEnsureExpanded(currentPage.id)
-    } else {
-      console.log('[Wiki Auto-Expand] Page not found even after recursive expansion')
-    }
+  if (pageSlug.value && wikiNavStore.isInitialized && pageData.value && pageData.value.id) {
+    console.log(`[Wiki Auto-Expand] watchEffect: pageSlug or pageData changed. Attempting to expand nav for page ID: ${pageData.value.id}, slug: ${pageSlug.value}`);
+    await wikiNavStore.getPathAndEnsureExpanded(pageData.value.id);
   }
 })
 
 // Ensure navigation is expanded on page load
 onMounted(async () => {
-  console.log('[Wiki Auto-Expand onMounted] Starting with slug:', pageSlug.value)
-  
-  // Ensure the navigation store is initialized
-  await wikiNavStore.ensureInitialized()
-  console.log('[Wiki Auto-Expand onMounted] Navigation initialized, items:', wikiNavStore.processedNavigationItems)
-  
-  // If we have a current page slug, try to expand its path using recursive search
-  if (pageSlug.value) {
-    const currentPage = await findAndExpandToPage(pageSlug.value)
-    if (currentPage) {
-      console.log('[Wiki Auto-Expand onMounted] Found page after recursive search:', currentPage)
-      await wikiNavStore.getPathAndEnsureExpanded(currentPage.id)
-    } else {
-      console.log('[Wiki Auto-Expand onMounted] Page not found even after recursive expansion')
-    }
-  }
+  console.log('[Wiki Auto-Expand] onMounted: Starting for slug:', pageSlug.value);
+  await wikiNavStore.ensureInitialized(); 
+  console.log('[Wiki Auto-Expand] onMounted: Navigation store initialized. Expansion will be handled by watchEffect.');
 })
 
-useSeo(pageData.value, 'article')
+// Watch pageData to call useSeo with processed data
+watchEffect(() => {
+  const currentPageData = pageData.value;
+  if (currentPageData) {
+    let processedJsonLD: Record<string, any> | null = null;
+    if (currentPageData.meta && currentPageData.meta.jsonLD) {
+      if (typeof currentPageData.meta.jsonLD === 'string') {
+        try {
+          processedJsonLD = JSON.parse(currentPageData.meta.jsonLD);
+        } catch (e) {
+          console.error('Failed to parse jsonLD string from FetchedWikiPage.meta:', e);
+        }
+      } else if (typeof currentPageData.meta.jsonLD === 'object') {
+        processedJsonLD = currentPageData.meta.jsonLD as Record<string, any>;
+      }
+    }
+
+    const seoDataForComposable: SeoPageData = {
+      title: currentPageData.title || '',
+      slug: currentPageData.slug,
+      updatedAt: currentPageData.updatedAt,
+      createdAt: currentPageData.createdAt,
+      pageBuilder: currentPageData.pageBuilder, 
+      meta: currentPageData.meta ? {
+        title: currentPageData.meta.title,
+        description: currentPageData.meta.description,
+        image: typeof currentPageData.meta.image === 'object' && currentPageData.meta.image !== null && 'url' in currentPageData.meta.image ? 
+               (currentPageData.meta.image as { url?: string | null }).url : 
+               (typeof currentPageData.meta.image === 'string' ? currentPageData.meta.image : null),
+        keywords: currentPageData.meta.keywords,
+        schemaType: currentPageData.meta.schemaType,
+        noIndex: currentPageData.meta.noIndex,
+        jsonLD: processedJsonLD,
+      } : null,
+    };
+    useSeo(seoDataForComposable, 'article');
+  } else {
+    useSeo(undefined, 'article'); 
+  }
+});
 </script>

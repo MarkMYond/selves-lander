@@ -6,7 +6,7 @@ import type {
 } from '../src/payload-types'; // Adjusted import path
 
 // Define a common interface for SEO-relevant fields
-interface SeoPageData {
+export interface SeoPageData { // Add export here
   title: string; // Main page title
   slug?: string; // Page slug for URL construction
   updatedAt?: string; // For dateModified

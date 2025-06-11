@@ -14,16 +14,12 @@
       Homepage content not found. Please ensure a page with slug 'home' is
       published in Payload.
     </div>
-
-    <!-- Temporary debug link -->
-    <div style="position: fixed; bottom: 10px; left: 10px; background: yellow; padding: 5px; z-index: 9999;">
-      <a href="/favicon-v2.png" target="_blank">Test Favicon Link</a>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { WebPage } from '../src/payload-types'
+import type { SeoPageData } from '../composables/useSeo' // Import SeoPageData
 
 const apiUrl = `/web-pages?where[slug][equals]=home&limit=1&depth=2`
 const runtimeConfig = useRuntimeConfig()
@@ -43,7 +39,48 @@ const pageData = computed(() => pageResponse.value?.docs?.[0])
 watch(
   pageData,
   (newPageData) => {
-    useSeo(newPageData, 'website')
+    if (newPageData) {
+      let processedJsonLD: Record<string, any> | null = null;
+      if (newPageData.meta && newPageData.meta.jsonLD) {
+        if (typeof newPageData.meta.jsonLD === 'string') {
+          try {
+            processedJsonLD = JSON.parse(newPageData.meta.jsonLD);
+          } catch (e) {
+            console.error('Failed to parse jsonLD string from pageData.meta:', e);
+            // Keep processedJsonLD as null
+          }
+        } else if (typeof newPageData.meta.jsonLD === 'object') {
+          // Ensures it's an object, not an array or other primitives
+          processedJsonLD = newPageData.meta.jsonLD as Record<string, any>;
+        }
+      }
+
+      // Construct the object for useSeo, ensuring the meta structure is compatible
+      const seoDataForComposable: SeoPageData = {
+        // Map fields from WebPage to SeoPageData
+        title: newPageData.title || '', // Ensure title is always a string
+        slug: newPageData.slug,
+        updatedAt: newPageData.updatedAt,
+        createdAt: newPageData.createdAt,
+        layout: newPageData.layout, // WebPage uses 'layout'
+        // pageBuilder: newPageData.pageBuilder, // Remove this line as WebPage doesn't have it
+        meta: newPageData.meta ? {
+          title: newPageData.meta.title,
+          description: newPageData.meta.description,
+          // Handle image type difference if necessary, SeoPageData expects { url?: string | null } | string | null
+          // Assuming newPageData.meta.image (Media type) has a URL property if it's an object
+          image: typeof newPageData.meta.image === 'object' && newPageData.meta.image !== null && 'url' in newPageData.meta.image ? 
+                 (newPageData.meta.image as { url?: string | null }).url : 
+                 (typeof newPageData.meta.image === 'string' ? newPageData.meta.image : null),
+          keywords: newPageData.meta.keywords,
+          schemaType: newPageData.meta.schemaType,
+          noIndex: newPageData.meta.noIndex,
+          jsonLD: processedJsonLD, // Use the processed jsonLD
+        } : null, // If newPageData.meta is null/undefined, pass null for meta
+      };
+      useSeo(seoDataForComposable, 'website');
+    }
+    // If newPageData is undefined, useSeo itself has a check and will return early.
   },
   { immediate: true }
 )
