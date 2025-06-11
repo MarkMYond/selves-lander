@@ -2,7 +2,7 @@
   <header class="sticky top-0 z-50 pt-4">
     <div class="container mx-auto px-5">
       <div
-        class="bg-white rounded-[24px] w-full p-4 border border-brandNeutral-stroke"
+        class="bg-white rounded-xl w-full p-4 border border-brandNeutral-stroke"
       >
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-[72px]">
@@ -112,7 +112,7 @@
     <div
       v-show="isMobileMenuOpen"
       id="mobile-menu"
-      class="lg:hidden bg-white shadow-lg rounded-b-[24px] mx-5 border border-brandNeutral-stroke border-t-0"
+      class="lg:hidden bg-white shadow-lg rounded-b-xl mx-5 border border-brandNeutral-stroke border-t-0"
     >
       <div class="pt-2 pb-3 space-y-1 px-2">
         <NuxtLink
