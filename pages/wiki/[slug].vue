@@ -256,7 +256,10 @@ const pageSlug = computed(() => {
 })
 
 const payloadApiFullUrl = config.public.payloadApiFullUrl 
-console.log(`[Wiki Slug Page] Using payloadApiFullUrl: ${payloadApiFullUrl} for slug: ${pageSlug.value}`); 
+// Only log in development
+if (process.env.NODE_ENV === 'development') {
+  console.log(`[Wiki Slug Page] Using payloadApiFullUrl: ${payloadApiFullUrl} for slug: ${pageSlug.value}`);
+} 
 const { getMediaUrl } = useMediaUrl()
 
 const fetchKey = computed(() => `wiki-page-${route.fullPath}`)
@@ -404,16 +407,30 @@ const wikiNavStore = useWikiNavStore()
 // Watch for route changes and pageData availability to expand navigation
 watchEffect(async () => {
   if (pageSlug.value && wikiNavStore.isInitialized && pageData.value && pageData.value.id) {
-    console.log(`[Wiki Auto-Expand] watchEffect: pageSlug or pageData changed. Attempting to expand nav for page ID: ${pageData.value.id}, slug: ${pageSlug.value}`);
-    await wikiNavStore.getPathAndEnsureExpanded(pageData.value.id);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Wiki Auto-Expand] watchEffect: pageSlug or pageData changed. Attempting to expand nav for page ID: ${pageData.value.id}, slug: ${pageSlug.value}`);
+    }
+    try {
+      await wikiNavStore.getPathAndEnsureExpanded(pageData.value.id);
+    } catch (error) {
+      console.error('[Wiki Auto-Expand] Error expanding navigation:', error);
+    }
   }
 })
 
 // Ensure navigation is expanded on page load
 onMounted(async () => {
-  console.log('[Wiki Auto-Expand] onMounted: Starting for slug:', pageSlug.value);
-  await wikiNavStore.ensureInitialized(); 
-  console.log('[Wiki Auto-Expand] onMounted: Navigation store initialized. Expansion will be handled by watchEffect.');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Wiki Auto-Expand] onMounted: Starting for slug:', pageSlug.value);
+  }
+  try {
+    await wikiNavStore.ensureInitialized(); 
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Wiki Auto-Expand] onMounted: Navigation store initialized. Expansion will be handled by watchEffect.');
+    }
+  } catch (error) {
+    console.error('[Wiki Auto-Expand] Error initializing navigation store:', error);
+  }
 })
 
 // Watch pageData to call useSeo with processed data

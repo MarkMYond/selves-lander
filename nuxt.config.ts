@@ -31,11 +31,21 @@ export default defineNuxtConfig({
       '/api/__sitemap__/urls'
     ],
     defaults: {
-      changefreq: 'daily',
+      changefreq: 'weekly',
       priority: 0.7,
       lastmod: new Date().toISOString(),
     },
-    // exclude: [ '/admin/**' ],
+    urls: [
+      // Add high-priority static pages
+      { loc: '/', changefreq: 'daily', priority: 1.0 },
+      { loc: '/pricing', changefreq: 'weekly', priority: 0.9 },
+      { loc: '/book-a-demo', changefreq: 'monthly', priority: 0.8 },
+    ],
+    exclude: [ 
+      '/admin/**',
+      '/api/**',
+      '/_nuxt/**',
+    ],
   },
 
   icon: { 
@@ -89,9 +99,9 @@ export default defineNuxtConfig({
     routeRules: {
       '/': { ssr: true },
       '/wiki': { ssr: true },
-      '/wiki/**': { ssr: false }, // Force client-side rendering for sub-pages
+      '/wiki/**': { ssr: true, prerender: false }, // Enable SSR for better SEO
       '/registry': { ssr: true },
-      '/registry/**': { ssr: false }, // Force client-side rendering for sub-pages
+      '/registry/**': { ssr: true, prerender: false }, // Enable SSR for better SEO
       '/favicon-v2.png': { headers: { 'cache-control': 'public, max-age=0, must-revalidate', 'content-type': 'image/png' } },
       '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
     },

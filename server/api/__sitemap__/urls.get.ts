@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Get runtime config for API URL
     const config = useRuntimeConfig(event);
-    const payloadApiUrl = (config.public.payloadApiUrl || process.env.NUXT_PUBLIC_PAYLOAD_API_URL || 'http://localhost:3333').replace(/\/$/, '');
+    const payloadApiUrl = config.public.payloadApiUrl || 'https://cms.taash.ai';
     
     console.log(`${SITEMAP_LOG_PREFIX} === DEBUGGING SITEMAP ISSUES ===`);
     console.log(`${SITEMAP_LOG_PREFIX} Generating sitemap URLs via server route...`);
@@ -118,7 +118,7 @@ export default defineEventHandler(async (event) => {
             // if the frontend routing is flat (e.g., /wiki/page-slug).
             // The getFullPath function correctly identifies the full path if needed elsewhere,
             // but for sitemap URLs matching flat frontend routes, we use page.slug directly.
-            if (page.slug) { 
+            if (page.slug && page.slug.trim()) { // Add validation for empty/invalid slugs
               const finalUrl = `${collection.pathPrefix}/${page.slug}`;
               dynamicRoutes.push({ 
                 loc: finalUrl, 
@@ -128,11 +128,13 @@ export default defineEventHandler(async (event) => {
           });
         } else { // For non-hierarchical like web-pages (web-pages already use direct slug)
             response.docs.forEach(page => {
-              const pageUrl = page.slug === 'home' ? '/' : `${collection.pathPrefix}/${page.slug}`;
-              dynamicRoutes.push({ 
-                loc: pageUrl, 
-                lastmod: page.updatedAt 
-              });
+              if (page.slug && page.slug.trim()) { // Add validation for empty/invalid slugs
+                const pageUrl = page.slug === 'home' ? '/' : `${collection.pathPrefix}/${page.slug}`;
+                dynamicRoutes.push({ 
+                  loc: pageUrl, 
+                  lastmod: page.updatedAt 
+                });
+              }
             });
           }
         }

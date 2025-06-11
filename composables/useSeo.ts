@@ -41,10 +41,10 @@ export function useSeo(
   // Extract SEO fields from the page
   const { meta } = page
 
-  // Default values
-  const title = meta?.title || page.title || 'Taash Website'
-  const description = meta?.description || '';
-  const keywords = meta?.keywords || '';
+  // Default values with better fallbacks
+  const title = meta?.title || page.title || 'Taash - AI-Ready Hospitality Infrastructure'
+  const description = meta?.description || 'Taash connects venues to AI agents, enabling seamless automated bookings and enhanced guest experiences through cutting-edge travel technology infrastructure.';
+  const keywords = meta?.keywords || 'AI travel, hospitality technology, automated bookings, venue management';
   const schemaType = meta?.schemaType || 'WebPage'; // Default to WebPage if not specified
   const noIndex = meta?.noIndex || false;
 
@@ -56,25 +56,35 @@ export function useSeo(
   // Use Nuxt's useHead to set meta tags
   useHead({
     title,
+    htmlAttrs: {
+      lang: 'en', // Add language attribute for better SEO
+    },
     meta: [
+      // Essential meta tags
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { charset: 'utf-8' },
       // Standard meta tags
       { name: 'description', content: description },
+      // Robots meta tag
+      { name: 'robots', content: noIndex ? 'noindex, nofollow' : 'index, follow' },
 
       // Open Graph tags
       { property: 'og:title', content: title },
       { property: 'og:description', content: description },
       { property: 'og:type', content: ogType },
-      { property: 'og:image', content: imageUrl, key: 'og:image' }, // Use key instead of hid
+      { property: 'og:image', content: imageUrl, key: 'og:image' },
+      { property: 'og:url', content: `${useRuntimeConfig().public.siteUrl || 'https://taash.ai'}${useRoute().path}` },
+      { property: 'og:site_name', content: 'Taash' },
 
       // Twitter Card tags
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: title },
       { name: 'twitter:description', content: description },
-      { name: 'twitter:image', content: imageUrl, key: 'twitter:image' }, // Use key instead of hid
+      { name: 'twitter:image', content: imageUrl, key: 'twitter:image' },
     ],
     link: [
-      // Canonical URL - you might want to add logic for this
-      // { rel: 'canonical', href: `https://yourdomain.com${route.path}` },
+      // Canonical URL
+      { rel: 'canonical', href: `${useRuntimeConfig().public.siteUrl || 'https://taash.ai'}${useRoute().path}` },
     ],
     script: [], // Initialize script array for JSON-LD
   });
@@ -131,7 +141,7 @@ export function useSeo(
           name: 'Taash',
           logo: {
             '@type': 'ImageObject',
-            url: `${siteUrl}/logo.png`, 
+            url: `${siteUrl}/logo.svg`, // Updated to use existing logo.svg
           },
         };
         // articleBody would ideally be generated or taken from a summary field
