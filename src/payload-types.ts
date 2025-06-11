@@ -1228,6 +1228,18 @@ export interface WebPage {
      * Comma-separated keywords (optional).
      */
     keywords?: string | null;
+    /**
+     * Automatically generated Schema.org JSON-LD markup. Can be overridden if needed.
+     */
+    jsonLD?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   layout: (
     | ContentBlock
@@ -1813,6 +1825,18 @@ export interface WikiPage {
      * Comma-separated keywords (optional).
      */
     keywords?: string | null;
+    /**
+     * Automatically generated Schema.org JSON-LD markup. Can be overridden if needed.
+     */
+    jsonLD?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -1911,6 +1935,18 @@ export interface RegistryPage {
      * Comma-separated keywords (optional).
      */
     keywords?: string | null;
+    /**
+     * Automatically generated Schema.org JSON-LD markup. Can be overridden if needed.
+     */
+    jsonLD?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -2078,6 +2114,7 @@ export interface WebPagesSelect<T extends boolean = true> {
         noIndex?: T;
         schemaType?: T;
         keywords?: T;
+        jsonLD?: T;
       };
   layout?:
     | T
@@ -2909,6 +2946,7 @@ export interface WikiPagesSelect<T extends boolean = true> {
         noIndex?: T;
         schemaType?: T;
         keywords?: T;
+        jsonLD?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -2947,6 +2985,7 @@ export interface RegistryPagesSelect<T extends boolean = true> {
         noIndex?: T;
         schemaType?: T;
         keywords?: T;
+        jsonLD?: T;
       };
   updatedAt?: T;
   createdAt?: T;

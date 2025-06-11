@@ -3,36 +3,23 @@
   "version": 2,
   "installCommand": "pnpm install",
   "buildCommand": "pnpm run build",
-  "headers": [
+  "routes": [
     {
-      "source": "/favicon-v2.png",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "image/png"
-        }
-      ]
+      "src": "/favicon-v2\\.png",
+      "dest": "/favicon-v2.png",
+      "continue": false
     },
     {
-      "source": "/favicon.svg",
-      "headers": [
-        {
-          "key": "Content-Type", 
-          "value": "image/svg+xml"
-        }
-      ]
-    },
-    {
-      "source": "/favicon.ico",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "image/x-icon"
-        }
-      ]
+      "src": "/admin/(.*)",
+      "dest": "https://payload-sigma-ten.vercel.app/admin/$1"
     }
   ],
   "env": {
     "NUXT_PUBLIC_PAYLOAD_API_URL": "https://cms.taash.ai"
+  },
+  "github": {
+    "silent": true,
+    "autoAlias": true,
+    "autoJobCancelation": true
   }
 }

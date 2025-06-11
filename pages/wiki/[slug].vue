@@ -405,39 +405,35 @@ const wikiNavStore = useWikiNavStore()
 // Helper function to search for a page by slug in the navigation tree
 const findPageBySlug = (items: any[], targetSlug: string): any => {
   for (const item of items) {
-    // Check if this item itself matches (for direct page matches)
     if (item.slug === targetSlug) {
       return item
     }
-    
-    // Search in children - this handles both category children and nested page children
     if (item.children && item.children.length > 0) {
       const found = findPageBySlug(item.children, targetSlug)
-      if (found) {
-        return found
-      }
+      if (found) return found
     }
   }
-  
   return null
 }
 
 // Helper function to find the full path to a page by working backwards from the page
 const findPagePath = async (targetSlug: string): Promise<string[]> => {
+  console.log('[Wiki Auto-Expand] Finding path for page:', targetSlug)
+  
   try {
     // First, find the page in Payload CMS to get its parent chain
     const config = useRuntimeConfig()
     const payloadApiUrl = config.public.payloadApiFullUrl
     
-    const fetchUrl = `${payloadApiUrl}/wiki-pages?where[slug][equals]=${targetSlug}&depth=5`
-    
-    const pageResponse = await $fetch<{docs: any[]}>(fetchUrl)
+    const pageResponse = await $fetch<{docs: any[]}>(`${payloadApiUrl}/wiki-pages?where[slug][equals]=${targetSlug}&depth=5`)
     
     if (!pageResponse.docs || pageResponse.docs.length === 0) {
+      console.log('[Wiki Auto-Expand] Page not found in CMS')
       return []
     }
     
     const page = pageResponse.docs[0]
+    console.log('[Wiki Auto-Expand] Found page in CMS:', page)
     
     // Build the path by following parent references
     const path: string[] = []
@@ -452,9 +448,7 @@ const findPagePath = async (targetSlug: string): Promise<string[]> => {
       path.unshift(parentId)
       
       // Fetch the parent to continue walking up the chain
-      const parentFetchUrl = `${payloadApiUrl}/wiki-pages?where[id][equals]=${parentId}&depth=2`
-      
-      const parentResponse = await $fetch<{docs: any[]}>(parentFetchUrl)
+      const parentResponse = await $fetch<{docs: any[]}>(`${payloadApiUrl}/wiki-pages?where[id][equals]=${parentId}&depth=2`)
       if (parentResponse.docs && parentResponse.docs.length > 0) {
         currentPage = parentResponse.docs[0]
       } else {
@@ -462,125 +456,99 @@ const findPagePath = async (targetSlug: string): Promise<string[]> => {
       }
     }
     
+    console.log('[Wiki Auto-Expand] Built path:', path)
     return path
     
   } catch (error) {
-    console.error('Error finding page path:', error)
+    console.error('[Wiki Auto-Expand] Error finding page path:', error)
     return []
   }
 }
 
 // Helper function to expand navigation along a specific path
 const expandNavigationPath = async (path: string[]): Promise<any> => {
+  console.log('[Wiki Auto-Expand] Expanding navigation along path:', path)
+  
   if (path.length === 0) return null
   
-  // Helper function to find an item anywhere in the navigation tree
-  const findItemInTree = (items: any[], targetId: string): any => {
-    for (const item of items) {
-      if (item.id === targetId) {
-        return item
-      }
-      if (item.children && item.children.length > 0) {
-        const found = findItemInTree(item.children, targetId)
-        if (found) return found
-      }
-    }
-    return null
-  }
-  
-  // Helper function to find the path to an item (returns array of parent items)
-  const findPathToItem = (items: any[], targetId: string, currentPath: any[] = []): any[] | null => {
-    for (const item of items) {
-      const newPath = [...currentPath, item]
-      
-      if (item.id === targetId) {
-        return newPath
-      }
-      
-      if (item.children && item.children.length > 0) {
-        const found = findPathToItem(item.children, targetId, newPath)
-        if (found) return found
-      }
-    }
-    return null
-  }
-  
+  // Start from the root and expand each level in the path
+  let currentItems = wikiNavStore.processedNavigationItems
   let targetPage = null
   
-  // Process each item in the path
   for (let i = 0; i < path.length; i++) {
     const targetId = path[i]
+    console.log(`[Wiki Auto-Expand] Looking for item with id: ${targetId}`)
     
-    // Find the item anywhere in the navigation tree
-    const item = findItemInTree(wikiNavStore.processedNavigationItems, targetId)
+    // Find the item in current level
+    const item = currentItems.find(item => item.id === targetId)
     
     if (!item) {
+      console.log(`[Wiki Auto-Expand] Item with id ${targetId} not found in current level`)
       break
     }
+    
+    console.log(`[Wiki Auto-Expand] Found item: ${item.title}`)
     
     // If this is the last item in the path, we found our target
     if (i === path.length - 1) {
       targetPage = item
+      console.log('[Wiki Auto-Expand] Found target page:', targetPage)
       break
     }
     
-    // If not the last item, we need to expand it to ensure its children are loaded
+    // If not the last item, expand it to get children
     if (item.hasChildren && !item.expanded) {
+      console.log(`[Wiki Auto-Expand] Expanding ${item.title} to continue path`)
       await wikiNavStore.toggleExpand(item.id)
     }
     
-    // Also expand all parent items in the path to this item to ensure proper navigation tree state
-    const pathToItem = findPathToItem(wikiNavStore.processedNavigationItems, targetId)
-    if (pathToItem) {
-      for (const parentItem of pathToItem.slice(0, -1)) { // Exclude the target item itself
-        if (parentItem.hasChildren && !parentItem.expanded) {
-          await wikiNavStore.toggleExpand(parentItem.id)
-        }
-      }
+    // Move to the children for the next iteration
+    if (item.children && item.children.length > 0) {
+      currentItems = item.children
+    } else {
+      console.log(`[Wiki Auto-Expand] ${item.title} has no children, cannot continue path`)
+      break
     }
   }
   
   return targetPage
 }
 
-// Helper function to recursively find and expand to a page by slug
-const findAndExpandToPage = async (targetSlug: string): Promise<any> => {
-  // First try to find the page in the current navigation items
-  let foundPage = findPageBySlug(wikiNavStore.processedNavigationItems, targetSlug)
-  
-  if (foundPage) {
-    return foundPage
-  }
-  
-  // If not found, try to get the full path from CMS and expand along it
-  const path = await findPagePath(targetSlug)
-  
-  if (path.length > 0) {
-    const expandedPage = await expandNavigationPath(path)
-    if (expandedPage) {
-      return expandedPage
-    }
-  }
-  
-  return null
-}
-
 // Watch for route changes and expand navigation accordingly
 watchEffect(async () => {
   if (pageSlug.value && wikiNavStore.isInitialized) {
+    console.log('[Wiki Auto-Expand] Looking for page with slug:', pageSlug.value)
+    
     // Use the recursive search function to find deeply nested pages
-    await findAndExpandToPage(pageSlug.value)
+    const currentPage = await findAndExpandToPage(pageSlug.value)
+    
+    if (currentPage) {
+      console.log('[Wiki Auto-Expand] Successfully found and expanded to page:', currentPage)
+      // Use the store's getPathAndEnsureExpanded function to ensure full path is expanded
+      await wikiNavStore.getPathAndEnsureExpanded(currentPage.id)
+    } else {
+      console.log('[Wiki Auto-Expand] Page not found even after recursive expansion')
+    }
   }
 })
 
 // Ensure navigation is expanded on page load
 onMounted(async () => {
+  console.log('[Wiki Auto-Expand onMounted] Starting with slug:', pageSlug.value)
+  
   // Ensure the navigation store is initialized
   await wikiNavStore.ensureInitialized()
+  console.log('[Wiki Auto-Expand onMounted] Navigation initialized, items:', wikiNavStore.processedNavigationItems)
   
   // If we have a current page slug, try to expand its path using recursive search
   if (pageSlug.value) {
-    await findAndExpandToPage(pageSlug.value)
+    const currentPage = await findAndExpandToPage(pageSlug.value)
+    if (currentPage) {
+      console.log('[Wiki Auto-Expand onMounted] Found page after recursive search:', currentPage)
+      await wikiNavStore.getPathAndEnsureExpanded(currentPage.id)
+    } else {
+      console.log('[Wiki Auto-Expand onMounted] Page not found even after recursive expansion')
+    }
   }
 })
 

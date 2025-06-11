@@ -11,14 +11,13 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "generate:wiki-nav": "node scripts/generate-wiki-navigation.js",
-    "prebuild": "echo 'Ensuring favicon exists...' && test -f public/favicon-v2.png && echo 'favicon-v2.png found.' || echo 'Warning: favicon-v2.png not found'",
-    "postbuild": "echo 'Build complete. Checking output...' && ls -la .vercel/output/static/ | grep favicon || echo 'Warning: favicon not found in build output'"
+    "generate:wiki-nav": "node scripts/generate-wiki-navigation.js"
   },
   "dependencies": {
     "@google/genai": "^0.12.0",
     "@google/generative-ai": "^0.24.1",
     "@nuxt/image": "^1.10.0",
+    "@nuxt/kit": "^3.17.4",
     "@payloadcms/richtext-lexical": "3.37.0",
     "@phosphor-icons/vue": "^2.2.1",
     "@pinia/nuxt": "^0.11.0",
@@ -31,7 +30,6 @@
     "dotenv": "^16.5.0",
     "marked": "^15.0.11",
     "nuxt": "^3.16.2",
-    "@nuxt/kit": "^3.17.4",
     "nuxt-icon": "^0.6.10",
     "openai": "^4.98.0",
     "pinia": "^3.0.2",
@@ -47,12 +45,12 @@
   },
   "devDependencies": {
     "@iconify-json/ph": "^1.1.15",
+    "@nuxtjs/sitemap": "^7.3.1",
     "@nuxtjs/tailwindcss": "^6.13.0",
     "@tailwindcss/typography": "^0.5.14",
     "@types/node": "^20.16.2",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^13.0.0",
-    "typescript-eslint": "^7.18.0",
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.5.1",
     "autoprefixer": "^10.4.20",
@@ -65,6 +63,8 @@
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.10",
     "typescript": "~5.5.4",
+    "typescript-eslint": "^7.18.0",
     "vue-tsc": "^2.1.0"
-  }
+  },
+  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
 }

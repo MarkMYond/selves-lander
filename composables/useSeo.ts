@@ -1,18 +1,28 @@
 // useHead is auto-imported by Nuxt 3
 import type {
-  WebPage,
+  WebPage, // Assuming these are defined in your payload-types
   WikiPage,
   RegistryPage,
-} from '../../payload-cms/src/payload-types' // Import other page types
+} from '../src/payload-types'; // Adjusted import path
 
 // Define a common interface for SEO-relevant fields
 interface SeoPageData {
-  title: string
+  title: string; // Main page title
+  slug?: string; // Page slug for URL construction
+  updatedAt?: string; // For dateModified
+  createdAt?: string; // For datePublished
+  // Assuming 'layout' or 'pageBuilder' contains the main content for articleBody
+  layout?: any[]; 
+  pageBuilder?: any[]; 
   meta?: {
-    title?: string | null
-    description?: string | null
-    image?: { url?: string | null } | string | null // Allow for Media object or string ID
-  } | null
+    title?: string | null;
+    description?: string | null;
+    image?: { url?: string | null } | string | null;
+    keywords?: string | null; // Comma-separated string of keywords
+    schemaType?: string | null; // e.g., "Article", "WebPage"
+    noIndex?: boolean | null;
+    jsonLD?: Record<string, any> | null; // Added jsonLD field to store the object
+  } | null;
 }
 
 /**
@@ -33,11 +43,15 @@ export function useSeo(
 
   // Default values
   const title = meta?.title || page.title || 'Taash Website'
-  const description = meta?.description || ''
+  const description = meta?.description || '';
+  const keywords = meta?.keywords || '';
+  const schemaType = meta?.schemaType || 'WebPage'; // Default to WebPage if not specified
+  const noIndex = meta?.noIndex || false;
+
   // Handle image being an object or potentially just a string ID (though URL is preferred)
   const imageUrl =
-    typeof meta?.image === 'object' && meta.image?.url ? meta.image.url : ''
-  const ogType = type
+    typeof meta?.image === 'object' && meta.image?.url ? meta.image.url : '';
+  const ogType = type;
 
   // Use Nuxt's useHead to set meta tags
   useHead({
@@ -62,5 +76,80 @@ export function useSeo(
       // Canonical URL - you might want to add logic for this
       // { rel: 'canonical', href: `https://yourdomain.com${route.path}` },
     ],
-  })
+    script: [], // Initialize script array for JSON-LD
+  });
+
+  // JSON-LD Structured Data
+  // This is a basic implementation; you'll need to expand it based on schemaType
+  // and the specific properties required for each type.
+  if (!noIndex) { // Only add JSON-LD if page is not noIndex
+    let finalJsonLd: any;
+
+    if (meta?.jsonLD && typeof meta.jsonLD === 'object' && Object.keys(meta.jsonLD).length > 0) {
+      // If a pre-generated jsonLD object exists in meta, use it directly
+      finalJsonLd = meta.jsonLD;
+      // Ensure @context is present, default if not
+      if (!finalJsonLd['@context']) {
+        finalJsonLd['@context'] = 'https://schema.org';
+      }
+      // Ensure @type is present, use schemaType from meta if not, or default
+      if (!finalJsonLd['@type']) {
+        finalJsonLd['@type'] = schemaType; // schemaType defaults to 'WebPage'
+      }
+    } else {
+      // Construct JSON-LD if not pre-generated
+      const route = useRoute(); // Get current route for URL
+      const siteUrl = useRuntimeConfig().public.siteUrl || 'https://taash.ai'; // Get base URL
+      const pageUrl = `${siteUrl}${route.path}`;
+
+      finalJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': schemaType,
+        name: title,
+        description: description,
+        url: pageUrl,
+      };
+
+      if (imageUrl) {
+        finalJsonLd.image = imageUrl;
+      }
+      
+      if (keywords) {
+        finalJsonLd.keywords = keywords;
+      }
+
+      if (schemaType === 'Article') {
+        finalJsonLd.headline = title;
+        finalJsonLd.datePublished = page.createdAt || new Date().toISOString();
+        finalJsonLd.dateModified = page.updatedAt || new Date().toISOString();
+        finalJsonLd.author = {
+          '@type': 'Organization',
+          name: 'Taash', 
+        };
+        finalJsonLd.publisher = {
+          '@type': 'Organization',
+          name: 'Taash',
+          logo: {
+            '@type': 'ImageObject',
+            url: `${siteUrl}/logo.png`, 
+          },
+        };
+        // articleBody would ideally be generated or taken from a summary field
+        // finalJsonLd.articleBody = description; 
+      }
+      // Add more specific structures for other schemaTypes here
+    }
+
+    // Update head with JSON-LD script
+    if (finalJsonLd && Object.keys(finalJsonLd).length > 0) {
+      useHead({
+        script: [
+          {
+            type: 'application/ld+json',
+            innerHTML: JSON.stringify(finalJsonLd, null, 2), 
+          },
+        ],
+      });
+    }
+  }
 }

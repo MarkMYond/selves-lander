@@ -22,12 +22,12 @@
       <div class="space-y-4">
         <h2
           v-if="title"
-          class="text-h3 md:text-h2 font-bold text-brandNeutral-04 max-w-xl leading-[1.1]"
+          :class="['text-h3 md:text-h2 font-bold text-brandNeutral-04 leading-[1.1]', titleMaxWidth ? titleMaxWidth : 'max-w-xl']"
           v-html="title"
         />
         <p
           v-if="subtitle"
-          class="text-body-18 text-brandNeutral-03 max-w-2xl"
+          :class="['text-body-18 text-brandNeutral-03', subtitleMaxWidth ? subtitleMaxWidth : 'max-w-2xl']"
           v-html="subtitle"
         />
       </div>
@@ -73,6 +73,16 @@ const props = defineProps({
   },
   titleImage: {
     type: [Object, String, null] as PropType<Media | string | null>,
+    required: false,
+    default: null,
+  },
+  titleMaxWidth: {
+    type: String as PropType<string | null>,
+    required: false,
+    default: null,
+  },
+  subtitleMaxWidth: {
+    type: String as PropType<string | null>,
     required: false,
     default: null,
   },

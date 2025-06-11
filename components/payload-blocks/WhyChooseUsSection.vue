@@ -14,6 +14,8 @@
             :title="props.block.title"
             :subtitle="props.block.subTitle"
             :title-image="props.block.titleImage"
+            title-max-width="max-w-lg"
+            subtitle-max-width="max-w-xl"
           />
         </div>
 
