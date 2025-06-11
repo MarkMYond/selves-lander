@@ -6,6 +6,7 @@ interface PayloadDoc {
   title: string
   slug: string
   icon?: string
+  iconBackgroundColor?: string; // Added field
   // Add other fields if needed by nav, like _status if directly querying
 }
 
@@ -14,6 +15,7 @@ interface NavItem {
   title: string
   slug: string
   icon?: string
+  iconBackgroundColor?: string; // Added field
   hasChildren?: boolean // New property
   children?: NavItem[] // For client-side fetched children, not populated by this API directly
 }
@@ -145,6 +147,7 @@ export default defineEventHandler(async (event): Promise<NavItem[]> => {
         title: doc.title,
         slug: doc.slug,
         icon: doc.icon,
+        iconBackgroundColor: doc.iconBackgroundColor, // Added field
         hasChildren: parentIdsWithChildren.has(doc.id),
       }
     })

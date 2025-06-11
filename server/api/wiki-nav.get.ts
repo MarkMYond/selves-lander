@@ -13,6 +13,7 @@ interface PayloadWikiPageDoc {
   title: string
   slug: string
   icon?: string
+  iconBackgroundColor?: string; // Added field
   sort?: number
   category?: string | PayloadCategoryDoc
   parent?: string | PayloadWikiPageDoc
@@ -25,6 +26,7 @@ interface NavItem {
   title: string
   slug?: string
   icon?: string
+  iconBackgroundColor?: string; // Added field
   isCategory?: boolean
   children?: NavItem[]
   hasChildren?: boolean
@@ -134,6 +136,7 @@ async function fetchPagesAndDetermineChildren(
     title: pageDoc.title,
     slug: pageDoc.slug,
     icon: pageDoc.icon,
+    iconBackgroundColor: pageDoc.iconBackgroundColor, // Added field
     hasChildren: parentIdsWithChildren.has(pageDoc.id),
     isCategory: false, // These are page items
   }));

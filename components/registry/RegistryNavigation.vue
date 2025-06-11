@@ -1,6 +1,6 @@
 <template>
   <div
-    class="registry-navigation bg-light-grey text-gray-800 p-4 rounded-md h-full"
+    class="registry-navigation bg-[#FCFAF9] text-gray-800 p-4 rounded-md h-full"
   >
     <NuxtLink
       v-if="navTitle"
@@ -70,7 +70,7 @@
                   <span
                     v-if="page.icon && page.iconBackgroundColor && page.iconBackgroundColor !== 'none'"
                     :class="[
-                      'w-6 h-6 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
+                      'w-5 h-5 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
                       page.iconBackgroundColor,
                     ]"
                   >
@@ -134,7 +134,7 @@
                     <span
                       v-if="childPage.icon && childPage.iconBackgroundColor && childPage.iconBackgroundColor !== 'none'"
                       :class="[
-                        'w-6 h-6 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
+                        'w-5 h-5 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
                         childPage.iconBackgroundColor,
                       ]"
                     >
@@ -200,7 +200,7 @@
               <span
                 v-if="item.icon && item.iconBackgroundColor && item.iconBackgroundColor !== 'none'"
                 :class="[
-                  'w-6 h-6 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
+                  'w-5 h-5 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
                   item.iconBackgroundColor,
                 ]"
               >

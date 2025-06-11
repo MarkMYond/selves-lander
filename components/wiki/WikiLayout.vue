@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-start lg:flex-row relative">
     <aside
-      class="w-full fixed top-0 left-0 z-[11] pt-[5.5rem] overflow-scroll h-screen bg-light-grey lg:bg-light-grey lg:p-6 lg:h-[calc(100vh-5.5rem)] lg:overflow-y-auto lg:translate-x-0 lg:w-[21.6rem] lg:sticky lg:top-[5.5rem] transition-all duration-700 rounded-md lg:rounded-md m-4"
+      class="w-full fixed top-0 left-0 z-[11] pt-[5.5rem] overflow-scroll h-screen bg-[#FCFAF9] lg:bg-transparent lg:p-6 lg:h-[calc(100vh-5.5rem)] lg:overflow-y-auto lg:translate-x-0 lg:w-[21.6rem] lg:sticky lg:top-[5.5rem] transition-all duration-700 rounded-md lg:rounded-md lg:ml-4"
       :class="{
         'translate-x-[-100%]': !isLeftSidebarOpen,
         'translate-x-[0]': isLeftSidebarOpen,

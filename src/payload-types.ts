@@ -1752,7 +1752,15 @@ export interface WikiPage {
    * Background color for the icon circle. Select "None" for no background.
    */
   iconBackgroundColor?:
-    | ('none' | 'bg-pink-100' | 'bg-blue-100' | 'bg-green-100' | 'bg-yellow-100' | 'bg-purple-100')
+    | (
+        | 'none'
+        | 'bg-brandTheme-01'
+        | 'bg-brandTheme-02'
+        | 'bg-brandTheme-03'
+        | 'bg-brandTheme-04'
+        | 'bg-pink-light'
+        | 'bg-purple-light'
+      )
     | null;
   backgroundSettings?: {
     /**
@@ -1842,7 +1850,15 @@ export interface RegistryPage {
    * Background color for the icon circle. Select "None" for no background.
    */
   iconBackgroundColor?:
-    | ('none' | 'bg-pink-100' | 'bg-blue-100' | 'bg-green-100' | 'bg-yellow-100' | 'bg-purple-100')
+    | (
+        | 'none'
+        | 'bg-brandTheme-01'
+        | 'bg-brandTheme-02'
+        | 'bg-brandTheme-03'
+        | 'bg-brandTheme-04'
+        | 'bg-pink-light'
+        | 'bg-purple-light'
+      )
     | null;
   backgroundSettings?: {
     /**

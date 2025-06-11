@@ -10,7 +10,7 @@
         <span
           v-if="item.icon && item.iconBackgroundColor && item.iconBackgroundColor !== 'none'"
           :class="[
-            'w-6 h-6 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
+            'w-5 h-5 rounded-full flex items-center justify-center mr-2 flex-shrink-0',
             item.iconBackgroundColor,
           ]"
         >

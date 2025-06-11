@@ -1,6 +1,6 @@
 <template>
   <div
-    class="wiki-navigation bg-transparent text-gray-800 p-4 rounded-md h-full"
+    class="wiki-navigation bg-[#FCFAF9] text-gray-800 p-4 rounded-md h-full" 
   >
     <NuxtLink
       v-if="navTitle"
