@@ -196,25 +196,25 @@ const getSingleImageClass = (index: number) => {
 
 <style scoped>
 .card-style-1 {
-  background-image: url('/webflow-assets/images/benefits-shape1.png');
+  background-image: url('webflow-assets/images/benefits-shape1.png');
   background-position: 54% 160%;
   background-repeat: no-repeat;
   background-size: 190%;
 }
 .card-style-2 {
-  background-image: url('/webflow-assets/images/benefits-shape2.png');
+  background-image: url('webflow-assets/images/benefits-shape2.png');
   background-position: -60% 150%;
   background-repeat: no-repeat;
   background-size: 150%;
 }
 .card-style-3 {
-  background-image: url('/webflow-assets/images/benefits-shape3.png');
+  background-image: url('webflow-assets/images/benefits-shape3.png');
   background-position: 50%;
   background-repeat: no-repeat;
   background-size: auto;
 }
 .card-style-4 {
-  background-image: url('/webflow-assets/images/benefits-shape4.png');
+  background-image: url('webflow-assets/images/benefits-shape4.png');
   background-position: 30% -100%;
   background-repeat: no-repeat;
   background-size: auto;
