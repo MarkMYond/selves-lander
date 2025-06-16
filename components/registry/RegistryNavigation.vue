@@ -1,6 +1,6 @@
 <template>
   <div
-    class="registry-navigation bg-[#FCFAF9] text-gray-800 p-4 rounded-md h-full"
+    class="registry-navigation bg-[#FCFAF9] text-gray-800 p-6 rounded-md h-full"
   >
     <NuxtLink
       v-if="navTitle"
