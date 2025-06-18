@@ -21,10 +21,10 @@
               <ul class="flex items-center gap-[30px]">
                 <li>
                   <NuxtLink
-                    to="/wiki"
+                    to="/pricing"
                     class="nav-link"
                   >
-                    Knowledge Base
+                    Pricing
                   </NuxtLink>
                 </li>
                 <li>
@@ -33,14 +33,6 @@
                     class="nav-link"
                   >
                     About
-                  </NuxtLink>
-                </li>
-                <li>
-                  <NuxtLink
-                    to="/pricing"
-                    class="nav-link"
-                  >
-                    Pricing
                   </NuxtLink>
                 </li>
                 <li>
@@ -56,6 +48,12 @@
           </div>
 
           <div class="hidden lg:flex items-center gap-6">
+            <NuxtLink
+              to="/wiki"
+              class="nav-link"
+            >
+              Knowledge Base
+            </NuxtLink>
             <NuxtLink
               to="/registry"
               class="nav-link"
@@ -133,11 +131,11 @@
         </NuxtLink>
 
         <NuxtLink
-          to="/wiki"
+          to="/pricing"
           class="mobile-nav-link"
           @click="closeMobileMenu"
         >
-          Knowledge Base
+          Pricing
         </NuxtLink>
         <NuxtLink
           to="/about"
@@ -147,11 +145,18 @@
           About
         </NuxtLink>
         <NuxtLink
-          to="/pricing"
+          to="/contact"
           class="mobile-nav-link"
           @click="closeMobileMenu"
         >
-          Pricing
+          Contact
+        </NuxtLink>
+        <NuxtLink
+          to="/wiki"
+          class="mobile-nav-link"
+          @click="closeMobileMenu"
+        >
+          Knowledge Base
         </NuxtLink>
         <NuxtLink
           to="/registry"
@@ -159,13 +164,6 @@
           @click="closeMobileMenu"
         >
           Registry
-        </NuxtLink>
-        <NuxtLink
-          to="/contact"
-          class="mobile-nav-link"
-          @click="closeMobileMenu"
-        >
-          Contact
         </NuxtLink>
         <hr class="my-2 border-gray-200">
         <BaseButton
