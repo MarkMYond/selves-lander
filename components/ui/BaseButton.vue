@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { computed, type PropType, useAttrs, resolveComponent } from 'vue'
 
-type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'border'
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'border' | 'dark-pill' // Added dark-pill
 
 const emit = defineEmits<{
   click: [event: MouseEvent]
@@ -35,7 +35,7 @@ const props = defineProps({
     type: String as PropType<ButtonVariant>,
     default: 'primary',
     validator: (value: string) =>
-      ['primary', 'secondary', 'tertiary', 'border'].includes(value),
+      ['primary', 'secondary', 'tertiary', 'border', 'dark-pill'].includes(value), // Added dark-pill
   },
   target: {
     type: String,
@@ -88,6 +88,10 @@ const buttonClasses = computed(() => {
     case 'border':
       variantClasses =
         'bg-transparent hover:bg-brandNeutral-02 border-brandNeutral-04 text-brandNeutral-04 focus:ring-brandNeutral-04'
+      break
+    case 'dark-pill':
+      variantClasses =
+        'bg-black text-white hover:bg-gray-800 border-transparent focus:ring-black rounded-full px-8 py-3' // Specific padding for pill shape
       break
     default: // Should not happen due to validator, but good practice
       variantClasses =

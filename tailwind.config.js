@@ -113,7 +113,7 @@ module.exports = {
         'remixco-icon-purple': '#714AE3',
         // Brand Colors (add more as needed)
         // 'brand-primary': '#3713A2', // Removed, as primary is now brandNeutral.04
-        'brand-50': '#F7F3FF', // Brand 50 purple
+        'brand-50': '#e6e1f0', // Changed from #F7F3FF (Brand 50 purple) to match brandTheme-01 (Lavender)
         'brand-100': '#F0E7FE', // Added Brand 100 purple
         'brand-900': '#280772', // Brand 900 purple
         // Add new Micro Header colors
@@ -162,7 +162,7 @@ module.exports = {
         lg: 'var(--radius)', // This is 0.5rem (8px) from your CSS variables
         md: 'calc(var(--radius) - 2px)', // This would be 6px
         sm: 'calc(var(--radius) - 4px)', // This would be 4px
-        xl: '0.75rem', // Added 12px border radius
+        xl: '1.5rem', // Updated 12px (0.75rem) to 24px (1.5rem) border radius
       },
       fontFamily: {
         sans: ['Satoshi', 'sans-serif'], // Set Satoshi as default sans font

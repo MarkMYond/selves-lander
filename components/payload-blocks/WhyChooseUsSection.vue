@@ -27,12 +27,21 @@
           <div
             v-for="(card, index) in props.block.cards"
             :key="card.id || `card-${index}`"
-            class="why-choose-us-single-card text-center border border-gray-200 rounded-2xl p-6 md:p-8 space-y-4"
+            class="why-choose-us-single-card text-center rounded-2xl p-6 md:p-8 space-y-4"
+            :class="[
+              card.invertStyle
+                ? card.iconBackgroundColor || 'bg-brandTheme-01'
+                : 'border border-gray-200',
+            ]"
           >
             <div
               v-if="card.icon && typeof card.icon === 'object' && card.icon.url"
               class="why-choose-us-card-icon inline-flex items-center justify-center rounded-xl p-3.5"
-              :class="[card.iconBackgroundColor || 'bg-brandTheme-01']"
+              :class="[
+                card.invertStyle
+                  ? 'bg-brandNeutral-01'
+                  : card.iconBackgroundColor || 'bg-brandTheme-01',
+              ]"
             >
               <img
                 :src="getMediaUrl(card.icon)"

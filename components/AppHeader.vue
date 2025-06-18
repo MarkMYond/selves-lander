@@ -37,6 +37,14 @@
                 </li>
                 <li>
                   <NuxtLink
+                    to="/pricing"
+                    class="nav-link"
+                  >
+                    Pricing
+                  </NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink
                     to="/contact"
                     class="nav-link"
                   >
@@ -60,6 +68,7 @@
             >
               Get Started
             </BaseButton>
+            <elevenlabs-convai agent-id="agent_01jy1a192de0qtdfsq9h2nzyqa"></elevenlabs-convai>
           </div>
 
           <div class="lg:hidden">
@@ -138,6 +147,13 @@
           About
         </NuxtLink>
         <NuxtLink
+          to="/pricing"
+          class="mobile-nav-link"
+          @click="closeMobileMenu"
+        >
+          Pricing
+        </NuxtLink>
+        <NuxtLink
           to="/registry"
           class="mobile-nav-link"
           @click="closeMobileMenu"
@@ -155,11 +171,14 @@
         <BaseButton
           to="/contact"
           variant="primary"
-          class="block w-full text-center mt-2 mb-2 shadow-sm"
+          class="block w-full text-center my-2 shadow-sm" <!-- Adjusted margin -->
           @click="closeMobileMenu"
         >
           Get Started
         </BaseButton>
+        <div class="flex justify-end py-2 pr-2">
+          <elevenlabs-convai agent-id="agent_01jy1a192de0qtdfsq9h2nzyqa"></elevenlabs-convai>
+        </div>
       </div>
     </div>
   </header>
@@ -167,7 +186,19 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import BaseButton from '@/components/ui/BaseButton.vue' // Changed to @ alias
+import { useHead } from '#app' // For Nuxt 3
+import BaseButton from '@/components/ui/BaseButton.vue'
+
+// Add the ElevenLabs widget script
+useHead({
+  script: [
+    {
+      src: 'https://unpkg.com/@elevenlabs/convai-widget-embed',
+      async: true,
+      type: 'text/javascript',
+    },
+  ],
+})
 
 const isMobileMenuOpen = ref(false)
 const megaMenuVisible = ref(false) // For desktop mega menu hover state

@@ -188,9 +188,19 @@ const blockComponents = {
       () => import('./payload-blocks/general/ProductFeatures.vue')
     )
   ),
-  pricingPlans: markRaw(
+  // pricingPlans: markRaw( // Old combined block
+  //   defineAsyncComponent(
+  //     () => import('./payload-blocks/general/PricingPlans.vue')
+  //   )
+  // ),
+  pricingCards: markRaw( // New separate block for cards
     defineAsyncComponent(
-      () => import('./payload-blocks/general/PricingPlans.vue')
+      () => import('./payload-blocks/general/PricingCards.vue')
+    )
+  ),
+  featureComparisonTable: markRaw( // New separate block for table
+    defineAsyncComponent(
+      () => import('./payload-blocks/general/FeatureComparisonTable.vue')
     )
   ),
   scheduleCallSection: markRaw(

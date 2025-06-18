@@ -40,6 +40,7 @@
         :src="getMediaUrl(titleImage)"
         :alt="titleImage.alt || title || 'Header image'"
         class="w-full h-auto rounded-lg object-contain mx-auto"
+        style="transform: scale(0.8);"
         loading="lazy"
       >
     </div>

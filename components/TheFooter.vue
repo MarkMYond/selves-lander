@@ -55,7 +55,6 @@
             />
           </div>
         </div>
-        {/* Closing max-w-4xl wrapper */}
       </div>
       <div
         class="cta-bg absolute bottom-0 left-0 right-0 h-[38%] bg-brandNeutral-04 -z-10"

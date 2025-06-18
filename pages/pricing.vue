@@ -36,7 +36,16 @@ import BlockRenderer from '@/components/BlockRenderer.vue'
 import { useSeo } from '@/composables/useSeo'
 
 const config = useRuntimeConfig()
-const { PAYLOAD_API_URL } = config.public
+// Ensure payloadApiFullUrl is a valid string, with a fallback.
+const rawApiUrl = config.public.payloadApiFullUrl
+const safeApiUrl = (typeof rawApiUrl === 'string' && rawApiUrl.length > 0) 
+                    ? rawApiUrl 
+                    : 'https://cms.taash.ai/api'; // Default fallback
+
+if (typeof rawApiUrl !== 'string' || rawApiUrl.length === 0) {
+  console.warn(`Pricing Page: config.public.payloadApiFullUrl was not a valid string ('${rawApiUrl}'), using fallback '${safeApiUrl}'`);
+}
+
 const {
   data: pageData,
   pending,
@@ -44,7 +53,7 @@ const {
 } = await useAsyncData<PageType | null>('pricing-page', async () => {
   try {
     const response = await $fetch(
-      `${PAYLOAD_API_URL}/web-pages?where[slug][equals]=pricing&depth=2`
+      `${safeApiUrl}/web-pages?where[slug][equals]=pricing&depth=2` // Use safeApiUrl
     )
     const page = (response as any)?.docs?.[0] as PageType | undefined
     if (!page) {
@@ -56,6 +65,9 @@ const {
     return page
   } catch (fetchError: any) {
     console.error('Failed to fetch pricing page data:', fetchError)
+    // Set error for display
+    // Note: useError() must be called at the top level of setup, not conditionally or in async
+    // So, we return null and let the template handle the error display based on the 'error' ref from useAsyncData
     return null
   }
 })
@@ -64,6 +76,7 @@ watchEffect(() => {
   if (pageData.value) {
     useSeo(pageData.value as PageType, 'website')
   } else {
+    // Fallback SEO if pageData fails to load or is null
     useHead({
       title: 'Our Pricing Plans - TaskHub',
       meta: [
@@ -76,12 +89,13 @@ watchEffect(() => {
   }
 })
 
-if (!pending.value && !pageData.value && process.client) {
-}
+// This condition was empty, can be removed or used for specific client-side logic if needed.
+// if (!pending.value && !pageData.value && process.client) {
+// }
 </script>
 
 <style scoped>
 main {
-  flex-grow: 1;
+  flex-grow: 1; /* Ensure main content takes up available space */
 }
 </style>

@@ -1,140 +1,138 @@
 <template>
   <div
-    class="p-6 md:p-8 rounded-2xl border flex flex-col"
+    class="pricing-card flex flex-col shadow-lg rounded-xl" 
     :class="[
-      bgColorClass,
-      isMostPopular
-        ? 'border-brand-primary shadow-2xl scale-105 z-10'
-        : 'border-gray-200 dark:border-gray-700 shadow-lg',
+      cardOuterBackgroundColor, 
+      planData.isMostPopular ? 'border-2 border-brand-primary scale-105 z-10 active' : 'border border-gray-200 dark:border-gray-700'
     ]"
   >
-    <div
-      v-if="isMostPopular"
-      class="absolute top-0 -mt-3 left-1/2 transform -translate-x-1/2"
-    >
-      <span
-        class="bg-brand-primary text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider"
-      >Popular</span>
-    </div>
-    <h3
-      class="text-2xl font-semibold leading-tight mb-2"
-      :class="
-        isMostPopular
-          ? 'text-brand-primary'
-          : 'text-brand-900 dark:text-brand-100'
-      "
-    >
-      {{ title }}
-    </h3>
-    <p class="text-sm text-gray-600 dark:text-gray-400 min-h-[4em] mb-4">
-      {{ description }}
-    </p>
-    <div class="mb-6">
-      <template v-if="displayPrice">
-        <span
-          class="text-4xl font-bold"
-          :class="
-            isMostPopular
-              ? 'text-brand-primary'
-              : 'text-brand-900 dark:text-brand-100'
-          "
-        >{{ displayPrice }}</span><span class="text-sm text-gray-500 dark:text-gray-400">
-          {{ displayPriceSuffix }}</span>
-      </template>
-      <template v-else>
-        <div class="mt-2 md:-mt-6 lg:mt-0 lg:min-h-[88px] lg:mb-5">
-          <span
-            class="[font-variant-ligatures:stylistic] [font-feature-settings:'ss01'] font-bold"
-          >Available on request
-          </span>
-          <b
-            class="inline text-4xl font-bold leading-[54px] max-sm:text-2xl max-sm:leading-9"
-          />
+    <!-- Top section always with white background -->
+    <div class="bg-white p-6 md:p-8 rounded-xl" :class="{ 'rounded-b-none': true }">
+      <div v-if="planData.isMostPopular" class="pricing-tagline-wrapper mb-4 text-right">
+        <span class="pricing-tagline-text bg-black text-white text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block">Popular</span>
+      </div>
+      <div class="pricing-card-top">
+        <div class="pricing-name-tagline text-left">
+          <p class="pricng-card-top-heading text-3xl font-bold leading-tight mb-1 text-black"> 
+            {{ planData.name }}
+          </p>
         </div>
-      </template>
+        <div class="card-price-text mt-4 mb-6 text-left">
+          <template v-if="displayPrice">
+            <div class="flex items-baseline space-x-2">
+              <h3 class="pricing-price text-5xl font-extrabold text-black">
+                {{ displayPrice }}
+              </h3>
+              <p class="pricing-duration text-sm text-gray-500">
+                  {{ displayPriceSuffix }}
+              </p>
+            </div>
+            <p class="pricing-top-info-text text-base text-gray-700 min-h-[2em] mt-2">
+              {{ planData.description }}
+            </p>
+          </template>
+          <template v-else>
+            <div class="min-h-[88px] flex items-start py-2">
+              <span class="font-bold text-xl text-black">
+                Available on request
+              </span>
+            </div>
+          </template>
+        </div>
+      </div>
     </div>
-    <ul class="space-y-3 mb-8 flex-grow">
-      <PlanFeature
-        v-for="(feature, featureIndex) in features"
-        :key="feature.id || `feature-${title}-${featureIndex}`"
-        :feature-text="feature.featureName"
-        :availability="
-          getFeatureAvailability(feature, planIndex) as
-            | 'included'
-            | 'not_included'
-            | 'custom'
-            | undefined
-        "
-        :custom-text="getFeatureCustomText(feature, planIndex)"
-        :tooltip="feature.tooltip ?? undefined"
-      />
-    </ul>
-    <BaseButton
-      :to="ctaLink"
-      :variant="isMostPopular ? 'primary' : 'secondary'"
-      class="w-full mt-auto"
-      :target="isExternalUrl(ctaLink) ? '_blank' : undefined"
-    >
-      {{ ctaText }}
-    </BaseButton>
+
+    <!-- Features and Button section on card's main background -->
+    <div class="pricing-card-body-footer flex flex-col flex-grow p-6 md:p-8 rounded-b-xl" :class="{'pt-0': true }">
+      <div class="pricing-body-content flex-grow">
+        <ul v-if="features && features.length > 0" class="pricing-card-features space-y-3 mb-8">
+          <PlanFeature
+            v-for="(featureItem, featureIndex) in features"
+            :key="featureItem.id || `feature-${planData.name}-${featureIndex}`"
+            :feature-text="featureItem.featureText || ''"
+            :is-included="featureItem.isIncluded ?? true"
+            :tooltip="featureItem.tooltip ?? undefined"
+            :is-popular="planData.isMostPopular || false" 
+          />
+        </ul>
+        <p v-else class="text-sm italic text-gray-500 mb-8">(No features listed for this plan)</p>
+      </div>
+      <BaseButton
+        :to="planData.ctaButtonLink || '#'"
+        :variant="planData.isMostPopular ? 'tertiary' : 'dark-pill'" 
+        class="w-full mt-auto"
+        :target="isExternalUrl(planData.ctaButtonLink || '#') ? '_blank' : undefined"
+      >
+        {{ planData.ctaButtonLabel || 'Select Plan' }}
+      </BaseButton>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from 'vue'
-import type { PricingPlansBlock } from '@/src/payload-types'
-import PlanFeature from './PlanFeature.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import { computed, type PropType } from 'vue';
+import type { PricingCardsBlock, PricingPlansBlock } from '../../../src/payload-types';
+import PlanFeature from './PlanFeature.vue';
+import BaseButton from '@/components/ui/BaseButton.vue';
 
-type SharedFeatureItem = NonNullable<
-  PricingPlansBlock['sharedFeatures']
->[number]
+// Create a flexible type that can handle both PricingCardsBlock and PricingPlansBlock plan structures
+type PlanDataType = (NonNullable<PricingCardsBlock['plans']>[number]) | (NonNullable<PricingPlansBlock['plans']>[number]);
+
+type PlanSpecificFeatureItem = {
+  featureText?: string | null;
+  isIncluded?: boolean | null;
+  tooltip?: string | null;
+  id?: string | null;
+};
 
 const props = defineProps({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  monthlyPrice: { type: String, default: '' },
-  annualPrice: { type: String, default: '' },
-  priceSuffix: { type: String, default: '/month' },
-  bgColorClass: { type: String, default: 'bg-white dark:bg-brandNeutral-03' },
-  ctaText: { type: String, required: true },
-  ctaLink: { type: String, required: true },
-  isMostPopular: { type: Boolean, default: false },
-  features: { type: Array as PropType<SharedFeatureItem[]>, required: true },
+  planData: { type: Object as PropType<PlanDataType>, required: true },
+  features: { type: Array as PropType<PlanSpecificFeatureItem[]>, default: () => [] },
   planIndex: { type: Number, required: true },
   isYearlyBilling: { type: Boolean, required: true },
-})
+});
 
-const isExternalUrl = (url: string): boolean => /^(https?:)?\/\//.test(url)
+const isExternalUrl = (url: string): boolean => /^(https?:)?\/\//.test(url);
 
 const displayPrice = computed(() => {
-  return props.isYearlyBilling ? props.annualPrice : props.monthlyPrice
-})
+  return props.isYearlyBilling ? props.planData.annualPrice : props.planData.monthlyPrice;
+});
+
+const cardOuterBackgroundColor = computed(() => {
+  if (props.planData.isMostPopular) {
+    // For popular plans, use a default light purple if no specific color is set
+    if (!props.planData.cardBackgroundColor || 
+        props.planData.cardBackgroundColor === 'default' || 
+        props.planData.cardBackgroundColor === 'none') {
+      return 'bg-purple-200'; // Default popular background
+    }
+    return props.planData.cardBackgroundColor;
+  }
+  // For non-popular plans, use white as default
+  if (!props.planData.cardBackgroundColor || 
+      props.planData.cardBackgroundColor === 'default' || 
+      props.planData.cardBackgroundColor === 'none') {
+    return 'bg-white'; // Default non-popular card background is white
+  }
+  return props.planData.cardBackgroundColor;
+});
+
+const roundedClass = 'rounded-xl'; // Consistent 12px rounding
 
 const displayPriceSuffix = computed(() => {
-  if (props.isYearlyBilling && props.priceSuffix.includes('/month')) {
-    return props.priceSuffix.replace('/month', '/year (billed annually)')
+  const suffix = props.planData.priceSuffix || '/month';
+  if (props.isYearlyBilling && suffix.includes('/month')) {
+    return suffix.replace('/month', '/year');
   }
-  return props.priceSuffix
-})
-
-const getFeatureAvailability = (
-  feature: SharedFeatureItem,
-  planIndex: number
-): string | undefined => {
-  if (planIndex === 0) return feature.plan1Availability ?? undefined
-  if (planIndex === 1) return feature.plan2Availability ?? undefined
-  if (planIndex === 2) return feature.plan3Availability ?? undefined
-  return undefined
-}
-
-const getFeatureCustomText = (
-  feature: SharedFeatureItem,
-  planIndex: number
-): string | undefined => {
-  if (planIndex === 0) return feature.plan1CustomText ?? undefined
-  if (planIndex === 1) return feature.plan2CustomText ?? undefined
-  if (planIndex === 2) return feature.plan3CustomText ?? undefined
-  return undefined
-}
+  return suffix;
+});
 </script>
+
+<style scoped>
+.pricing-card {
+  min-height: 520px; 
+}
+.pricing-tagline-wrapper {
+  min-height: 28px; 
+}
+</style>

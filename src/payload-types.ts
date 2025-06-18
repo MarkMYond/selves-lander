@@ -1399,7 +1399,8 @@ export interface WebPage {
     | ProductFeaturesBlock
     | SectorsSectionBlockPayload
     | ScheduleCallBlockPayload
-    | PricingPlansBlock
+    | PricingCardsBlock
+    | FeatureComparisonTableBlock
     | Home03HeroBlock
     | BrandLogosBlock
     | BenefitsSectionBlock
@@ -1510,6 +1511,10 @@ export interface WebPage {
                 | null;
               cardTitle: string;
               cardText: string;
+              /**
+               * If checked, the card will have a colored background (using the Icon Background Color) and the icon will have a white background.
+               */
+              invertStyle?: boolean | null;
               id?: string | null;
             }[]
           | null;
@@ -1523,6 +1528,111 @@ export interface WebPage {
   )[];
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingCardsBlock".
+ */
+export interface PricingCardsBlock {
+  eyebrowText?: string | null;
+  title?: string | null;
+  description?: string | null;
+  headerImage?: (string | null) | Media;
+  enableBillingToggle?: boolean | null;
+  sectionBackgroundColor?: ('white' | 'light-grey' | 'brand-50' | 'brand-900' | 'brand-primary') | null;
+  removeTopPadding?: boolean | null;
+  removeBottomPadding?: boolean | null;
+  plans?:
+    | {
+        name: string;
+        description?: string | null;
+        monthlyPrice?: string | null;
+        annualPrice?: string | null;
+        priceSuffix?: string | null;
+        /**
+         * Select a background color for this plan card. Popular plans will use Brand Primary by default. "None" also uses the default creamy off-white.
+         */
+        cardBackgroundColor?:
+          | (
+              | 'default'
+              | 'none'
+              | 'bg-brandTheme-01'
+              | 'bg-brandTheme-02'
+              | 'bg-brandTheme-03'
+              | 'bg-brandTheme-04'
+              | 'bg-pink-light'
+              | 'bg-purple-light'
+              | 'bg-brand-primary'
+            )
+          | null;
+        ctaButtonLabel?: string | null;
+        ctaButtonLink?: string | null;
+        isMostPopular?: boolean | null;
+        planSpecificFeatures?:
+          | {
+              featureText: string;
+              isIncluded?: boolean | null;
+              tooltip?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  sectionCtaText?: string | null;
+  sectionCtaLink?: string | null;
+  sectionCtaStyle?: ('primary' | 'secondary') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pricingCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureComparisonTableBlock".
+ */
+export interface FeatureComparisonTableBlock {
+  eyebrowText?: string | null;
+  title?: string | null;
+  description?: string | null;
+  headerImage?: (string | null) | Media;
+  sectionBackgroundColor?: ('white' | 'light-grey' | 'brand-50' | 'brand-900' | 'brand-primary') | null;
+  removeTopPadding?: boolean | null;
+  removeBottomPadding?: boolean | null;
+  planHeaders?:
+    | {
+        name: string;
+        isMostPopular?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  sharedFeatures?:
+    | {
+        featureName: string;
+        /**
+         * Corresponds to the first plan defined in Plan Headers.
+         */
+        plan1Availability?: ('included' | 'not_included' | 'custom') | null;
+        plan1CustomText?: string | null;
+        /**
+         * Corresponds to the second plan defined in Plan Headers (if it exists).
+         */
+        plan2Availability?: ('included' | 'not_included' | 'custom') | null;
+        plan2CustomText?: string | null;
+        /**
+         * Corresponds to the third plan defined in Plan Headers (if it exists).
+         */
+        plan3Availability?: ('included' | 'not_included' | 'custom') | null;
+        plan3CustomText?: string | null;
+        /**
+         * Short explanation for the feature, shown on hover or info icon.
+         */
+        tooltip?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'featureComparisonTable';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1689,6 +1799,10 @@ export interface WhyChooseUsSection {
           | null;
         cardTitle: string;
         cardText: string;
+        /**
+         * If checked, the card will have a colored background (using the Icon Background Color) and the icon will have a white background.
+         */
+        invertStyle?: boolean | null;
         id?: string | null;
       }[]
     | null;
@@ -2239,7 +2353,8 @@ export interface WebPagesSelect<T extends boolean = true> {
         productFeatures?: T | ProductFeaturesBlockSelect<T>;
         sectorsSection?: T | SectorsSectionBlockPayloadSelect<T>;
         scheduleCallSection?: T | ScheduleCallBlockPayloadSelect<T>;
-        pricingPlans?: T | PricingPlansBlockSelect<T>;
+        pricingCards?: T | PricingCardsBlockSelect<T>;
+        featureComparisonTable?: T | FeatureComparisonTableBlockSelect<T>;
         home03Hero?: T | Home03HeroBlockSelect<T>;
         brandLogos?: T | BrandLogosBlockSelect<T>;
         benefitsSection?: T | BenefitsSectionBlockSelect<T>;
@@ -2313,6 +2428,7 @@ export interface WebPagesSelect<T extends boolean = true> {
                     iconBackgroundColor?: T;
                     cardTitle?: T;
                     cardText?: T;
+                    invertStyle?: T;
                     id?: T;
                   };
               id?: T;
@@ -2577,14 +2693,14 @@ export interface ScheduleCallBlockPayloadSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PricingPlansBlock_select".
+ * via the `definition` "PricingCardsBlock_select".
  */
-export interface PricingPlansBlockSelect<T extends boolean = true> {
+export interface PricingCardsBlockSelect<T extends boolean = true> {
   eyebrowText?: T;
   title?: T;
-  mainCtaText?: T;
-  mainCtaLink?: T;
-  mainCtaStyle?: T;
+  description?: T;
+  headerImage?: T;
+  enableBillingToggle?: T;
   sectionBackgroundColor?: T;
   removeTopPadding?: T;
   removeBottomPadding?: T;
@@ -2599,6 +2715,39 @@ export interface PricingPlansBlockSelect<T extends boolean = true> {
         cardBackgroundColor?: T;
         ctaButtonLabel?: T;
         ctaButtonLink?: T;
+        isMostPopular?: T;
+        planSpecificFeatures?:
+          | T
+          | {
+              featureText?: T;
+              isIncluded?: T;
+              tooltip?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  sectionCtaText?: T;
+  sectionCtaLink?: T;
+  sectionCtaStyle?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureComparisonTableBlock_select".
+ */
+export interface FeatureComparisonTableBlockSelect<T extends boolean = true> {
+  eyebrowText?: T;
+  title?: T;
+  description?: T;
+  headerImage?: T;
+  sectionBackgroundColor?: T;
+  removeTopPadding?: T;
+  removeBottomPadding?: T;
+  planHeaders?:
+    | T
+    | {
+        name?: T;
         isMostPopular?: T;
         id?: T;
       };
@@ -2615,8 +2764,6 @@ export interface PricingPlansBlockSelect<T extends boolean = true> {
         tooltip?: T;
         id?: T;
       };
-  compareTableTitle?: T;
-  compareTableDescription?: T;
   id?: T;
   blockName?: T;
 }
