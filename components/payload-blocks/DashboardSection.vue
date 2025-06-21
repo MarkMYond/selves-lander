@@ -2,11 +2,11 @@
   <section
     class="section-dashboard-payload relative overflow-hidden block-section-padding"
   >
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+    <div class="container mx-auto sm:px-6 lg:px-8 relative">
       <div
         v-if="block"
         :data-w-id="block.dataWId || '96f4d3d9-d9a0-c250-9d0a-736521598813'"
-        class="bg-brandNeutral-02 rounded-xl p-12 md:p-16 flex flex-col gap-y-12 relative overflow-hidden"
+        class="bg-brandNeutral-02 rounded-xl md:p-16 flex flex-col gap-y-12 relative overflow-hidden"
       >
         <!-- <div
           class="absolute inset-0 z-10 bg-[url('~/assets/images/pattern-hero3.png')] bg-center bg-no-repeat bg-cover opacity-20"
@@ -17,7 +17,7 @@
           style="background-size: 100%"
         />
         <div
-          class="overview-top-content flex flex-col md:grid md:grid-cols-2 items-stretch gap-x-8 md:gap-x-12 relative z-20"
+          class="overview-top-content flex flex-col md:grid md:grid-cols-2 items-stretch gap-x-8 md:gap-x-12 relative z-20 p-12 md:p-0"
         >
           <div
             class="overview-left-content flex flex-col items-start justify-center gap-y-10 w-full md:col-span-1"
@@ -61,7 +61,7 @@
           </div>
           <div
             v-if="block.image"
-            class="overview-image-block-2 md:col-span-1 h-auto md:h-full relative self-stretch md:-mr-24"
+            class="overview-image-block-2 md:col-span-1 h-auto md:h-full relative self-stretch mt-8 md:mt-0 w-full"
           >
             <img
               :src="getMediaUrl(block.image)"
@@ -77,7 +77,7 @@
         </div>
         <div
           v-if="block.stats && block.stats.length"
-          class="overview-bottom-content grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-x-[30px] w-full relative z-20"
+          class="overview-bottom-content grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-x-[30px] w-full relative z-20 p-12 md:p-0"
         >
           <div
             v-for="(stat, index) in block.stats"
