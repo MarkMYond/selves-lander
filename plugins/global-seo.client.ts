@@ -1,5 +1,8 @@
 // Global SEO configuration and organization schema
 export default defineNuxtPlugin(() => {
+  const config = useRuntimeConfig()
+  const siteName = config.public.siteName || 'Site'
+  const siteUrl = (config.public.siteUrl || 'http://localhost:3000').replace(/\/$/, '')
   // Add global organization schema
   useHead({
     script: [
@@ -8,9 +11,9 @@ export default defineNuxtPlugin(() => {
         innerHTML: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Organization',
-          name: 'Taash',
-          url: 'https://taash.ai',
-          logo: 'https://taash.ai/logo.svg',
+          name: siteName,
+          url: siteUrl,
+          logo: `${siteUrl}/logo.svg`,
           description: 'AI-ready hospitality infrastructure connecting venues to intelligent travel agents.',
           foundingDate: '2024',
           industry: 'Travel Technology',
@@ -20,7 +23,7 @@ export default defineNuxtPlugin(() => {
           contactPoint: {
             '@type': 'ContactPoint',
             contactType: 'sales',
-            url: 'https://taash.ai/book-a-demo',
+            url: `${siteUrl}/book-a-demo`,
           },
           address: {
             '@type': 'PostalAddress',

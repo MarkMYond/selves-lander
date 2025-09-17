@@ -125,7 +125,7 @@ const dynamicPaddingClass = computed(() => {
           <div class="flex-1 mx-auto max-w-[618px] max-md:max-w-none">
             <h2
               v-if="props.block.title"
-              class="text-brandNeutral-04 dark:text-brandNeutral-01 mb-6 md:mb-8 font-bold tracking-[-0.01em]"
+              class="text-brandNeutral-04 dark:text-brandNeutral-01 mb-6 md:mb-8 font-semibold tracking-[-0.01em]"
               :class="
                 props.block.titleStyle === 'large'
                   ? 'text-8xl leading-[96px] max-md:text-7xl max-md:leading-[76px] max-sm:text-5xl max-sm:leading-[56px]'

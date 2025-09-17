@@ -15,12 +15,11 @@
             >
               <p
                 class="text-body-14 font-medium text-brandNeutral-04 bg-brandTheme-02 rounded-full inline-block px-3 py-1"
-              >
-                {{ props.block.eyebrowText }}
-              </p>
+                v-html="props.block.eyebrowText"
+              ></p>
             </div>
             <h1
-              class="text-5xl md:text-display-h1 font-bold tracking-custom-tightest text-brandNeutral-04 leading-1"
+              class="text-5xl md:text-display-h1 font-semibold tracking-custom-tightest text-brandNeutral-04 leading-1"
               v-html="
                 props.block?.heading || 'Transform the way your team works<br>'
               "
@@ -28,12 +27,11 @@
             <div class="max-w-xl">
               <p
                 class="text-body-18 md:text-body-20 leading-1.7 text-brandNeutral-03"
-              >
-                {{
+                v-html="
                   props.block?.subheading ||
-                    'Streamline your workflow, manage projects, and empower your team with task management solution.'
-                }}
-              </p>
+                  'Streamline your workflow, manage projects, and empower your team with task management solution.'
+                "
+              ></p>
             </div>
           </div>
           <div class="flex flex-row items-center justify-start gap-4">
@@ -109,7 +107,7 @@ import { useScrollAnimations } from '@/composables/useScrollAnimations'
 import { useHeroAnimations } from '@/composables/useHeroAnimations'
 import { useMediaUrl } from '@/composables/useMediaUrl'
 import { useLinkResolver } from '@/composables/useLinkResolver' // Import the new composable
-import type { HeroSection02Payload, Media, WebPage } from '@/src/payload-types'
+import type { HeroSection02Payload, Media, WebPage } from '../../src/payload-types'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
 const { resolveLinkProps } = useLinkResolver(); // Instantiate the composable

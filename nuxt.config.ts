@@ -1,31 +1,57 @@
 export default defineNuxtConfig({
+  app: {
+    head: {
+      title: process.env.NUXT_PUBLIC_SITE_NAME ? `${process.env.NUXT_PUBLIC_SITE_NAME}` : 'Site',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        // { hid: 'description', name: 'description', content: 'Your page description here.' }
+      ],
+      link: [
+        { rel: 'alternate', type: 'application/ld+json', href: '/api/room-data.json' }
+      ],
+      script: [
+        { type: 'importmap', innerHTML: '{"imports":{"#entry":"/_nuxt/entry.DkiX8Wm2.js"}}' },
+  // elevenlabs widget removed
+      ]
+    }
+  },
+  site: {
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  },
   css: [
     '~/assets/css/main.css',
   ],
-  devtools: { enabled: true },
+  devtools: { enabled: false },
 
   runtimeConfig: {
     public: {
       payloadApiUrl: (
-        process.env.NUXT_PUBLIC_PAYLOAD_API_URL || 'https://cms.taash.ai'
+        process.env.NUXT_PUBLIC_PAYLOAD_API_URL || 
+        'http://localhost:3333'
       ).replace(/\/$/, ''),
-      payloadApiFullUrl: `${(process.env.NUXT_PUBLIC_PAYLOAD_API_URL || 'https://cms.taash.ai').replace(/\/$/, '')}/api`,
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://taash.ai',
-      siteName: process.env.NUXT_PUBLIC_SITE_NAME || 'Taash',
-      // sitemap configuration removed from here
+      payloadApiFullUrl: `${(process.env.NUXT_PUBLIC_PAYLOAD_API_URL || 'http://localhost:3333').replace(/\/$/, '')}/api`,
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      siteName: process.env.NUXT_PUBLIC_SITE_NAME || 'Site',
     },
   },
 
   modules: [
-    '@nuxtjs/tailwindcss',
-    'nuxt-icon', // Ensure nuxt-icon is active
-    '@pinia/nuxt',
-    '@nuxt/image',
-    '@nuxtjs/sitemap', // Added sitemap module
+  '@nuxtjs/tailwindcss',
+  'nuxt-icon', // Ensure nuxt-icon is active
+  '@pinia/nuxt',
+  '@nuxt/image',
+  '@nuxtjs/sitemap', // Added sitemap module
+  '@nuxtjs/seo', // SEO optimization module
   ],
 
+  // Disable problematic SEO features
+  ogImage: {
+    enabled: false, // Disable OG image generation to avoid the error
+  },
+
   sitemap: { 
-    hostname: 'https://taash.ai', 
+    hostname: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000', 
     gzip: true,
     sources: [
       '/api/__sitemap__/urls'
@@ -38,7 +64,6 @@ export default defineNuxtConfig({
     urls: [
       // Add high-priority static pages
       { loc: '/', changefreq: 'daily', priority: 1.0 },
-      { loc: '/pricing', changefreq: 'weekly', priority: 0.9 },
       { loc: '/book-a-demo', changefreq: 'monthly', priority: 0.8 },
     ],
     exclude: [ 
@@ -47,6 +72,20 @@ export default defineNuxtConfig({
       '/_nuxt/**',
     ],
   },
+
+  // SEO Configuration for hotel guide pages
+  seo: {
+    automaticDefaults: false, // Custom control over meta tags
+    fallbackTitle: false, // Disable fallback title
+    templateParams: {}, // Empty template params to avoid conflicts
+    defaultSeoMeta: {
+      title: `${process.env.NUXT_PUBLIC_SITE_NAME || 'Site'} - Hotel Guide`,
+      description: 'Comprehensive hotel guides with detailed room information, amenities, and local insights.',
+      ogImage: '/logo.svg',
+      themeColor: '#1E0D43',
+    },
+  },
+
 
   icon: { 
     // packs: ['ph'], // Remove packs to avoid loading all icons
@@ -61,7 +100,6 @@ export default defineNuxtConfig({
   },
 
   plugins: [
-    '~/plugins/phosphor-icons.ts', // Ensure this plugin is active
   ],
 
   nitro: {
@@ -70,22 +108,25 @@ export default defineNuxtConfig({
         target: 'node20',
       },
     },
-    preset: 'vercel',
-    vercel: {
-      functions: {
-        runtime: 'nodejs20.x',
-      },
+    minify: true, // Always minify for clean output
+    compressPublicAssets: {
+      gzip: true,
+      brotli: true,
+    },
+    storage: {
+      // Disable dev storage
+    },
+    experimental: {
+      wasm: false, // Disable WASM for cleaner builds
     },
     prerender: {
-      crawlLinks: false,
+      crawlLinks: true, // Enable crawling for automatic discovery
       routes: [
         '/',
+        '/wiki', // Enable prerendering for wiki home
+        '/registry', // Enable prerendering for registry home
       ],
       ignore: [
-        '/wiki', // Keep base ignored for now as it's SSR
-        '/registry', // Keep base ignored for now as it's SSR
-        // '/wiki/**', // Attempt not ignoring dynamic CSR routes
-        '/registry/**',
         '/**/_payload.json',
       ],
       failOnError: false,
@@ -98,52 +139,44 @@ export default defineNuxtConfig({
     ],
     routeRules: {
       '/': { ssr: true },
-      '/wiki': { ssr: true },
-      '/wiki/**': { ssr: true, prerender: false }, // Enable SSR for better SEO
-      '/registry': { ssr: true },
-      '/registry/**': { ssr: true, prerender: false }, // Enable SSR for better SEO
+      '/wiki': { prerender: true }, // Static prerendering for ultra-fast loading
+      '/wiki/**': { 
+        prerender: true, // Enable static generation for all wiki pages
+        headers: { 'cache-control': 'public, max-age=3600, immutable' } // Long cache for static content
+      },
+      '/registry': { prerender: true }, // Static prerendering for ultra-fast loading
+      '/registry/**': { 
+        prerender: true, // Enable static generation for all registry pages
+        headers: { 'cache-control': 'public, max-age=3600, immutable' } // Long cache for static content
+      },
+      // Hotel guide pages - SSR with caching for SEO
+      '/guide/hotel/**': { 
+        ssr: true, // Server-side render for SEO
+        headers: { 
+          'cache-control': 'public, max-age=300, s-maxage=3600', // 5 min browser, 1 hour CDN
+          'vary': 'Accept-Encoding',
+        },
+        experimentalNoScripts: false, // Keep scripts for interactivity
+      },
+      '/guide/room/**': { 
+        ssr: true, // Server-side render for SEO
+        headers: { 
+          'cache-control': 'public, max-age=300, s-maxage=3600', // 5 min browser, 1 hour CDN
+          'vary': 'Accept-Encoding',
+        },
+        experimentalNoScripts: false, // Keep scripts for interactivity
+      },
+      '/pricing': { prerender: true }, // Static page can be prerendered
+      '/book-a-demo': { prerender: true }, // Static page can be prerendered
       '/favicon-v2.png': { headers: { 'cache-control': 'public, max-age=0, must-revalidate', 'content-type': 'image/png' } },
       '/_nuxt/**': { cache: { maxAge: 60 * 60 * 24 * 30 } },
     },
   },
 
   experimental: {
-    payloadExtraction: true,
-    renderJsonPayloads: true,
     asyncContext: true,
   },
 
-  app: {
-    pageTransition: { name: 'page', mode: 'out-in' },
-    head: {
-      htmlAttrs: {
-        lang: 'en',
-      },
-      charset: 'utf-8',
-      viewport: 'width=device-width, initial-scale=1',
-      link: [
-        { rel: 'icon', type: 'image/png', href: '/favicon-v2.png' },
-      ],
-      script: [
-        {
-          innerHTML: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-MS2DN2ZJ');`,
-          type: 'text/javascript',
-        },
-      ],
-      noscript: [
-        {
-          innerHTML: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MS2DN2ZJ"
-height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
-        },
-      ],
-    },
-    rootId: '__nuxt',
-    cdnURL: process.env.NUXT_PUBLIC_CDN_URL || '',
-  },
 
   postcss: {
     plugins: {
@@ -170,9 +203,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
     },
   ],
 
-  compatibilityDate: '2025-04-24',
+    vue: {
+      compilerOptions: {
+  // elevenlabs widget removed
+      },
+    },
 
-  ssr: true,
+  compatibilityDate: '2025-04-24',
 
   vite: {
     optimizeDeps: {
@@ -184,15 +221,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
     },
     build: {
       target: 'esnext',
-      minify: 'terser',
-      cssMinify: true,
+      minify: 'terser', // Always minify
+      cssMinify: true, // Always minify CSS
       rollupOptions: {
         output: {
           manualChunks: undefined,
+          // Clean asset names
+          assetFileNames: '_nuxt/[name].[hash][extname]',
+          chunkFileNames: '_nuxt/[name].[hash].js',
+          entryFileNames: '_nuxt/[name].[hash].js'
         },
       },
       commonjsOptions: {
         transformMixedEsModules: true,
+      },
+      terserOptions: {
+        format: {
+          comments: false, // Strip comments
+          beautify: false, // No formatting
+        },
+        compress: {
+          drop_console: true, // Remove console logs
+          drop_debugger: true, // Remove debuggers
+          pure_funcs: ['console.log', 'console.info'],
+        },
+        mangle: {
+          safari10: true,
+        },
       },
     },
     server: {
@@ -204,6 +259,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
           '**/.output/**',
         ],
       },
+    },
+    // Force production-like behavior in dev
+    define: {
+      __DEV__: false,
+      'process.env.NODE_ENV': '"production"',
     },
   },
 })

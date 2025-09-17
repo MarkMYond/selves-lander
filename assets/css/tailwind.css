@@ -2,184 +2,192 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --neutral-neutral-01: #fff;
-    --neutral-neutral-02: #f8f4f1;
-    --neutral-neutral-03: #454140;
-    --neutral-neutral-04: #120a0b;
-    --neutral-stroke: #e3e2e2;
-    --theme-colors-color-01: #e6e1f0;
-    --theme-colors-color-02: #d9e8f0;
-    --theme-colors-color-03: #d8eae7;
-    --theme-colors-color-04: #fbf2d6;
-  }
-
-  .Light-mode {
-    /* semantic / neutral */
-    --semantic-neutral-200: var(--neutral-200, #e5e7eb);
-
-    /* semantic / warning */
-    --semantic-warning-400: var(--warning-400, #fbbf24);
-  }
-
-  .Dark-mode {
-    /* semantic / neutral */
-    --semantic-neutral-200: var(--neutral-700, #374151);
-
-    /* semantic / warning */
-    --semantic-warning-400: var(--warning-500, #f59e0b);
-  }
-}
-
-@layer components {
-  .block-section-padding {
-    @apply py-16; /* Standard 64px top and bottom padding */
-  }
-}
-
 /* Font face definitions */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('~/assets/fonts/Satoshi_Complete/Fonts/TTF/Satoshi-Variable.ttf')
+    format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('~/assets/fonts/Satoshi_Complete/Fonts/TTF/Satoshi-VariableItalic.ttf')
+    format('truetype-variations');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Legacy font definitions (remove if not used) */
 @font-face {
   font-family: 'Rebond Grotesque';
   src: url('../fonts/woff2/ESRebondGrotesque-Regular.woff2') format('woff2');
-  font-weight: 400; /* Regular */
+  font-weight: 400;
   font-style: normal;
-  font-display: swap; /* Use swap for better performance */
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Rebond Grotesque';
   src: url('../fonts/woff2/ESRebondGrotesque-Semibold.woff2') format('woff2');
-  font-weight: 600; /* Semibold */
+  font-weight: 600;
   font-style: normal;
-  font-display: swap; /* Use swap for better performance */
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Rebond Grotesque';
   src: url('../fonts/woff2/ESRebondGrotesque-Bold.woff2') format('woff2');
-  font-weight: 700; /* Bold */
-  font-style: normal;
-  font-display: swap; /* Use swap for better performance */
-}
-
-/* Apply the font globally or where needed */
-body {
-  font-family: 'Satoshi', sans-serif; /* Updated to Satoshi */
-  background-color: theme('colors.brandNeutral.01'); /* Set to white */
-  min-height: 100vh;
-  color: theme('colors.brandNeutral.04'); /* Updated to new main font color */
-}
-
-/* Specific element styling if needed */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: 'Satoshi', sans-serif; /* Updated to Satoshi */
-  color: theme('colors.brandNeutral.04'); /* Updated to new main font color */
-}
-
-/* Example of using weights */
-.font-normal {
-  font-weight: 400;
-}
-.font-semibold {
-  font-weight: 600;
-}
-.font-bold {
   font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
-/* Add smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Basic styling for Shadcn UI components (adjust as needed) */
-:root {
-  --background: 0 0% 100%; /* White */
-  --foreground: 266 84% 23%; /* Using brand-900 (#280772) color values */
-
-  --card: 0 0% 100%; /* White */
-  --card-foreground: 266 84% 23%; /* Using brand-900 color values */
-
-  --popover: 0 0% 100%; /* White */
-  --popover-foreground: 266 84% 23%; /* Using brand-900 color values */
-
-  --primary: 240 5.9% 10%; /* Near Black */
-  --primary-foreground: 0 0% 98%; /* Light Gray */
-
-  --secondary: 240 4.8% 95.9%; /* Light Gray */
-  --secondary-foreground: 240 5.9% 10%; /* Near Black */
-
-  --muted: 240 4.8% 95.9%; /* Light Gray */
-  --muted-foreground: 240 3.8% 46.1%; /* Medium Gray */
-
-  --accent: 240 4.8% 95.9%; /* Light Gray */
-  --accent-foreground: 240 5.9% 10%; /* Near Black */
-
-  --destructive: 0 84.2% 60.2%; /* Red */
-  --destructive-foreground: 0 0% 98%; /* Light Gray */
-
-  --border: 240 5.9% 90%; /* Light Gray Border */
-  --input: 240 5.9% 90%; /* Light Gray Border */
-  --ring: 240 5.9% 10%; /* Near Black */
-
-  --radius: 0.5rem;
-}
-
-.dark {
-  --background: 240 10% 3.9%; /* Dark Gray */
-  --foreground: 0 0% 98%; /* Light Gray */
-
-  --card: 240 10% 3.9%; /* Dark Gray */
-  --card-foreground: 0 0% 98%; /* Light Gray */
-
-  --popover: 240 10% 3.9%; /* Dark Gray */
-  --popover-foreground: 0 0% 98%; /* Light Gray */
-
-  --primary: 0 0% 98%; /* Light Gray */
-  --primary-foreground: 240 5.9% 10%; /* Near Black */
-
-  --secondary: 240 3.7% 15.9%; /* Darker Gray */
-  --secondary-foreground: 0 0% 98%; /* Light Gray */
-
-  --muted: 240 3.7% 15.9%; /* Darker Gray */
-  --muted-foreground: 240 5% 64.9%; /* Medium Light Gray */
-
-  --accent: 240 3.7% 15.9%; /* Darker Gray */
-  --accent-foreground: 0 0% 98%; /* Light Gray */
-
-  --destructive: 0 62.8% 30.6%; /* Dark Red */
-  --destructive-foreground: 0 0% 98%; /* Light Gray */
-
-  --border: 240 3.7% 15.9%; /* Darker Gray */
-  --input: 240 3.7% 15.9%; /* Darker Gray */
-  --ring: 240 4.9% 83.9%; /* Light Gray Ring */
-}
-
-.bg-gradient {
-  background: #fff;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(247, 243, 255, 0.4) 16%,
-    rgba(230, 216, 255, 0.4) 37%,
-    rgba(255, 255, 255, 1) 100%
-  );
-}
-
-/* Optional: Add layer utilities if needed */
 @layer base {
-  * {
-    @apply border-border;
+  /* CSS Custom Properties - simplified and focused */
+  :root {
+    /* Primary Micro Header Colors */
+    --color-sand: #fefce7;
+    --color-pink-light: #fef1e7;
+    --color-coral-light: #fee7e8;
+    --color-pink-mid: #fee7fa;
+    --color-purple-light: #f0e7fe;
+    --color-blue-light: #e7f0fe;
+    --color-aqua-light: #e7f9fe;
+    --color-green-light: #e7fcfe;
+    --color-light-green: #e7fef9;
+    --color-grass-light: #e7fee8;
+    
+    /* Neutral Colors */
+    --color-neutral-white: #fff;
+    --color-neutral-off-white: #FBF8FF;
+    --color-neutral-light-grey: #F1F1F1;
+    --color-neutral-stroke: #e3e2e2;
+    --color-neutral-medium: #454140;
+    --color-neutral-dark: #120a0b;
+    --color-navy-dark: #002C3A;
+
+    /* Legacy variables for backward compatibility */
+    --neutral-neutral-01: var(--color-neutral-white);
+    --neutral-neutral-02: var(--color-neutral-off-white);
+    --neutral-neutral-03: var(--color-neutral-medium);
+    --neutral-neutral-04: var(--color-neutral-dark);
+    --neutral-stroke: var(--color-neutral-stroke);
+    --theme-colors-color-01: var(--color-purple-light);
+    --theme-colors-color-02: var(--color-blue-light);
+    --theme-colors-color-03: var(--color-green-light);
+    --theme-colors-color-04: var(--color-sand);
+
+    /* Shadcn UI Variables - Light Mode */
+    --background: 0 0% 100%;
+    --foreground: 266 84% 23%;
+    --card: 0 0% 100%;
+    --card-foreground: 266 84% 23%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 266 84% 23%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+
+    /* Semantic Colors - Light Mode */
+    --semantic-neutral-200: #e5e7eb;
+    --semantic-warning-400: #fbbf24;
   }
 
-  /* Add default text color via Tailwind's base layer */
+  /* Dark mode overrides */
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+
+    /* Semantic Colors - Dark Mode */
+    --semantic-neutral-200: #374151;
+    --semantic-warning-400: #f59e0b;
+  }
+
+  /* Global base styles */
+
   html {
-    color: theme('colors.brandNeutral.04'); /* Updated to new main font color */
+    scroll-behavior: smooth;
+    color: theme('colors.neutral-dark');
+  }
+
+  body {
+    font-family: 'Rebond Grotesque', sans-serif;
+    background-color: theme('colors.neutral-white');
+    min-height: 100vh;
+    color: theme('colors.neutral-dark');
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Rebond Grotesque', sans-serif;
+    font-weight: 600; /* semibold */
+    color: theme('colors.neutral-dark');
+  }
+
+  /* Override h3 text alignment globally */
+  h3 {
+    text-align: left !important;
+  }
+}
+
+@layer components {
+  /* Utility components */
+  .block-section-padding {
+    @apply py-16;
+  }
+
+  .font-normal {
+    font-weight: 400;
+  }
+
+  .font-semibold {
+    font-weight: 600;
+  }
+
+  .font-bold {
+    font-weight: 700;
+  }
+
+  /* Background gradient utility */
+  .bg-gradient {
+    background: #fff;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(247, 243, 255, 0.4) 16%,
+      rgba(230, 216, 255, 0.4) 37%,
+      rgba(255, 255, 255, 1) 100%
+    );
   }
 }

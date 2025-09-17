@@ -8,7 +8,7 @@
       :class="containerClass"
     >
       <div class="max-w-4xl">
-        <h1 class="font-bold text-4xl md:text-5xl lg:text-6xl mb-4">
+        <h1 class="font-semibold text-4xl md:text-5xl lg:text-6xl mb-4">
           <span class="block">{{ block?.headingLine1 }}</span>
           <span class="block text-primary-600">{{ block?.headingLine2 }}</span>
         </h1>

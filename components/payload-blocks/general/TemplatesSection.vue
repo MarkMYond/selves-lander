@@ -105,7 +105,7 @@ const templates: TemplateItem[] = [
             >
               <header class="mb-4 max-md:mb-6 max-sm:mb-5">
                 <p
-                  class="text-base leading-relaxed font-bold uppercase whitespace-pre-line border-neutral-400 decoration-neutral-400 outline-neutral-400 text-neutral-400 [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"
+                  class="text-base leading-relaxed font-semibold uppercase whitespace-pre-line border-neutral-400 decoration-neutral-400 outline-neutral-400 text-neutral-400 [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"
                 >
                   Templates
                 </p>

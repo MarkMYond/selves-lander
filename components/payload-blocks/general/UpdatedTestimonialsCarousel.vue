@@ -57,7 +57,7 @@
           <div class="flex flex-col items-center">
             <div
               v-if="currentTestimonial.authorName"
-              class="font-bold text-[#2C2C2C] text-xl"
+              class="font-semibold text-[#2C2C2C] text-xl"
             >
               {{ currentTestimonial.authorName }}
             </div>

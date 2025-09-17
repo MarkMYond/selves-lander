@@ -4,9 +4,7 @@
   >
     <div
       :class="[
-        titleImage && typeof titleImage === 'object' && titleImage.url
-          ? 'md:w-3/4'
-          : 'md:w-full',
+        titleImage ? 'md:w-3/4' : 'md:w-full',
         'space-y-2',
       ]"
     >
@@ -15,30 +13,30 @@
         class="inline-block px-4 py-1 rounded-full"
         :class="[eyebrowBackgroundColorClass]"
       >
-        <p class="text-body-14 font-medium text-brandNeutral-04">
+  <p class="text-body-14 font-medium text-neutral-dark">
           {{ eyebrowText }}
         </p>
       </div>
       <div class="space-y-4">
         <h2
           v-if="title"
-          :class="['text-h3 md:text-h2 font-bold text-brandNeutral-04 leading-[1.1]', titleMaxWidth ? titleMaxWidth : 'max-w-xl']"
+          :class="['text-h3 md:text-h2 font-semibold text-neutral-dark leading-[1.1]', titleMaxWidth ? titleMaxWidth : 'max-w-xl']"
           v-html="title"
         />
         <p
           v-if="subtitle"
-          :class="['text-body-18 text-brandNeutral-03', subtitleMaxWidth ? subtitleMaxWidth : 'max-w-2xl']"
+          :class="['text-body-18 text-neutral-medium', subtitleMaxWidth ? subtitleMaxWidth : 'max-w-2xl']"
           v-html="subtitle"
         />
       </div>
     </div>
     <div
-      v-if="titleImage && typeof titleImage === 'object' && titleImage.url"
+      v-if="titleImage"
       class="hidden md:block md:w-1/4 mt-4 md:mt-0"
     >
       <img
         :src="getMediaUrl(titleImage)"
-        :alt="titleImage.alt || title || 'Header image'"
+        :alt="title || 'Header image'"
         class="w-full h-auto rounded-lg object-contain mx-auto"
         style="transform: scale(0.8);"
         loading="lazy"
@@ -50,7 +48,7 @@
 <script setup lang="ts">
 import { computed, type PropType } from 'vue'
 import { useMediaUrl } from '@/composables/useMediaUrl'
-import type { Media } from '@/src/payload-types' // Assuming Media type is available
+// Removed Media type reference; only using string | null for titleImage
 
 const props = defineProps({
   eyebrowText: {
@@ -61,7 +59,7 @@ const props = defineProps({
   eyebrowBackgroundColor: {
     type: [String, null] as PropType<string | null>,
     required: false,
-    default: 'bg-brandTheme-02',
+  default: 'bg-blue-light',
   },
   title: {
     type: String,
@@ -73,7 +71,7 @@ const props = defineProps({
     default: null,
   },
   titleImage: {
-    type: [Object, String, null] as PropType<Media | string | null>,
+    type: [String, null] as PropType<string | null>,
     required: false,
     default: null,
   },

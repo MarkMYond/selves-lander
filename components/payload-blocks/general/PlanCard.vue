@@ -13,14 +13,14 @@
       </div>
       <div class="pricing-card-top">
         <div class="pricing-name-tagline text-left">
-          <p class="pricng-card-top-heading text-3xl font-bold leading-tight mb-1 text-black"> 
+          <p class="pricng-card-top-heading text-3xl font-semibold leading-tight mb-1 text-black"> 
             {{ planData.name }}
           </p>
         </div>
         <div class="card-price-text mt-4 mb-6 text-left">
           <template v-if="displayPrice">
             <div class="flex items-baseline space-x-2">
-              <h3 class="pricing-price text-5xl font-extrabold text-black">
+              <h3 class="pricing-price text-5xl font-semibold text-black">
                 {{ displayPrice }}
               </h3>
               <p class="pricing-duration text-sm text-gray-500">
@@ -33,7 +33,7 @@
           </template>
           <template v-else>
             <div class="min-h-[88px] flex items-start py-2">
-              <span class="font-bold text-xl text-black">
+              <span class="font-semibold text-xl text-black">
                 Available on request
               </span>
             </div>

@@ -8,7 +8,7 @@
           :eyebrow-text="block.eyebrowText"
           :title="block.title"
           :subtitle="block.description"
-          :title-image="block.headerImage || null"
+          :title-image="typeof block.headerImage === 'object' && block.headerImage?.url ? block.headerImage.url : (typeof block.headerImage === 'string' ? block.headerImage : null)"
           class="mb-8 md:mb-12" 
           title-max-width="max-w-2xl" 
           subtitle-max-width="max-w-3xl" 

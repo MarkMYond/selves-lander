@@ -2,7 +2,7 @@
   <section class="travel-era-explorer py-16 md:py-24 bg-slate-50">
     <div class="container mx-auto px-4">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+        <h2 class="text-3xl md:text-4xl font-semibold mb-4">
           {{ heading || 'Travel Through Technology Eras' }}
         </h2>
         <p
@@ -15,7 +15,7 @@
 
       <div class="travel-section mb-16">
         <div class="travel-header text-center mb-8">
-          <h3 class="text-2xl font-bold mb-2">
+          <h3 class="text-2xl font-semibold mb-2">
             {{ travelHeading || 'Travel through time' }}
           </h3>
           <p class="text-gray-600 max-w-2xl mx-auto">
@@ -96,7 +96,7 @@
             </div>
 
             <div class="era-details md:w-1/2">
-              <h3 class="text-2xl font-bold mb-4">
+              <h3 class="text-2xl font-semibold mb-4">
                 {{ activeEra.title }}
               </h3>
               <p

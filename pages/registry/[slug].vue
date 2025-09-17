@@ -12,7 +12,7 @@
       <div class="w-24 h-24 mx-auto mb-6 text-4xl">
         🔩
       </div>
-      <h1 class="text-3xl font-bold text-gray-700 mb-3">
+      <h1 class="text-3xl font-semibold text-gray-700 mb-3">
         Registry Page Not Found
       </h1>
       <p class="mt-3 text-gray-500 max-w-md mx-auto mb-6">
@@ -204,7 +204,7 @@ const pageSlug = computed(() => {
   return Array.isArray(slugParam) ? slugParam[slugParam.length - 1] : slugParam
 })
 
-const fetchKey = computed(() => `registry-page-${route.fullPath}`)
+const fetchKey = computed(() => `registry-page-${pageSlug.value}`)
 const {
   data: pageResponse,
   pending,
@@ -214,28 +214,22 @@ const {
   {
     baseURL: payloadApiFullUrl,
     key: fetchKey.value,
-  async transform(response) {
-    if (!payloadApiFullUrl) {
-      // console.error(
-      //   `Registry Slug Page: Payload API URL is not configured for slug ${pageSlug.value}.`
-      // )
-      return { docs: [] }
-    }
-    if (!response || !response.docs) {
-      // console.warn(
-      //   `Registry Slug Page: No docs found in page response for slug ${pageSlug.value} or response is null.`
-      // )
-      return { docs: [] }
-    }
+    default: () => ({ docs: [] }),
+    async transform(response) {
+      if (!payloadApiFullUrl) {
+        return { docs: [] }
+      }
+      if (!response || !response.docs) {
+        return { docs: [] }
+      }
       return response
-  },
-  onRequestError({ request, options, error: requestError }) {
-    // console.error(
-    //   `Registry Slug Page: Error fetching page data for slug ${pageSlug.value} from ${options.baseURL}${request}:`,
-    //   requestError
-    // )
-  },
-  cache: 'no-cache',
+    },
+    onRequestError({ request, options, error: requestError }) {
+      console.error(
+        `Registry Slug Page: Error fetching page data for slug ${pageSlug.value} from ${options.baseURL}${request}:`,
+        requestError
+      )
+    },
     watch: false,
   }
 )

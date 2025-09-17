@@ -7,7 +7,7 @@
           :eyebrow-text="block.eyebrow"
           :title="block.title"
           :subtitle="block.description"
-          :title-image="block.titleImage"
+          :title-image="typeof block.titleImage === 'object' && block.titleImage?.url ? block.titleImage.url : (typeof block.titleImage === 'string' ? block.titleImage : null)"
           class=""
         />
 

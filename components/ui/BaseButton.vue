@@ -79,15 +79,15 @@ const buttonClasses = computed(() => {
       break
     case 'secondary':
       variantClasses =
-        'bg-brandTheme-04 text-brandNeutral-04 hover:bg-brandNeutral-04 hover:text-brandNeutral-01 border-transparent focus:ring-brandTheme-04'
+        'bg-secondary text-secondary-foreground hover:bg-neutral-900 hover:text-neutral-50 border-transparent focus:ring-secondary'
       break
     case 'tertiary':
       variantClasses =
-        'bg-brandNeutral-01 text-brandNeutral-04 hover:bg-brandNeutral-02 border-transparent focus:ring-brandNeutral-03'
+        'bg-neutral-50 text-neutral-900 hover:bg-neutral-100 border-transparent focus:ring-neutral-300'
       break
     case 'border':
       variantClasses =
-        'bg-transparent hover:bg-brandNeutral-02 border-brandNeutral-04 text-brandNeutral-04 focus:ring-brandNeutral-04'
+        'bg-transparent hover:bg-neutral-100 border-neutral-900 text-neutral-900 focus:ring-neutral-900'
       break
     case 'dark-pill':
       variantClasses =

@@ -148,7 +148,7 @@ Unhandled block style: {{ block.style }} - {{
           v-else
           class="p-4 my-4 border border-red-500 bg-red-50"
         >
-          <p class="font-bold text-red-700">
+          <p class="font-semibold text-red-700">
             Unknown block type:
           </p>
           <pre>{{ JSON.stringify(block, null, 2) }}</pre>

@@ -1,0 +1,67 @@
+{
+  "budgets": [
+    {
+      "path": "/guide/hotel/*",
+      "resourceSizes": [
+        {
+          "type": "initial",
+          "maximumWarning": "100kb",
+          "maximumError": "150kb"
+        },
+        {
+          "type": "anyComponentStyle",
+          "maximumWarning": "20kb",
+          "maximumError": "30kb"
+        },
+        {
+          "type": "bundle",
+          "name": "main",
+          "maximumWarning": "150kb",
+          "maximumError": "200kb"
+        }
+      ],
+      "resourceCounts": [
+        {
+          "type": "script",
+          "maximumWarning": 5,
+          "maximumError": 8
+        },
+        {
+          "type": "font",
+          "maximumWarning": 2,
+          "maximumError": 4
+        }
+      ]
+    },
+    {
+      "path": "/guide/room/*",
+      "resourceSizes": [
+        {
+          "type": "initial",
+          "maximumWarning": "120kb",
+          "maximumError": "170kb"
+        }
+      ]
+    },
+    {
+      "path": "/*",
+      "timings": [
+        {
+          "metric": "interactive",
+          "maximum": "5s",
+          "warn": "3s"
+        },
+        {
+          "metric": "first-contentful-paint",
+          "maximum": "2s",
+          "warn": "1.5s"
+        },
+        {
+          "metric": "largest-contentful-paint",
+          "maximum": "2.5s",
+          "warn": "2s"
+        }
+      ]
+    }
+  ]
+}

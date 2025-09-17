@@ -41,10 +41,15 @@ export function useSeo(
   // Extract SEO fields from the page
   const { meta } = page
 
+  // Access runtime configuration once
+  const runtime = useRuntimeConfig()
+  const siteUrl = (runtime.public.siteUrl as string) || 'http://localhost:3000'
+  const siteName = (runtime.public.siteName as string) || 'Site'
+
   // Default values with better fallbacks
-  const title = meta?.title || page.title || 'Taash - AI-Ready Hospitality Infrastructure'
-  const description = meta?.description || 'Taash connects venues to AI agents, enabling seamless automated bookings and enhanced guest experiences through cutting-edge travel technology infrastructure.';
-  const keywords = meta?.keywords || 'AI travel, hospitality technology, automated bookings, venue management';
+  const title = meta?.title || page.title || `${siteName}`
+  const description = meta?.description || `Learn more on ${siteName}.`;
+  const keywords = meta?.keywords || 'website, article, guide';
   const schemaType = meta?.schemaType || 'WebPage'; // Default to WebPage if not specified
   const noIndex = meta?.noIndex || false;
 
@@ -73,8 +78,8 @@ export function useSeo(
       { property: 'og:description', content: description },
       { property: 'og:type', content: ogType },
       { property: 'og:image', content: imageUrl, key: 'og:image' },
-      { property: 'og:url', content: `${useRuntimeConfig().public.siteUrl || 'https://taash.ai'}${useRoute().path}` },
-      { property: 'og:site_name', content: 'Taash' },
+  { property: 'og:url', content: `${siteUrl}${useRoute().path}` },
+  { property: 'og:site_name', content: siteName },
 
       // Twitter Card tags
       { name: 'twitter:card', content: 'summary_large_image' },
@@ -84,7 +89,7 @@ export function useSeo(
     ],
     link: [
       // Canonical URL
-      { rel: 'canonical', href: `${useRuntimeConfig().public.siteUrl || 'https://taash.ai'}${useRoute().path}` },
+  { rel: 'canonical', href: `${siteUrl}${useRoute().path}` },
     ],
     script: [], // Initialize script array for JSON-LD
   });
@@ -108,9 +113,8 @@ export function useSeo(
       }
     } else {
       // Construct JSON-LD if not pre-generated
-      const route = useRoute(); // Get current route for URL
-      const siteUrl = useRuntimeConfig().public.siteUrl || 'https://taash.ai'; // Get base URL
-      const pageUrl = `${siteUrl}${route.path}`;
+  const route = useRoute(); // Get current route for URL
+  const pageUrl = `${siteUrl}${route.path}`;
 
       finalJsonLd = {
         '@context': 'https://schema.org',
@@ -134,14 +138,14 @@ export function useSeo(
         finalJsonLd.dateModified = page.updatedAt || new Date().toISOString();
         finalJsonLd.author = {
           '@type': 'Organization',
-          name: 'Taash', 
+          name: siteName, 
         };
         finalJsonLd.publisher = {
           '@type': 'Organization',
-          name: 'Taash',
+          name: siteName,
           logo: {
             '@type': 'ImageObject',
-            url: `${siteUrl}/logo.svg`, // Updated to use existing logo.svg
+            url: `${siteUrl.replace(/\/$/, '')}/logo.svg`,
           },
         };
         // articleBody would ideally be generated or taken from a summary field

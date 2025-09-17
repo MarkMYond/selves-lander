@@ -35,7 +35,7 @@
               <div class="space-y-4">
                 <h3
                   v-if="block.title"
-                  class="text-h3 lg:text-h2 font-bold text-brandNeutral-04 max-w-lg leading-[1.1]"
+                  class="text-h3 lg:text-h2 font-semibold text-brandNeutral-04 max-w-lg leading-[1.1]"
                   v-html="block.title"
                 />
                 <p

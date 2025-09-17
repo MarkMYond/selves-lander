@@ -56,8 +56,8 @@ export default defineEventHandler(async (event) => {
   
   try {
     // Get runtime config for API URL
-    const config = useRuntimeConfig(event);
-    const payloadApiUrl = config.public.payloadApiUrl || 'https://cms.taash.ai';
+  const config = useRuntimeConfig(event);
+  const payloadApiUrl = (config.public.payloadApiUrl as string) || (process.env.NUXT_PUBLIC_PAYLOAD_API_URL?.replace(/\/$/, '') || 'http://localhost:3333');
     
     console.log(`${SITEMAP_LOG_PREFIX} === DEBUGGING SITEMAP ISSUES ===`);
     console.log(`${SITEMAP_LOG_PREFIX} Generating sitemap URLs via server route...`);
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
     const dynamicRoutes: SitemapUrl[] = [];
 
     // Test API connectivity first
-    console.log(`${SITEMAP_LOG_PREFIX} Testing API connectivity to ${payloadApiUrl}/api/wiki-pages?limit=1...`);
+  console.log(`${SITEMAP_LOG_PREFIX} Testing API connectivity to ${payloadApiUrl}/api/wiki-pages?limit=1...`);
     
     try {
       const testResponse = await $fetch<any>(`${payloadApiUrl}/api/wiki-pages?limit=1`);
@@ -95,6 +95,37 @@ export default defineEventHandler(async (event) => {
       { slug: 'wiki-pages', pathPrefix: '/wiki', isHierarchical: true },
       { slug: 'registry-pages', pathPrefix: '/registry', isHierarchical: true } 
     ];
+
+    // Add hotel guide pages to sitemap
+    try {
+      console.log(`${SITEMAP_LOG_PREFIX} Fetching hotel guide data...`);
+      const hotelResponse = await $fetch<{ docs: any[] }>(`${payloadApiUrl}/api/hotels?limit=1000`);
+      
+      const numHotels = hotelResponse.docs?.length || 0;
+      console.log(`${SITEMAP_LOG_PREFIX} Fetched ${numHotels} hotels for sitemap.`);
+      
+      if (hotelResponse.docs && numHotels > 0) {
+        hotelResponse.docs.forEach(hotel => {
+          // Add hotel page with high priority
+          dynamicRoutes.push({
+            loc: `/guide/hotel/${hotel.id}`,
+            lastmod: hotel.updatedAt || new Date().toISOString()
+          });
+          
+          // Add room pages for each hotel
+          hotel.rooms?.forEach((room: any) => {
+            if (room.roomId) {
+              dynamicRoutes.push({
+                loc: `/guide/room/${room.roomId}`,
+                lastmod: hotel.updatedAt || new Date().toISOString()
+              });
+            }
+          });
+        });
+      }
+    } catch (e: any) {
+      console.error(`${SITEMAP_LOG_PREFIX} Error fetching hotel data for sitemap:`, e.message);
+    }
 
     for (const collection of collectionsToFetch) {
       try {

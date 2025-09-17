@@ -23,7 +23,7 @@
       >
       <span
         for="Solution"
-        class="mt-4 text-base font-bold leading-6 text-center cursor-pointer max-md:mt-4 max-md:text-base max-md:leading-5 max-sm:mt-3.5 max-sm:text-base max-sm:leading-relaxed [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"
+        class="mt-4 text-base font-semibold leading-6 text-center cursor-pointer max-md:mt-4 max-md:text-base max-md:leading-5 max-sm:mt-3.5 max-sm:text-base max-sm:leading-relaxed [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"
       >{{ solution.name }}</span>
       <div
         class="hidden text-base leading-relaxed tracking-wide text-center uppercase cursor-pointer max-md:text-base max-md:leading-relaxed max-md:leading-3 max-sm:text-base max-sm:leading-relaxed [font-variant-ligatures:stylistic] [font-feature-settings:'ss01']"

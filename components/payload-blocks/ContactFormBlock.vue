@@ -32,7 +32,7 @@
           </div>
           <h2
             v-if="block.contentTitle"
-            class="text-3xl lg:text-4xl font-bold text-brandNeutral-04"
+            class="text-3xl lg:text-4xl font-semibold text-brandNeutral-04"
           >
             {{ block.contentTitle }}
           </h2>
@@ -67,7 +67,7 @@
           >
             <h3
               v-if="block.formTitle"
-              class="text-xl font-bold text-brandNeutral-04 mb-6 text-center"
+              class="text-xl font-semibold text-brandNeutral-04 mb-6 text-center"
             >
               {{ block.formTitle }}
             </h3>

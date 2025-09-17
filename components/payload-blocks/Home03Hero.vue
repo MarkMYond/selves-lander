@@ -26,7 +26,7 @@
               </p>
             </div>
             <h1
-              class="text-[72px] font-bold text-[#120a0b] leading-[1.15] tracking-[-0.02em] mb-0"
+              class="text-[72px] font-semibold text-[#120a0b] leading-[1.15] tracking-[-0.02em] mb-0"
             >
               <span v-html="block.headline" />
             </h1>
@@ -55,7 +55,7 @@
               >
               <button
                 type="submit"
-                class="w-full sm:w-auto flex-shrink-0 h-14 px-[30px] py-3 border border-transparent rounded-full shadow-sm text-base font-bold text-[#120a0b] bg-[#ffd86f] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffd86f]"
+                class="w-full sm:w-auto flex-shrink-0 h-14 px-[30px] py-3 border border-transparent rounded-full shadow-sm text-base font-semibold text-[#120a0b] bg-[#ffd86f] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffd86f]"
               >
                 {{ block.formButtonText || 'Get Started for free' }}
               </button>

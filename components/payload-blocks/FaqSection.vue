@@ -8,7 +8,7 @@
           :subtitle="block.description"
           :eyebrow-text="block.eyebrow"
           :eyebrow-background-color="block.eyebrowBackgroundColor"
-          :title-image="block.titleImage"
+          :title-image="typeof block.titleImage === 'object' && block.titleImage?.url ? block.titleImage.url : (typeof block.titleImage === 'string' ? block.titleImage : null)"
           class=""
         />
 
@@ -25,7 +25,7 @@
               class="faq-header style-2 w-full flex justify-between items-center py-6 text-left focus:outline-none"
               @click="toggleAccordion(index)"
             >
-              <p class="faq-question text-xl font-bold text-[#120a0b] pr-10">
+              <p class="faq-question text-xl font-semibold text-[#120a0b] pr-10">
                 {{ faq.question }}
               </p>
               <div class="faq-item-icon">

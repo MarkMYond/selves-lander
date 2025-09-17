@@ -43,10 +43,10 @@ export default defineEventHandler(async (event) => {
 
     // Email details
     // It's better to get these from runtimeConfig if possible, or ensure they are securely set.
-    const fromEmail = useRuntimeConfig(event).public.resendFromEmail || process.env.RESEND_FROM_EMAIL || 'noreply@taash.ai'
-    const toEmail = useRuntimeConfig(event).resendToEmail || process.env.RESEND_TO_EMAIL || 'hello@taash.ai'
+  const fromEmail = (useRuntimeConfig(event).public?.resendFromEmail as string) || process.env.RESEND_FROM_EMAIL || ''
+  const toEmail = (useRuntimeConfig(event).public?.resendToEmail as string) || process.env.RESEND_TO_EMAIL || ''
     
-    if (!fromEmail || !toEmail) {
+  if (!fromEmail || !toEmail) {
         console.error('[send-email.post.ts] From/To email addresses are not configured.');
         throw createError({
             statusCode: 500,

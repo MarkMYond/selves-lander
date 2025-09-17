@@ -31,16 +31,16 @@
 
 <script setup lang="ts">
 import { useAsyncData, useRuntimeConfig, useError } from 'nuxt/app'
-import type { WebPage as PageType } from '@/src/payload-types'
+import type { WebPage as PageType } from '../src/payload-types'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import { useSeo } from '@/composables/useSeo'
 
 const config = useRuntimeConfig()
-// Ensure payloadApiFullUrl is a valid string, with a fallback.
+// Ensure payloadApiFullUrl is a valid string, with a safe generic fallback.
 const rawApiUrl = config.public.payloadApiFullUrl
-const safeApiUrl = (typeof rawApiUrl === 'string' && rawApiUrl.length > 0) 
-                    ? rawApiUrl 
-                    : 'https://cms.taash.ai/api'; // Default fallback
+const safeApiUrl = (typeof rawApiUrl === 'string' && rawApiUrl.length > 0)
+  ? rawApiUrl
+  : (process.env.NUXT_PUBLIC_PAYLOAD_API_URL?.replace(/\/$/, '') || 'http://localhost:3333') + '/api'
 
 if (typeof rawApiUrl !== 'string' || rawApiUrl.length === 0) {
   console.warn(`Pricing Page: config.public.payloadApiFullUrl was not a valid string ('${rawApiUrl}'), using fallback '${safeApiUrl}'`);

@@ -12,7 +12,7 @@
       <div class="w-24 h-24 mx-auto mb-6 text-4xl">
         📚
       </div>
-      <h1 class="text-3xl font-bold text-gray-700 mb-3">
+      <h1 class="text-3xl font-semibold text-gray-700 mb-3">
         Registry Homepage Not Set
       </h1>
       <p class="mt-3 text-gray-500 max-w-md mx-auto mb-6">

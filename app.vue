@@ -6,10 +6,12 @@
       <NuxtPage />
     </main>
     <TheFooter v-if="showFooter" />
+  <!-- GTM noscript moved to useHead for SSR compatibility -->
   </div>
 </template>
 
 <script setup lang="ts">
+// GTM script injection removed for SSR/client hydration match. Use useHead or Nuxt module for GTM.
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -17,7 +19,7 @@ const route = useRoute()
 
 // Determine if the footer should be shown
 const showFooter = computed(() => {
-  return !route.path.startsWith('/wiki') && !route.path.startsWith('/registry')
+  return !route.path.startsWith('/wiki') && !route.path.startsWith('/registry') && !route.path.startsWith('/guide')
 })
 
 // Set default SEO meta tags at app level
@@ -30,7 +32,11 @@ useHead({
   ],
   link: [
     { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-    { rel: 'apple-touch-icon', href: '/favicon-v2.png' },
   ],
+  noscript: [
+    {
+      innerHTML: '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MS2DN2ZJ" height="0" width="0" style="display:none;visibility:hidden"></iframe>'
+    }
+  ]
 })
 </script>

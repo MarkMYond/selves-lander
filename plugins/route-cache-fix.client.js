@@ -154,5 +154,5 @@ export default defineNuxtPlugin(() => {
     }
   })
 
-  console.log('PayloadCMS Route Cache fix loaded successfully')
+  // log removed
 })

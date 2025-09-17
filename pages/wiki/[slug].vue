@@ -12,7 +12,7 @@
       <div class="w-24 h-24 mx-auto mb-6 text-4xl">
         🔍
       </div>
-      <h1 class="text-3xl font-bold text-gray-700 mb-3">
+      <h1 class="text-3xl font-semibold text-gray-700 mb-3">
         Error Loading Page
       </h1>
       <p class="mt-3 text-gray-500 max-w-md mx-auto mb-6">
@@ -52,7 +52,7 @@
       <div class="w-24 h-24 mx-auto mb-6 text-4xl">
         🤷
       </div>
-      <h1 class="text-3xl font-bold text-gray-700 mb-3">
+      <h1 class="text-3xl font-semibold text-gray-700 mb-3">
         Page Not Found
       </h1>
       <p class="mt-3 text-gray-500 max-w-md mx-auto mb-6">
@@ -262,7 +262,7 @@ if (process.env.NODE_ENV === 'development') {
 } 
 const { getMediaUrl } = useMediaUrl()
 
-const fetchKey = computed(() => `wiki-page-${route.fullPath}`)
+const fetchKey = computed(() => `wiki-page-${pageSlug.value}`)
 const {
   data: pageResponse,
   pending: pagePending,
@@ -278,11 +278,11 @@ const {
         statusMessage: 'API URL not configured',
       })
     }
-    return `${payloadApiFullUrl}/wiki-pages?where[slug][equals]=${pageSlug.value}&limit=1`
+    return `${payloadApiFullUrl}/wiki-pages?where[slug][equals]=${pageSlug.value}&limit=1&depth=2`
   },
   {
     key: fetchKey.value,
-    cache: 'no-cache',
+    default: () => ({ docs: [] }),
     onRequestError({ request, options, error: requestError }) {
       console.error(
         `Wiki Slug Page: Error in useFetch for slug ${pageSlug.value} from ${request}:`,

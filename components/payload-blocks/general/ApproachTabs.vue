@@ -6,7 +6,7 @@
   >
     <h3
       v-if="block.title"
-      class="mb-6 text-2xl font-bold leading-8 max-md:mb-6 max-md:text-xl max-md:leading-8 max-sm:mb-5 max-sm:text-base max-sm:leading-6"
+      class="mb-6 text-2xl font-semibold leading-8 max-md:mb-6 max-md:text-xl max-md:leading-8 max-sm:mb-5 max-sm:text-base max-sm:leading-6"
       v-html="block.title"
     />
     <div

@@ -19,7 +19,7 @@
       </NuxtLink>
     </div>
     <BlockRenderer
-      v-else-if="pageData"
+      v-if="pageData"
       :blocks="filteredBlocks"
     />
     <div v-else>
@@ -37,6 +37,17 @@ const payloadApiFullUrl = config.public.payloadApiFullUrl
 const slug = Array.isArray(route.params.slug)
   ? route.params.slug.join('/')
   : route.params.slug
+
+useHead({
+  link: [
+    {
+      rel: 'alternate',
+      type: 'application/ld+json',
+      href: `/api/room-data/${slug}.json`,
+    },
+  ],
+  script: [] // Ensure no inline JSON-LD is rendered
+})
 
 const apiPath = computed(
   () => `/web-pages?where[slug][equals]=${slug}&depth=2&limit=1`
@@ -87,14 +98,14 @@ const filteredBlocks = computed(() => {
 
   if (slug === 'get-in-touch' && pageData.value?.layout) {
     return pageData.value.layout
-      .filter((block) => block.blockType === 'scheduleCallSection')
+      .filter((block: any) => block.blockType === 'scheduleCallSection')
       .map(processBlock)
   }
   return pageData.value?.layout?.map(processBlock) || []
 })
 
 // Apply SEO data
-useSeo(pageData.value, 'website')
+useSeo(pageData.value as any, 'website')
 
 const pageSpecificClass = computed(() => {
   if (slug === 'about') {

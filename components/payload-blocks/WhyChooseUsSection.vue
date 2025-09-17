@@ -13,7 +13,7 @@
             :eyebrow-background-color="props.block.eyebrowBackgroundColor"
             :title="props.block.title"
             :subtitle="props.block.subTitle"
-            :title-image="props.block.titleImage"
+            :title-image="typeof props.block.titleImage === 'object' && props.block.titleImage?.url ? props.block.titleImage.url : (typeof props.block.titleImage === 'string' ? props.block.titleImage : null)"
             title-max-width="max-w-lg"
             subtitle-max-width="max-w-xl"
           />
