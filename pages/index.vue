@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import type { WebPage } from '../src/payload-types'
 import type { SeoPageData } from '../composables/useSeo' // Import SeoPageData
 
@@ -32,9 +33,24 @@ const {
   baseURL: runtimeConfig.public.payloadApiFullUrl,
   key: 'homepage-data',
   cache: 'no-cache',
+  retry: 2,
+  retryDelay: 500,
+  // Guard against hanging requests
+  timeout: 10000,
 })
 
 const pageData = computed(() => pageResponse.value?.docs?.[0])
+
+// If SSR failed or returned empty, try a client-side refresh after hydration
+onMounted(async () => {
+  if (!pageData.value) {
+    try {
+      await refreshNuxtData('homepage-data')
+    } catch (e) {
+      console.error('Homepage: client refresh failed', e)
+    }
+  }
+})
 
 watch(
   pageData,

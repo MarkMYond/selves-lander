@@ -137,7 +137,8 @@ export default defineNuxtConfig({
       },
     ],
     routeRules: {
-      '/': { ssr: true },
+      // Serve homepage as prerendered static HTML to avoid runtime SSR fetches
+      '/': { prerender: true },
       '/wiki': { prerender: true }, // Static prerendering for ultra-fast loading
       '/wiki/**': { 
         prerender: true, // Enable static generation for all wiki pages

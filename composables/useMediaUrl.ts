@@ -1,6 +1,10 @@
 // Helper composable to standardize media URL handling across the site
 import { useRuntimeConfig } from 'nuxt/app'
-import type { Media } from '../src/payload-types'
+// Use a loose Media type to avoid depending on generated payload types
+type Media = {
+  url?: string
+  filename?: string
+} | string | null | undefined
 
 export function useMediaUrl() {
   const config = useRuntimeConfig()
@@ -21,7 +25,7 @@ export function useMediaUrl() {
    * @param media - The media object or URL string
    * @returns The complete URL to the media file
    */
-  const getMediaUrl = (media: Media | string | null | undefined): string => {
+  const getMediaUrl = (media: Media): string => {
     if (!media) return '' // Return empty if no media provided
 
     let url: string | null | undefined = null
@@ -54,38 +58,36 @@ export function useMediaUrl() {
     // For relative URLs, prepend the appropriate base URL
     const baseUrl = getBaseUrl()
 
-    // Special case for the path format seen in wiki microheaders
+    // Normalize to Payload's static file convention: served from /media/*
+    // Keep API routes as-is only if explicitly provided.
+
+    // Fix common mis-formed Payload file paths: '/api/media/file/...'
+    if (url.startsWith('/api/media/file/')) {
+      return `${baseUrl}${url.replace(/^\/api\/media\//, '/media/')}`
+    }
     if (url.startsWith('api/media/file/')) {
-      return `${baseUrl}/${url}`
+      return `${baseUrl}/${url.replace(/^api\/media\//, 'media/')}`
     }
 
-    // Handle different path formats
-    if (url.startsWith('/')) {
-      // If it already starts with a slash like /api/media/..., just prepend base URL
-      if (url.includes('/api/media/')) {
-        return `${baseUrl}${url}`
-      }
-      // If it starts with a slash but doesn't include /api/media/, add it
-      if (url.startsWith('/media/')) {
-        return `${baseUrl}/api${url}`
-      }
-      // Any other path starting with a slash
-      return `${baseUrl}${url}`
-    } else if (url.includes('/')) {
-      // If it has slashes but doesn't start with one, it's likely a relative path
-      // Check if it already includes 'media/'
-      if (url.startsWith('media/')) {
-        return `${baseUrl}/api/${url}`
-      }
-      // Check for api/ prefix but not starting with slash
-      if (url.startsWith('api/')) {
-        return `${baseUrl}/${url}`
-      }
-      return `${baseUrl}/api/media/${url}`
-    } else {
-      // If it's just an ID or filename without path, construct standard path
-      return `${baseUrl}/api/media/${url}`
+    // Explicit API path - pass through (JSON endpoints etc.)
+    if (url.startsWith('/api/')) return `${baseUrl}${url}`
+    if (url.startsWith('api/')) return `${baseUrl}/${url}`
+
+    // Static media paths
+    if (url.startsWith('/media/')) return `${baseUrl}${url}`
+    if (url.startsWith('media/')) return `${baseUrl}/${url}`
+
+    // If it looks like a filename with an image extension, serve from /media/
+    if (/\.(png|jpe?g|gif|webp|svg|avif)$/i.test(url)) {
+      const prefixed = url.startsWith('/') ? url : `/${url}`
+      return `${baseUrl}/media${prefixed}`
     }
+
+    // Fallback: if it contains slashes, treat as relative path
+    if (url.includes('/')) return `${baseUrl}/${url}`
+
+    // Last resort: assume it's a bare filename or id -> try static media
+    return `${baseUrl}/media/${url}`
   }
 
   return {
