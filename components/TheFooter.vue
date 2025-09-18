@@ -188,7 +188,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Footer as FooterType } from '../src/payload-types'
+// Using a loose FooterType to avoid coupling to generated types that may not be present in this repo
+type FooterType = any
 import { ref, computed } from 'vue'
 // import type { Ref } from 'vue'; // Ref import might be removed if not used elsewhere
 import { useRuntimeConfig } from 'nuxt/app'
@@ -197,6 +198,7 @@ import { useMediaUrl } from '../composables/useMediaUrl'
 // Removed missing type import for FooterType and MediaType
 import BaseButton from '@/components/ui/BaseButton.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue' // Import SectionHeader
+import whiteLogoUrl from '@/assets/images/white-logo.svg?url'
 
 const { getMediaUrl } = useMediaUrl()
 const emailForSubscription = ref('')
@@ -339,8 +341,8 @@ const getEyebrowBgClass = (bgColorValue?: string | null) => {
   }
 }
 
-// Bind white logo source to avoid Vite rewriting in certain environments
-const whiteLogoSrc = '/white-logo.svg'
+// Use Vite-bundled asset URL to ensure consistent paths across environments
+const whiteLogoSrc = whiteLogoUrl
 </script>
 
 <style scoped>

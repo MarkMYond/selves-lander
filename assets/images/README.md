@@ -1,0 +1,2 @@
+This folder holds image assets imported by components (e.g. `import logoUrl from '@/assets/images/logo.svg?url'`).
+We keep copies of critical public assets here to ensure Vite resolves them consistently across environments (local + Vercel).

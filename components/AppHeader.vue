@@ -53,13 +53,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import logoUrl from '@/assets/images/logo.svg?url'
 
 const isMobileMenuOpen = ref(false)
 const megaMenuVisible = ref(false)
 const mobileMegaMenuOpen = ref(false)
 
-// Use a bound src so Vite doesn't rewrite to an import on Vercel
-const logoSrc = '/logo.svg'
+// Use Vite-bundled asset URL so it works across environments (Vercel, local)
+const logoSrc = logoUrl
 
 const toggleMegaMenu = () => {
   if (window.innerWidth < 1024) {
