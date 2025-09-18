@@ -176,7 +176,11 @@ export default defineEventHandler(async (event): Promise<NavItem[]> => {
   const parentId = queryParams.parentId as string | undefined
 
   const runtimeConfig = useRuntimeConfig()
-  const payloadApiUrl = runtimeConfig.public.payloadApiUrl
+  let payloadApiUrl = runtimeConfig.public.payloadApiUrl
+  if (!payloadApiUrl && runtimeConfig.public?.payloadApiFullUrl) {
+    // Derive base from full URL if only that is set
+    payloadApiUrl = String(runtimeConfig.public.payloadApiFullUrl).replace(/\/?api\/?$/, '')
+  }
   if (process.env.NODE_ENV !== 'development') {
     // Minimal prod diagnostics (once per request) to identify misconfigurations
     console.info('[wiki-nav.get.ts] Using payloadApiUrl:', payloadApiUrl)

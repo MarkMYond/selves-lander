@@ -14,9 +14,6 @@
       "dest": "https://payload-sigma-ten.vercel.app/admin/$1"
     }
   ],
-  "env": {
-    "NUXT_PUBLIC_PAYLOAD_API_URL": ""
-  },
   "github": {
     "silent": true,
     "autoAlias": true,
