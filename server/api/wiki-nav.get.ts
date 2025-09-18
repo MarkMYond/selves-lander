@@ -67,10 +67,15 @@ const buildPayloadQueryUrl = (
         // Handle operators like 'equals', 'in', 'exists', 'not_equals'
         if (typeof condition === 'object' && condition !== null) {
           for (const operator in condition) {
-            apiQuery.append(
-              `where[${field}][${operator}]`,
-              String(condition[operator]) // Value for the operator
-            )
+            const value = condition[operator]
+            // For 'in' with arrays, append multiple values to ensure proper encoding
+            if (operator === 'in' && Array.isArray(value)) {
+              for (const v of value) {
+                apiQuery.append(`where[${field}][in]`, String(v))
+              }
+            } else {
+              apiQuery.append(`where[${field}][${operator}]`, String(value))
+            }
           }
         } else {
            // Default to 'equals' if condition is not an object (though less common for complex queries)
@@ -116,7 +121,7 @@ async function fetchPagesAndDetermineChildren(
   if (pageIds.length > 0) {
     const childrenOfPagesUrl = buildPayloadQueryUrl(payloadApiUrl, 'wiki-pages', {
       where: {
-        parent: { in: pageIds.join(',') },
+        parent: { in: pageIds },
         status: { equals: 'published' },
         isSectionHomepage: { not_equals: true },
       },
