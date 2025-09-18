@@ -33,6 +33,24 @@ interface NavItem {
   // pageId, pageSlug, pageIcon were redundant as id, slug, icon cover pages too
 }
 
+// Simple fetch with retry/timeout to handle sporadic network hiccups
+async function fetchWithRetry<T>(url: string, opts?: { attempts?: number; timeout?: number }): Promise<T> {
+  const attempts = opts?.attempts ?? 2
+  const timeout = opts?.timeout ?? 10000
+  let lastErr: any
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await $fetch<T>(url, { timeout })
+    } catch (e) {
+      lastErr = e
+      if (i < attempts - 1) {
+        await new Promise((r) => setTimeout(r, 300))
+      }
+    }
+  }
+  throw lastErr
+}
+
 const buildPayloadQueryUrl = (
   baseApiUrl: string,
   collection: string,
@@ -83,12 +101,16 @@ async function fetchPagesAndDetermineChildren(
     console.log(`[wiki-nav.get.ts] Fetching pages from: ${pagesUrl}`);
   }
   const pagesResponse = await $fetch<{ docs: PayloadWikiPageDoc[] }>(pagesUrl);
+  // replaced by retrying version
+  // const pagesResponse = await $fetch<{ docs: PayloadWikiPageDoc[] }>(pagesUrl);
+  const pagesResponseRetry = await fetchWithRetry<{ docs: PayloadWikiPageDoc[] }>(pagesUrl, { attempts: 2, timeout: 10000 })
 
-  if (!pagesResponse || !pagesResponse.docs || pagesResponse.docs.length === 0) {
+  const pagesDocs = pagesResponseRetry?.docs
+  if (!pagesDocs || pagesDocs.length === 0) {
     return [];
   }
 
-  const pageIds = pagesResponse.docs.map(doc => doc.id);
+  const pageIds = pagesDocs.map(doc => doc.id);
   const parentIdsWithChildren = new Set<string>();
 
   if (pageIds.length > 0) {
@@ -106,7 +128,7 @@ async function fetchPagesAndDetermineChildren(
       console.log(`[wiki-nav.get.ts] Checking children for multiple pages from: ${childrenOfPagesUrl}`);
     }
     // Restore original fetch for allChildrenResponse
-    const allChildrenResponse = await $fetch<{ docs: { id: string; parent: string | {id: string} }[] }>( // Ensure 'id' is expected for safety, though parent is key
+    const allChildrenResponse = await fetchWithRetry<{ docs: { id: string; parent: string | {id: string} }[] }>( // Ensure 'id' is expected for safety, though parent is key
        buildPayloadQueryUrl(payloadApiUrl, 'wiki-pages', {
         where: {
           parent: { in: pageIds.join(',') },
@@ -116,7 +138,8 @@ async function fetchPagesAndDetermineChildren(
         limit: 2000, // Fetch all potential children to map back
         depth: 0, // Keep depth 0, parent will be ID string
         // select: ['parent'], // Remove select to fetch all default depth 0 fields
-      })
+      }),
+      { attempts: 2, timeout: 10000 }
     );
     // Removed debugging logs for allChildrenResponse.docs content
     
@@ -131,7 +154,7 @@ async function fetchPagesAndDetermineChildren(
     }
   }
 
-  return pagesResponse.docs.map(pageDoc => ({
+  return pagesDocs.map(pageDoc => ({
     id: pageDoc.id,
     title: pageDoc.title,
     slug: pageDoc.slug,
@@ -149,6 +172,10 @@ export default defineEventHandler(async (event): Promise<NavItem[]> => {
 
   const runtimeConfig = useRuntimeConfig()
   const payloadApiUrl = runtimeConfig.public.payloadApiUrl
+  if (process.env.NODE_ENV !== 'development') {
+    // Minimal prod diagnostics (once per request) to identify misconfigurations
+    console.info('[wiki-nav.get.ts] Using payloadApiUrl:', payloadApiUrl)
+  }
 
   if (!payloadApiUrl) {
     console.error('[wiki-nav.get.ts] FATAL: payloadApiUrl is not defined.')
@@ -182,8 +209,10 @@ export default defineEventHandler(async (event): Promise<NavItem[]> => {
     })
     if (process.env.NODE_ENV === 'development') {
       console.log(`[wiki-nav.get.ts] Fetching categories from: ${categoriesUrl}`);
+    } else {
+      console.info('[wiki-nav.get.ts] Categories endpoint:', categoriesUrl)
     }
-    const categoriesResponse = await $fetch<{ docs: PayloadCategoryDoc[] }>(categoriesUrl);
+  const categoriesResponse = await fetchWithRetry<{ docs: PayloadCategoryDoc[] }>(categoriesUrl, { attempts: 2, timeout: 10000 });
 
     if (!categoriesResponse || !categoriesResponse.docs || categoriesResponse.docs.length === 0) {
       if (process.env.NODE_ENV === 'development') {

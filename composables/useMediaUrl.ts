@@ -58,18 +58,9 @@ export function useMediaUrl() {
     // For relative URLs, prepend the appropriate base URL
     const baseUrl = getBaseUrl()
 
-    // Normalize to Payload's static file convention: served from /media/*
-    // Keep API routes as-is only if explicitly provided.
+    // Keep API routes as-is if explicitly provided (including '/api/media/file/...')
 
-    // Fix common mis-formed Payload file paths: '/api/media/file/...'
-    if (url.startsWith('/api/media/file/')) {
-      return `${baseUrl}${url.replace(/^\/api\/media\//, '/media/')}`
-    }
-    if (url.startsWith('api/media/file/')) {
-      return `${baseUrl}/${url.replace(/^api\/media\//, 'media/')}`
-    }
-
-    // Explicit API path - pass through (JSON endpoints etc.)
+  // Explicit API path - pass through (JSON endpoints, media file endpoints, etc.)
     if (url.startsWith('/api/')) return `${baseUrl}${url}`
     if (url.startsWith('api/')) return `${baseUrl}/${url}`
 

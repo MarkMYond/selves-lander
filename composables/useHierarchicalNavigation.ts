@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Ref } from 'vue';
-import { $fetch } from 'ofetch';
-import { useRuntimeConfig } from '#app'; 
+// useRuntimeConfig and $fetch are auto-imported by Nuxt
 
 // Generic API Nav Item
 export interface ApiNavItem {
@@ -120,7 +119,7 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
           interface PayloadPageDoc { id: string; title: string; slug?: string; icon?: string; iconBackgroundColor?: string; children?: { id: string }[]; }
           const response = await $fetch<{ docs: PayloadPageDoc[] }>(fallbackUrl);
           if (response?.docs?.length > 0) {
-            const transformedItems = response.docs.map((page): ApiNavItem => ({
+            const transformedItems = response.docs.map((page: PayloadPageDoc): ApiNavItem => ({
               id: page.id, title: page.title, slug: page.slug, icon: page.icon, iconBackgroundColor: page.iconBackgroundColor,
               isCategory: false, hasChildren: !!(page.children && page.children.length > 0),
             }));
@@ -133,14 +132,21 @@ export function createHierarchicalNavigationStore(options: HierarchicalNavigatio
       
       if (!isFetchingChildren && options.staticJsonFallbackUrl) {
         try {
-          const staticUrl = options.staticJsonFallbackUrl.startsWith('http') ? options.staticJsonFallbackUrl : (runtimeConfig.app.baseURL || '') + options.staticJsonFallbackUrl;
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`[${options.storeId}] Attempting static JSON fallback: ${staticUrl}`);
+          let staticUrl = options.staticJsonFallbackUrl
+          if (!/^https?:\/\//i.test(staticUrl)) {
+            const siteUrl = (runtimeConfig.public?.siteUrl || '').replace(/\/$/, '')
+            const path = options.staticJsonFallbackUrl.startsWith('/')
+              ? options.staticJsonFallbackUrl
+              : `/${options.staticJsonFallbackUrl}`
+            staticUrl = siteUrl ? `${siteUrl}${path}` : path
           }
-          const staticItems = await $fetch<ApiNavItem[]>(staticUrl);
-          return processApiItemsRecursive(staticItems);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[${options.storeId}] Attempting static JSON fallback: ${staticUrl}`)
+          }
+          const staticItems = await $fetch<ApiNavItem[]>(staticUrl)
+          return processApiItemsRecursive(staticItems)
         } catch (e) {
-          console.error(`[${options.storeId}] Static JSON fallback failed. Error:`, e);
+          console.error(`[${options.storeId}] Static JSON fallback failed. Error:`, e)
         }
       }
       return [];

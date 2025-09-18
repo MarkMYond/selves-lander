@@ -10,8 +10,8 @@ export const useWikiNavStore = createHierarchicalNavigationStore({
   childrenNavEndpointPattern: (parentId: string) => `/api/wiki-nav?parentId=${parentId}`,
   directApiFallbackPattern: (parentId: string | null | undefined) =>
     parentId
-      ? `/api/payload/wiki-pages?where[parent][equals]=${parentId}&where[status][equals]=published&sort=sort`
-      : `/api/payload/wiki-pages?where[parent][exists]=false&where[status][equals]=published&sort=sort`, // Top-level if no parentId
+      ? `/api/wiki-pages?where[parent][equals]=${parentId}&where[status][equals]=published&sort=sort`
+      : `/api/wiki-pages?where[parent][exists]=false&where[status][equals]=published&sort=sort`, // Top-level if no parentId
   collectionSlug: 'wiki-pages',
   staticJsonFallbackUrl: '/wiki-navigation.json', // If you have a static fallback for wiki
 });

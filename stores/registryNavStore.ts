@@ -11,8 +11,8 @@ export const useRegistryNavStore = createHierarchicalNavigationStore({
   childrenNavEndpointPattern: (parentId: string) => `/api/registry-nav?parentId=${parentId}`,
   directApiFallbackPattern: (parentId: string | null | undefined) => 
     parentId 
-      ? `/api/payload/registry-pages?where[parent][equals]=${parentId}&where[status][equals]=published&sort=sort`
-      : `/api/payload/registry-pages?where[parent][exists]=false&where[status][equals]=published&sort=sort`, // Top-level if no parentId
+      ? `/api/registry-pages?where[parent][equals]=${parentId}&where[status][equals]=published&sort=sort`
+      : `/api/registry-pages?where[parent][exists]=false&where[status][equals]=published&sort=sort`, // Top-level if no parentId
   collectionSlug: 'registry-pages',
   staticJsonFallbackUrl: '/registry-navigation.json',
 });
