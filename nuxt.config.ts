@@ -8,6 +8,9 @@ export default defineNuxtConfig({
         // { hid: 'description', name: 'description', content: 'Your page description here.' }
       ],
       link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/png', href: '/favicon-v2.png' },
+        { rel: 'apple-touch-icon', href: '/favicon-v2.png' },
         { rel: 'alternate', type: 'application/ld+json', href: '/api/room-data.json' }
       ],
       script: [
