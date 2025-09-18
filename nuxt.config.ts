@@ -11,8 +11,7 @@ export default defineNuxtConfig({
         { rel: 'alternate', type: 'application/ld+json', href: '/api/room-data.json' }
       ],
       script: [
-        { type: 'importmap', innerHTML: '{"imports":{"#entry":"/_nuxt/entry.DkiX8Wm2.js"}}' },
-  // elevenlabs widget removed
+        // elevenlabs widget removed
       ]
     }
   },

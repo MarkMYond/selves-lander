@@ -48,10 +48,7 @@
             </div>
             <div
               class="cta-shape absolute top-0 bottom-0 right-[-110px] w-[70%] bg-no-repeat bg-contain hidden lg:block"
-              style="
-                background-image: url('/webflow-assets/images/cta-shape.svg');
-                z-index: -1;
-              "
+              :style="{ backgroundImage: `url(${ctaShapeUrl})`, zIndex: -1 }"
             />
           </div>
         </div>
@@ -199,9 +196,11 @@ import { useMediaUrl } from '../composables/useMediaUrl'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue' // Import SectionHeader
 import whiteLogoUrl from '@/assets/images/white-logo.svg?url'
+import ctaShape from '@/assets/images/cta-shape.svg?url'
 
 const { getMediaUrl } = useMediaUrl()
 const emailForSubscription = ref('')
+const ctaShapeUrl = ctaShape
 
 const handleSubscribe = () => {
   console.log('Subscribing with email:', emailForSubscription.value)
