@@ -79,7 +79,7 @@
                 class="navbar-brand-footer inline-block"
               >
                 <img
-                  src="/white-logo.svg"
+                  :src="whiteLogoSrc"
                   :alt="siteName + ' Logo'"
                   class="footer-logo h-9"
                 >
@@ -338,6 +338,9 @@ const getEyebrowBgClass = (bgColorValue?: string | null) => {
       return 'bg-brandTheme-02' // Fallback default if value is unexpected or null
   }
 }
+
+// Bind white logo source to avoid Vite rewriting in certain environments
+const whiteLogoSrc = '/white-logo.svg'
 </script>
 
 <style scoped>

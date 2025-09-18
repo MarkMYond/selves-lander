@@ -5,7 +5,7 @@
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-[72px]">
                   <NuxtLink to="/" class="flex items-center">
-                    <img src="/logo.svg" alt="Company Logo" class="h-[44px] w-auto" />
+                    <img :src="logoSrc" alt="Company Logo" class="h-[44px] w-auto" />
                   </NuxtLink>
                   <nav class="hidden lg:flex">
                     <ul class="flex items-center gap-[30px]">
@@ -57,6 +57,9 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 const isMobileMenuOpen = ref(false)
 const megaMenuVisible = ref(false)
 const mobileMegaMenuOpen = ref(false)
+
+// Use a bound src so Vite doesn't rewrite to an import on Vercel
+const logoSrc = '/logo.svg'
 
 const toggleMegaMenu = () => {
   if (window.innerWidth < 1024) {
